@@ -1,153 +1,119 @@
-
 <!doctype html>
-<html>
-    <head>
-		<title>
-			Liens
-	  </title>
-	  <meta charset="utf-8" />
-		<meta name="viewport" content="width=device-width, user-scalable=no">
-		<style>
-			a:link,a:visited,a:hover,a:active{
-				text-decoration:none;
-				color:black;
-			}
-			body{
-				font-family:arial;
-				text-align:center;
-			}  
-			table.main{
-			    text-align:center;
-			}
-			table.liens{
-	    	    font-size:15px;
-	        	width:100%;
-				border-spacing:10px;
-			}
-			.titre{
-				font-size:1.5em;
-				background-color:white;
-				font-weight:bold;
-			}
-			.entete{
-				font-size:0.5em;
-				color:gray;
-			}
-		</style>
-	</head>
-	
-	<body>
-			
-<!-- BLOC EN-TÊTE -->
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <title>Liens de rappel</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      background: #fff;
+      color: #111;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+    #app {
+      width: 100%;
+      max-width: 400px;
+      padding: 20px;
+    }
+    .btn {
+      display: block;
+      padding: 15px;
+      margin: 10px 0;
+      border-radius: 12px;
+      background: #f3f3f3;
+      text-align: center;
+      font-size: 18px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .btn:hover {
+      background: #e5e5e5;
+    }
+    .link {
+      display: block;
+      padding: 12px;
+      margin: 8px 0;
+      border-radius: 10px;
+      background: #f9f9f9;
+      font-size: 16px;
+      text-decoration: none;
+      color: #111;
+    }
+    .link:hover {
+      background: #eee;
+    }
+    .back {
+      font-size: 14px;
+      color: #666;
+      margin-bottom: 15px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div id="app"></div>
 
-		<div align=right class="entete">
-			version Léo - 25/08/2025
-		</div>
-		<div align=center>
-			<table class="titre" border=0>
-				<tr>
-					<td width=32px align=right onclick="window.location.href='./index.html';">
-						<img src="https://static.s-sfr.fr/assets/logos/SFR.svg" height="30px"/>
-					</td>
-					<td onclick="window.location.href='./index.html';">
-						Liens utiles
-					</td>
-				</tr>
-			</table>
-			<br/>&nbsp;
-		</div>
+  <script>
+    const data = {
+      root: [
+        { id: "S", label: "SFR" },
+        { id: "R", label: "RED" }
+      ],
+      S: [
+        { label: "Déménagement", url: "https://appel.sfr.fr/webcallback_form?CAMPAIGN_ID=591bf8d780df1a8d4a8b4567" },
+        { label: "Technique FTTH", url: "https://appel.sfr.fr/webcallback_form?CAMPAIGN_ID=59089f4280df1a45398b4567" },
+        { label: "Résiliation", url: "https://appel.sfr.fr/webcallback_form?CAMPAIGN_ID=60ae5e5b3735652fb8000000" },
+        { label: "Réclamation conso box", url: "tel:0171251186" }
+      ],
+      R: [
+        { label: "Déménagement", url: "https://c.sfr.fr/red-demenagement/" },
+        { label: "Résiliation box", url: "https://c.sfr.fr/red-service-resiliation" },
+        { label: "Technique box", url: "https://c.sfr.fr/conseiller_technique_RED" }
+      ]
+    };
 
-<!-- BLOC LIENS -->
+    const app = document.getElementById("app");
+    let historyStack = [];
 
-		<table align=center class="liens" border=0 >
-	        <tr>
-	            <td colspan=2>
-	                <hr width=100% />
-	            </td>
-	        </tr>
-	        <tr>
-	            <td rowspan=6>
-		               <img src="https://static.s-sfr.fr/assets/logos/SFR.svg" height="30px" />
-		           </td>
-		           <td>
-		               <a href="https://appel.sfr.fr/webcallback_form?CAMPAIGN_ID=591bf8d780df1a8d4a8b4567" target="_blank">Déménagement</a>
-		           </td>
-		       </tr>
-		       <tr>
-		           <td>
-		               <a href="https://appel.sfr.fr/webcallback_form?CAMPAIGN_ID=59089f4280df1a45398b4567" target="_blank">Technique FTTH</a>
-		           </td>
-		       </tr>
-		       <tr>
-		           <td>
-		               <a href="https://appel.sfr.fr/webcallback_form?CAMPAIGN_ID=60ae5e5b3735652fb8000000" target="_blank">Résiliation</a>
-		           </td>
-		       </tr>
-		       <tr>
-		           <td>
-                 <a href="http://s.sfr.fr/comFixe_1" target="_blank">Premium fixe*</a>
-             </td>
-         </tr>
-         <tr>
-             <td>
-                 <a href="http://s.sfr.fr/comMob_1" target="_blank">Premium mobile*</a>
-             </td>
-         </tr>
-         <tr>
-             <td>
-                 <font size="1"><i>* un dossier premium doit être en cours</i></font>
-             </td>
-         </tr>
-         <tr>
-             <td colspan=2>
-                 <hr width=100% />
-             </td>
-         </tr>
-         <tr>
-             <td rowspan=3>
-                 <img src="https://static.s-sfr.fr/media/favicon-redbysfr.ico" width="30px" />
-             </td>
-             <td>
-                 <a href="https://c.sfr.fr/red-demenagement/" target="_blank">Déménagement</a>
-             </td>
-         </tr>
-         <tr>
-             <td>
-                 <a href="https://c.sfr.fr/red-service-resiliation" target="_blank">Résiliation box</a>
-             </td>
-         </tr>
-         <tr>
-             <td>
-                 <a href="https://c.sfr.fr/conseiller_technique_RED" target="_blank">Technique box</a>
-             </td>
-         </tr>
-         <tr>
-             <td colspan=2>
-                 <hr width=100% />
-             </td>
-         </tr>
-         <tr>
-             <td colspan=2>
-                 <a href="tel:0171251186" target="_blank">Réclamation conso box 0171251186</a>
-             </td>
-         </tr>
-         <tr>
-             <td colspan=2>
-                 <a href="https://assistance.sfr.fr/form/re/mobile/rech/reg/get.html" target="_blank">Formulaire recherche règlement mobile</a>
-             </td>
-         </tr>
-         <tr>
-             <td colspan=2>
-                 <a href="https://assistance.sfr.fr/form/re/fixe/rech/reg/get.html" target="_blank">Formulaire recherche règlement fixe</a>
-             </td>
-         </tr>
-     </table>
-		
-<!-- BLOC COMPTEUR DE VISITE -->
+    function renderMenu(id = "root") {
+      app.innerHTML = "";
+      if (id !== "root") {
+        const back = document.createElement("div");
+        back.className = "back";
+        back.textContent = "← Retour";
+        back.onclick = () => {
+          renderMenu(historyStack.pop() || "root");
+        };
+        app.appendChild(back);
+      }
 
-	<div align=center>
-		<img src="http://www.mon-compteur.fr/html_c01genv2-239199-5" height=10px/>
-	</div>
+      data[id].forEach(item => {
+        if (item.url) {
+          const a = document.createElement("a");
+          a.href = item.url;
+          a.target = "_blank";
+          a.className = "link";
+          a.textContent = item.label;
+          app.appendChild(a);
+        } else {
+          const btn = document.createElement("div");
+          btn.className = "btn";
+          btn.textContent = item.label;
+          btn.onclick = () => {
+            historyStack.push(id);
+            renderMenu(item.id);
+          };
+          app.appendChild(btn);
+        }
+      });
+    }
 
+    renderMenu();
+  </script>
 </body>
 </html>

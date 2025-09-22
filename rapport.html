@@ -22,8 +22,8 @@
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
 </head>
 <body>
-    <h1>Tableau de bord</h1>
-    <p id="instructionText">Sélectionnez votre fichier Excel pour afficher le suivi des objectifs.</p>
+    <h1>Résultats à date</h1>
+    <p id="instructionText">Tableau de bord</p>
 
     <input type="file" id="fileInput" accept=".xlsx">
     
@@ -40,7 +40,7 @@
     <script>
         document.getElementById('fileInput').addEventListener('change', handleFile, false);
 
-        // Plugin pour les multiples lignes de repère
+        // Plugin pour les lignes et les étiquettes de repère personnalisées
         const referenceLines = {
             id: 'referenceLines',
             beforeDatasetsDraw(chart) {
@@ -63,6 +63,12 @@
                         ctx.moveTo(xPos, top);
                         ctx.lineTo(xPos, bottom);
                         ctx.stroke();
+
+                        // Ajout de l'étiquette au-dessus de la ligne
+                        ctx.fillStyle = line.color;
+                        ctx.font = 'bold 12px Arial';
+                        ctx.textAlign = 'center';
+                        ctx.fillText(`${line.value}%`, xPos, top - 10);
                     }
                 });
                 ctx.restore();
@@ -183,9 +189,7 @@
                             beginAtZero: true,
                             max: 150,
                             ticks: {
-                                callback: function(value) {
-                                    return value + '%';
-                                }
+                                display: false, // Cache les étiquettes par défaut
                             }
                         }
                     }

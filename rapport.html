@@ -10,11 +10,9 @@
         h1 { color: #333; }
         .container { width: 80%; max-width: 900px; margin-top: 20px; }
         .hidden { display: none; }
-        .summary-table { width: 80%; max-width: 900px; margin-top: 40px; border-collapse: collapse; }
-        .summary-table th, .summary-table td { padding: 10px; border: 1px solid #ddd; text-align: left; }
-        .summary-table th { background-color: #f2f2f2; font-size: 1.1em; }
-        .summary-table .green { color: green; font-weight: bold; }
-        .summary-table .red { color: red; font-weight: bold; }
+        .summary-block { width: 80%; max-width: 900px; margin-top: 40px; }
+        .summary-block h2 { color: #dc3545; font-weight: bold; }
+        .summary-list { margin-top: 10px; line-height: 1.6; }
     </style>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -31,20 +29,10 @@
         <canvas id="prioritiesChart"></canvas>
     </div>
     
-    <table id="summaryTable" class="summary-table hidden">
-        <thead>
-            <tr>
-                <th class="green">Avances</th>
-                <th class="red">Retards</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td id="advances"></td>
-                <td id="delays"></td>
-            </tr>
-        </tbody>
-    </table>
+    <div id="summaryBlock" class="summary-block hidden">
+        <h2>Priorités à rattraper :</h2>
+        <div id="delaysList" class="summary-list"></div>
+    </div>
 
     <script>
         document.getElementById('fileInput').addEventListener('change', handleFile, false);
@@ -73,7 +61,7 @@
 
             document.getElementById('fileInput').classList.add('hidden');
             document.getElementById('instructionText').classList.add('hidden');
-            document.getElementById('summaryTable').classList.remove('hidden');
+            document.getElementById('summaryBlock').classList.remove('hidden');
 
             const reader = new FileReader();
             reader.onload = function(event) {
@@ -97,7 +85,6 @@
                 const backgroundColors = [];
                 const borderColors = [];
                 const datalabelsText = [];
-                const advancesList = [];
                 const delaysList = [];
 
                 priorities.forEach(p => {
@@ -114,28 +101,26 @@
                     chartLabels.push(p.name);
                     chartData.push(percentage);
 
-                    // Arrondi de O à l'entier supérieur pour l'affichage 'R / O'
                     const roundedOValue = Math.ceil(oValue);
                     datalabelsText.push(`${Math.round(rValue)} / ${roundedOValue}`);
                     
-                    // Calcul de la différence et arrondi à l'entier le plus proche
-                    const difference = Math.round(rValue - oValue);
-                    
-                    if (difference >= 0) {
-                        advancesList.push(`${p.name} : +${difference}`);
+                    if (percentage >= 100) {
                         backgroundColors.push('#28a745');
                         borderColors.push('#1e7e34');
                     } else {
-                        // Arrondi de la différence négative à l'entier supérieur
-                        const roundedDifference = Math.ceil(difference);
-                        delaysList.push(`${p.name} : ${roundedDifference}`);
                         backgroundColors.push('#dc3545');
                         borderColors.push('#bd2130');
+
+                        // Calcul du retard et arrondi à l'entier supérieur
+                        const delay = Math.ceil(oValue - rValue);
+                        if (delay > 0) {
+                            delaysList.push(`${p.name} : ${delay}`);
+                        }
                     }
                 });
 
                 displayPrioritiesChart(chartLabels, chartData, backgroundColors, borderColors, datalabelsText);
-                updateSummaryTable(advancesList, delaysList);
+                updateDelaysList(delaysList);
             };
             reader.readAsArrayBuffer(file);
         }
@@ -187,9 +172,13 @@
             });
         }
 
-        function updateSummaryTable(advances, delays) {
-            document.getElementById('advances').innerHTML = advances.join('<br>');
-            document.getElementById('delays').innerHTML = delays.join('<br>');
+        function updateDelaysList(delays) {
+            const delaysContainer = document.getElementById('delaysList');
+            if (delays.length > 0) {
+                delaysContainer.innerHTML = delays.join('<br>');
+            } else {
+                delaysContainer.innerHTML = "Aucune priorité à rattraper !";
+            }
         }
     </script>
 </body>

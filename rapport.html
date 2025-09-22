@@ -9,7 +9,7 @@
         body { font-family: Arial, sans-serif; display: flex; flex-direction: column; align-items: center; padding: 10px; }
         h1 { color: #333; margin-top: 0; margin-bottom: 10px; }
         .score-display { text-align: center; font-size: 1.5em; font-weight: bold; margin-bottom: 5px; }
-        .container { width: 100%; max-width: 900px; height: 285px; margin-top: 10px; }
+        .container { width: 95%; max-width: 900px; height: 285px; margin-top: 10px; }
         .hidden { display: none; }
         .summary-block { width: 100%; max-width: 900px; margin-top: 10px; text-align: center; }
         .summary-block h2 { color: #dc3545; font-weight: bold; }
@@ -56,6 +56,7 @@
                 lines.forEach(line => {
                     const xPos = x.getPixelForValue(line.value);
                     if (xPos > left && xPos < right) {
+                        // Dessin de la ligne
                         ctx.beginPath();
                         ctx.strokeStyle = line.color;
                         ctx.setLineDash([5, 5]);
@@ -63,10 +64,22 @@
                         ctx.lineTo(xPos, bottom);
                         ctx.stroke();
 
+                        // Sauvegarde l'état du canvas avant la rotation
+                        ctx.save();
+                        
+                        // Réglage de la couleur et de la police du texte
                         ctx.fillStyle = line.color;
                         ctx.font = 'bold 12px Arial';
-                        ctx.textAlign = 'center';
-                        ctx.fillText(`${line.value}%`, xPos, bottom + 15);
+
+                        // Déplacement du point de rotation au bas de la ligne
+                        ctx.translate(xPos, bottom + 5);
+                        // Rotation du texte de 90 degrés vers la gauche
+                        ctx.rotate(-Math.PI / 2);
+                        // Dessin du texte
+                        ctx.fillText(`${line.value}%`, 0, 0);
+                        
+                        // Restaure l'état précédent du canvas
+                        ctx.restore();
                     }
                 });
                 ctx.restore();

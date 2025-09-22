@@ -43,7 +43,7 @@
         const referenceLines = {
             id: 'referenceLines',
             beforeDatasetsDraw(chart) {
-                const { ctx, chartArea: { top, bottom, left, right, width, height }, scales: { x } } = chart;
+                const { ctx, chartArea: { top, bottom, left, right, width, height }, scales: { x, y } } = chart;
                 ctx.save();
 
                 const lines = [
@@ -52,6 +52,9 @@
                     { value: 125, color: 'gold' },
                     { value: 150, color: 'gold' }
                 ];
+
+                // Y-position for the labels, which is now above the X-axis
+                const labelsYPos = y.getPixelForValue(y.max) - 20;
 
                 lines.forEach(line => {
                     const xPos = x.getPixelForValue(line.value);
@@ -73,9 +76,8 @@
                         ctx.textAlign = 'center';
                         ctx.textBaseline = 'middle';
 
-                        // Déplacement du point de rotation au bas de la zone de tracé
-                        // J'ai augmenté la valeur de 15px à 35px pour qu'il soit bien sous l'axe.
-                        ctx.translate(xPos, bottom + 35);
+                        // Déplacement du point de rotation
+                        ctx.translate(xPos, labelsYPos);
                         // Rotation du texte de 90 degrés vers la gauche
                         ctx.rotate(-Math.PI / 2);
                         // Dessin du texte
@@ -112,7 +114,9 @@
                     { name: 'Pro', R: 'K22', O: 'I22' },
                     { name: 'Assu', R: 'K28', O: 'I28' },
                     { name: 'Access', R: 'K29', O: 'I29' },
-                    { name: 'Canal+', R: 'K21', O: 'I21' }
+                    { name: 'Canal+', R: 'K21', O: 'I21' },
+                    // Ligne vide pour créer de l'espace en bas
+                    { name: ' ', R: null, O: null }
                 ];
 
                 const chartLabels = [];
@@ -124,6 +128,16 @@
                 let score = 0;
 
                 priorities.forEach(p => {
+                    // Pour la ligne vide, nous n'avons pas de valeurs
+                    if (p.R === null && p.O === null) {
+                        chartLabels.push(p.name);
+                        chartData.push(0);
+                        backgroundColors.push('rgba(0,0,0,0)');
+                        borderColors.push('rgba(0,0,0,0)');
+                        datalabelsText.push('');
+                        return;
+                    }
+
                     const rCell = worksheet[p.R];
                     const oCell = worksheet[p.O];
                     const rValue = rCell ? (rCell.v || 0) : 0;
@@ -155,7 +169,7 @@
                     }
                 });
 
-                document.getElementById('scoreDisplay').textContent = `Score : ${score}/${priorities.length}`;
+                document.getElementById('scoreDisplay').textContent = `Score : ${score}/${priorities.length - 1}`; // -1 pour ne pas compter la ligne vide
                 displayPrioritiesChart(chartLabels, chartData, backgroundColors, borderColors, datalabelsText);
                 updateDelaysList(delaysList);
             };

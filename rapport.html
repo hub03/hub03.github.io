@@ -8,11 +8,13 @@
     <style>
         body { font-family: Arial, sans-serif; display: flex; flex-direction: column; align-items: center; padding: 20px; }
         h1 { color: #333; }
+        .score-display { text-align: center; font-size: 2.5em; font-weight: bold; margin-bottom: 20px; }
         .container { width: 80%; max-width: 900px; margin-top: 20px; }
         .hidden { display: none; }
-        .summary-block { width: 80%; max-width: 900px; margin-top: 40px; }
+        .summary-block { width: 80%; max-width: 900px; margin-top: 40px; text-align: center; }
         .summary-block h2 { color: #dc3545; font-weight: bold; }
         .summary-list { margin-top: 10px; line-height: 1.6; }
+        .delay-value { font-size: 1.2em; font-weight: bold; color: #dc3545; }
     </style>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -25,6 +27,7 @@
 
     <input type="file" id="fileInput" accept=".xlsx">
     
+    <div id="scoreDisplay" class="score-display hidden"></div>
     <div class="container">
         <canvas id="prioritiesChart"></canvas>
     </div>
@@ -61,6 +64,7 @@
 
             document.getElementById('fileInput').classList.add('hidden');
             document.getElementById('instructionText').classList.add('hidden');
+            document.getElementById('scoreDisplay').classList.remove('hidden');
             document.getElementById('summaryBlock').classList.remove('hidden');
 
             const reader = new FileReader();
@@ -86,6 +90,7 @@
                 const borderColors = [];
                 const datalabelsText = [];
                 const delaysList = [];
+                let score = 0;
 
                 priorities.forEach(p => {
                     const rCell = worksheet[p.R];
@@ -105,20 +110,21 @@
                     datalabelsText.push(`${Math.round(rValue)} / ${roundedOValue}`);
                     
                     if (percentage >= 100) {
+                        score++; // Incrémente le score
                         backgroundColors.push('#28a745');
                         borderColors.push('#1e7e34');
                     } else {
                         backgroundColors.push('#dc3545');
                         borderColors.push('#bd2130');
 
-                        // Calcul du retard et arrondi à l'entier supérieur
                         const delay = Math.ceil(oValue - rValue);
                         if (delay > 0) {
-                            delaysList.push(`${p.name} : ${delay}`);
+                            delaysList.push(`${p.name} : <span class="delay-value">${delay}</span>`);
                         }
                     }
                 });
 
+                document.getElementById('scoreDisplay').textContent = `Score : ${score}/${priorities.length}`;
                 displayPrioritiesChart(chartLabels, chartData, backgroundColors, borderColors, datalabelsText);
                 updateDelaysList(delaysList);
             };

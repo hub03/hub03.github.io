@@ -71,8 +71,8 @@
                         ctx.fillStyle = line.color;
                         ctx.font = 'bold 12px Arial';
 
-                        // Déplacement du point de rotation au bas de la ligne
-                        ctx.translate(xPos, bottom + 5);
+                        // Déplacement du point de rotation au bas de la zone de tracé
+                        ctx.translate(xPos, bottom + 15);
                         // Rotation du texte de 90 degrés vers la gauche
                         ctx.rotate(-Math.PI / 2);
                         // Dessin du texte
@@ -198,7 +198,7 @@
                     scales: {
                         x: {
                             beginAtZero: true,
-                            max: 150,
+                            max: 160,
                             ticks: {
                                 display: false,
                             }

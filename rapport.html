@@ -10,10 +10,16 @@
         h1 { color: #333; }
         .container { width: 80%; max-width: 900px; margin-top: 20px; }
         .hidden { display: none; }
+        .summary-table { width: 80%; max-width: 900px; margin-top: 40px; border-collapse: collapse; }
+        .summary-table th, .summary-table td { padding: 10px; border: 1px solid #ddd; text-align: left; }
+        .summary-table th { background-color: #f2f2f2; font-size: 1.1em; }
+        .summary-table .green { color: green; font-weight: bold; }
+        .summary-table .red { color: red; font-weight: bold; }
     </style>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
 </head>
 <body>
     <h1>Tableau de bord des priorités</h1>
@@ -24,17 +30,30 @@
     <div class="container">
         <canvas id="prioritiesChart"></canvas>
     </div>
+    
+    <table id="summaryTable" class="summary-table hidden">
+        <thead>
+            <tr>
+                <th class="green">Avances</th>
+                <th class="red">Retards</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td id="advances"></td>
+                <td id="delays"></td>
+            </tr>
+        </tbody>
+    </table>
 
     <script>
         document.getElementById('fileInput').addEventListener('change', handleFile, false);
 
-        // Définir un plugin pour la ligne de 100%
         const targetLine = {
             id: 'targetLine',
             beforeDatasetsDraw(chart) {
                 const { ctx, chartArea: { top, bottom, left, right, width, height }, scales: { x, y } } = chart;
                 ctx.save();
-
                 const targetX = x.getPixelForValue(100);
                 if (targetX > left && targetX < right) {
                     ctx.beginPath();
@@ -52,9 +71,9 @@
             const file = e.target.files[0];
             if (!file) return;
 
-            // Masquer les éléments
             document.getElementById('fileInput').classList.add('hidden');
             document.getElementById('instructionText').classList.add('hidden');
+            document.getElementById('summaryTable').classList.remove('hidden');
 
             const reader = new FileReader();
             reader.onload = function(event) {
@@ -77,12 +96,16 @@
                 const chartData = [];
                 const backgroundColors = [];
                 const borderColors = [];
+                const datalabelsText = [];
+                const advancesList = [];
+                const delaysList = [];
 
                 priorities.forEach(p => {
                     const rCell = worksheet[p.R];
                     const oCell = worksheet[p.O];
                     const rValue = rCell ? (rCell.v || 0) : 0;
                     const oValue = oCell ? (oCell.v || 0) : 0;
+                    
                     let percentage = 0;
                     if (oValue !== 0) {
                         percentage = (rValue / oValue) * 100;
@@ -90,26 +113,29 @@
 
                     chartLabels.push(p.name);
                     chartData.push(percentage);
-
-                    if (percentage >= 100) {
-                        backgroundColors.push('#28a745'); // Vert vif
+                    datalabelsText.push(`${rValue} / ${oValue}`);
+                    
+                    const difference = Math.round(rValue - oValue);
+                    
+                    if (difference >= 0) {
+                        advancesList.push(`${p.name} : +${difference}`);
+                        backgroundColors.push('#28a745');
                         borderColors.push('#1e7e34');
-                    } else if (percentage >= 80) {
-                        backgroundColors.push('#ffc107'); // Jaune
-                        borderColors.push('#d39e00');
                     } else {
-                        backgroundColors.push('#dc3545'); // Rouge
+                        delaysList.push(`${p.name} : ${difference}`);
+                        backgroundColors.push('#dc3545');
                         borderColors.push('#bd2130');
                     }
                 });
-                displayPrioritiesChart(chartLabels, chartData, backgroundColors, borderColors);
+
+                displayPrioritiesChart(chartLabels, chartData, backgroundColors, borderColors, datalabelsText);
+                updateSummaryTable(advancesList, delaysList);
             };
             reader.readAsArrayBuffer(file);
         }
 
-        function displayPrioritiesChart(labels, data, colors, borders) {
+        function displayPrioritiesChart(labels, data, colors, borders, datalabels) {
             const ctx = document.getElementById('prioritiesChart').getContext('2d');
-            
             if (window.myChartInstance) {
                 window.myChartInstance.destroy();
             }
@@ -119,20 +145,25 @@
                 data: {
                     labels: labels,
                     datasets: [{
-                        label: 'Pourcentage de réalisation',
                         data: data,
                         backgroundColor: colors,
                         borderColor: borders,
-                        borderWidth: 1
+                        borderWidth: 1,
+                        datalabels: {
+                            anchor: 'end',
+                            align: 'right',
+                            formatter: (value, context) => {
+                                return datalabels[context.dataIndex];
+                            }
+                        }
                     }]
                 },
                 options: {
                     indexAxis: 'y',
                     responsive: true,
                     plugins: {
-                        legend: {
-                            display: false // Masque la légende
-                        }
+                        legend: { display: false },
+                        tooltip: { enabled: false },
                     },
                     scales: {
                         x: {
@@ -146,8 +177,13 @@
                         }
                     }
                 },
-                plugins: [targetLine] // Ajoute le plugin de la ligne de 100%
+                plugins: [ChartDataLabels, targetLine]
             });
+        }
+
+        function updateSummaryTable(advances, delays) {
+            document.getElementById('advances').innerHTML = advances.join('<br>');
+            document.getElementById('delays').innerHTML = delays.join('<br>');
         }
     </script>
 </body>

@@ -8,10 +8,10 @@
     <style>
         body { font-family: Arial, sans-serif; display: flex; flex-direction: column; align-items: center; padding: 10px; }
         h1 { color: #333; margin-top: 0; margin-bottom: 10px; }
-        .score-display { text-align: center; font-size: 1.5em; font-weight: bold; margin-bottom: 10px; }
-        .container { width: 100%; max-width: 900px; height: 333px; margin-top: 20px; }
+        .score-display { text-align: center; font-size: 1.5em; font-weight: bold; margin-bottom: 5px; }
+        .container { width: 100%; max-width: 900px; height: 285px; margin-top: 10px; margin-bottom: 20px; }
         .hidden { display: none; }
-        .summary-block { width: 100%; max-width: 900px; margin-top: 40px; text-align: center; }
+        .summary-block { width: 100%; max-width: 900px; margin-top: 20px; text-align: center; }
         .summary-block h2 { color: #dc3545; font-weight: bold; }
         .summary-list { margin-top: 10px; line-height: 1.6; }
         .delay-value { font-size: 1.2em; font-weight: bold; color: #dc3545; }
@@ -22,7 +22,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
 </head>
 <body>
-    <h1>Résultats à date</h1>
+    <h1>Tableau de bord</h1>
     <p id="instructionText">Sélectionnez votre fichier Excel pour afficher le suivi des objectifs.</p>
 
     <input type="file" id="fileInput" accept=".xlsx">
@@ -40,21 +40,32 @@
     <script>
         document.getElementById('fileInput').addEventListener('change', handleFile, false);
 
-        const targetLine = {
-            id: 'targetLine',
+        // Plugin pour les multiples lignes de repère
+        const referenceLines = {
+            id: 'referenceLines',
             beforeDatasetsDraw(chart) {
-                const { ctx, chartArea: { top, bottom, left, right, width, height }, scales: { x, y } } = chart;
+                const { ctx, chartArea: { top, bottom, left, right, width, height }, scales: { x } } = chart;
                 ctx.save();
-                const targetX = x.getPixelForValue(100);
-                if (targetX > left && targetX < right) {
-                    ctx.beginPath();
-                    ctx.strokeStyle = 'red';
-                    ctx.setLineDash([5, 5]);
-                    ctx.moveTo(targetX, top);
-                    ctx.lineTo(targetX, bottom);
-                    ctx.stroke();
-                    ctx.restore();
-                }
+
+                const lines = [
+                    { value: 90, color: 'red' },
+                    { value: 100, color: 'green' },
+                    { value: 125, color: 'gold' },
+                    { value: 150, color: 'gold' }
+                ];
+
+                lines.forEach(line => {
+                    const xPos = x.getPixelForValue(line.value);
+                    if (xPos > left && xPos < right) {
+                        ctx.beginPath();
+                        ctx.strokeStyle = line.color;
+                        ctx.setLineDash([5, 5]);
+                        ctx.moveTo(xPos, top);
+                        ctx.lineTo(xPos, bottom);
+                        ctx.stroke();
+                    }
+                });
+                ctx.restore();
             }
         };
 
@@ -62,8 +73,8 @@
             const file = e.target.files[0];
             if (!file) return;
 
-            document.getElementById('fileInput').classList.add('hidden');
             document.getElementById('instructionText').classList.add('hidden');
+            document.getElementById('fileInput').classList.add('hidden');
             document.getElementById('scoreDisplay').classList.remove('hidden');
             document.getElementById('summaryBlock').classList.remove('hidden');
 
@@ -149,9 +160,9 @@
                         datalabels: {
                             anchor: 'center',
                             align: 'center',
-                            color: 'white', // Met le texte en blanc
+                            color: 'white',
                             font: {
-                                weight: 'bold' // Met le texte en gras
+                                weight: 'bold'
                             },
                             formatter: (value, context) => {
                                 return datalabels[context.dataIndex];
@@ -170,7 +181,7 @@
                     scales: {
                         x: {
                             beginAtZero: true,
-                            max: 200,
+                            max: 150,
                             ticks: {
                                 callback: function(value) {
                                     return value + '%';
@@ -179,7 +190,7 @@
                         }
                     }
                 },
-                plugins: [ChartDataLabels, targetLine]
+                plugins: [ChartDataLabels, referenceLines]
             });
         }
 

@@ -7,7 +7,7 @@
     
     <style>
         body { font-family: Arial, sans-serif; display: flex; flex-direction: column; align-items: center; padding: 10px; }
-        h1 { color: #333; margin-top: 0; margin-bottom: 10px; }
+        h1#dynamicTitle { color: #333; margin-top: 0; margin-bottom: 10px; font-size: 1.5em; }
         .score-display { text-align: center; font-size: 1.5em; font-weight: bold; margin-bottom: 5px; }
         .container { width: 95%; max-width: 900px; height: 320px; margin-top: 10px; }
         .hidden { display: none; }
@@ -22,7 +22,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
 </head>
 <body>
-    <h1>Résultats à date</h1>
+    <h1 id="dynamicTitle" class="hidden"></h1>
     <p id="instructionText">Tableau de bord</p>
 
     <input type="file" id="fileInput" accept=".xlsx">
@@ -81,6 +81,14 @@
                 const data = new Uint8Array(event.target.result);
                 const workbook = XLSX.read(data, { type: 'array' });
                 const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+
+                // Lire le titre de la cellule A7
+                const titleCell = worksheet['A7'];
+                if (titleCell && titleCell.v) {
+                    const dynamicTitleElement = document.getElementById('dynamicTitle');
+                    dynamicTitleElement.textContent = titleCell.v;
+                    dynamicTitleElement.classList.remove('hidden');
+                }
 
                 const priorities = [
                     { name: 'Box VR', R: 'K18', O: 'I18' },

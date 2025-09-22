@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Analyse de données commerciales</title>
+    <title>Analyse des priorités commerciales</title>
     
     <style>
         body { font-family: Arial, sans-serif; display: flex; flex-direction: column; align-items: center; padding: 20px; }
@@ -15,13 +15,13 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-    <h1>Tableau de bord commercial</h1>
-    <p>Sélectionnez votre fichier Excel de résultats pour voir les graphiques.</p>
+    <h1>Tableau de bord des priorités</h1>
+    <p>Sélectionnez votre fichier Excel pour afficher le suivi des objectifs.</p>
 
     <input type="file" id="fileInput" accept=".xlsx">
     
     <div class="container">
-        <canvas id="myChart"></canvas>
+        <canvas id="prioritiesChart"></canvas>
     </div>
 
     <script>
@@ -35,52 +35,91 @@
             reader.onload = function(event) {
                 const data = new Uint8Array(event.target.result);
                 const workbook = XLSX.read(data, { type: 'array' });
+                const worksheet = workbook.Sheets[workbook.SheetNames[0]];
 
-                // Accéder à la première feuille de calcul
-                const sheetName = workbook.SheetNames[0];
-                const worksheet = workbook.Sheets[sheetName];
-                
-                // Convertir les données de la feuille en format JSON
-                const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
-                
-                // Appeler la fonction pour dessiner le graphique
-                displayChart(jsonData);
+                // Définition des priorités et des cellules correspondantes
+                const priorities = [
+                    { name: 'Box VR', R: 'K18', O: 'I18' },
+                    { name: 'Abo', R: 'K24', O: 'I24' },
+                    { name: 'Mig VR', R: 'K20', O: 'I20' },
+                    { name: 'Terminaux', R: 'K27', O: 'I27' },
+                    { name: 'Pro', R: 'K22', O: 'I22' },
+                    { name: 'Assu', R: 'K28', O: 'I28' },
+                    { name: 'Access', R: 'K29', O: 'I29' },
+                    { name: 'Canal+', R: 'K21', O: 'I21' }
+                ];
+
+                const chartLabels = [];
+                const chartData = [];
+                const backgroundColors = [];
+
+                priorities.forEach(p => {
+                    const rCell = worksheet[p.R];
+                    const oCell = worksheet[p.O];
+
+                    // Vérifier si les cellules existent et ont une valeur
+                    const rValue = rCell ? (rCell.v || 0) : 0;
+                    const oValue = oCell ? (oCell.v || 0) : 0;
+
+                    let percentage = 0;
+                    if (oValue !== 0) {
+                        percentage = (rValue / oValue) * 100;
+                    }
+
+                    chartLabels.push(p.name);
+                    chartData.push(percentage);
+
+                    // Définir une couleur en fonction du pourcentage
+                    if (percentage >= 100) {
+                        backgroundColors.push('rgba(75, 192, 192, 0.8)'); // Vert pour 100% ou plus
+                    } else if (percentage >= 80) {
+                        backgroundColors.push('rgba(255, 206, 86, 0.8)'); // Jaune pour 80% à 99%
+                    } else {
+                        backgroundColors.push('rgba(255, 99, 132, 0.8)'); // Rouge pour moins de 80%
+                    }
+                });
+
+                displayPrioritiesChart(chartLabels, chartData, backgroundColors);
             };
             reader.readAsArrayBuffer(file);
         }
 
-        function displayChart(data) {
-            // Supposons que la première ligne contient les en-têtes (par exemple, "Produit", "Ventes")
-            const headers = data[0];
-            const rows = data.slice(1);
-
-            // Adaptez cette partie selon les colonnes de votre fichier Excel
-            // Exemple : supposons que la colonne "Produit" est à l'index 0 et "Ventes" à l'index 1
-            const labels = rows.map(row => row[0]); // Les noms des produits
-            const values = rows.map(row => row[1]); // Les chiffres de vente
-
-            const ctx = document.getElementById('myChart').getContext('2d');
+        function displayPrioritiesChart(labels, data, colors) {
+            const ctx = document.getElementById('prioritiesChart').getContext('2d');
             
             if (window.myChartInstance) {
-                window.myChartInstance.destroy(); // Détruit le graphique précédent si l'utilisateur charge un nouveau fichier
+                window.myChartInstance.destroy();
             }
 
             window.myChartInstance = new Chart(ctx, {
-                type: 'bar', // ou 'line', 'pie', etc. pour d'autres types de graphiques
+                type: 'bar',
                 data: {
                     labels: labels,
                     datasets: [{
-                        label: 'Résultats des ventes',
-                        data: values,
-                        backgroundColor: 'rgba(54, 162, 235, 0.5)',
-                        borderColor: 'rgba(54, 162, 235, 1)',
+                        label: 'Pourcentage de réalisation',
+                        data: data,
+                        backgroundColor: colors,
+                        borderColor: colors.map(c => c.replace('0.8', '1')),
                         borderWidth: 1
                     }]
                 },
                 options: {
+                    indexAxis: 'y', // Convertit l'histogramme en mode horizontal
                     responsive: true,
                     scales: {
-                        y: { beginAtZero: true }
+                        x: {
+                            beginAtZero: true,
+                            max: 100,
+                            title: {
+                                display: true,
+                                text: 'Pourcentage de réalisation (%)'
+                            },
+                            ticks: {
+                                callback: function(value) {
+                                    return value + '%';
+                                }
+                            }
+                        }
                     }
                 }
             });

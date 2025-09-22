@@ -8,8 +8,8 @@
     <style>
         body { font-family: Arial, sans-serif; display: flex; flex-direction: column; align-items: center; padding: 20px; }
         h1 { color: #333; }
-        .score-display { text-align: center; font-size: 2.5em; font-weight: bold; margin-bottom: 20px; }
-        .container { width: 80%; max-width: 900px; margin-top: 20px; }
+        .score-display { text-align: center; font-size: 1.5em; font-weight: bold; margin-bottom: 20px; }
+        .container { width: 80%; max-width: 900px; margin-top: 20px; height: 500px; }
         .hidden { display: none; }
         .summary-block { width: 80%; max-width: 900px; margin-top: 40px; text-align: center; }
         .summary-block h2 { color: #dc3545; font-weight: bold; }
@@ -22,7 +22,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
 </head>
 <body>
-    <h1>Tableau de bord des priorités</h1>
+    <h1>Résultats à date</h1>
     <p id="instructionText">Sélectionnez votre fichier Excel pour afficher le suivi des objectifs.</p>
 
     <input type="file" id="fileInput" accept=".xlsx">
@@ -110,7 +110,7 @@
                     datalabelsText.push(`${Math.round(rValue)} / ${roundedOValue}`);
                     
                     if (percentage >= 100) {
-                        score++; // Incrémente le score
+                        score++;
                         backgroundColors.push('#28a745');
                         borderColors.push('#1e7e34');
                     } else {
@@ -147,8 +147,8 @@
                         borderColor: borders,
                         borderWidth: 1,
                         datalabels: {
-                            anchor: 'end',
-                            align: 'right',
+                            anchor: 'center', // Positionne l'étiquette au centre
+                            align: 'center', // Centre l'alignement
                             formatter: (value, context) => {
                                 return datalabels[context.dataIndex];
                             }
@@ -158,6 +158,7 @@
                 options: {
                     indexAxis: 'y',
                     responsive: true,
+                    maintainAspectRatio: false, // Permet de définir une hauteur fixe
                     plugins: {
                         legend: { display: false },
                         tooltip: { enabled: false },

@@ -113,8 +113,12 @@
 
                     chartLabels.push(p.name);
                     chartData.push(percentage);
-                    datalabelsText.push(`${rValue} / ${oValue}`);
+
+                    // Arrondi de O à l'entier supérieur pour l'affichage 'R / O'
+                    const roundedOValue = Math.ceil(oValue);
+                    datalabelsText.push(`${Math.round(rValue)} / ${roundedOValue}`);
                     
+                    // Calcul de la différence et arrondi à l'entier le plus proche
                     const difference = Math.round(rValue - oValue);
                     
                     if (difference >= 0) {
@@ -122,7 +126,9 @@
                         backgroundColors.push('#28a745');
                         borderColors.push('#1e7e34');
                     } else {
-                        delaysList.push(`${p.name} : ${difference}`);
+                        // Arrondi de la différence négative à l'entier supérieur
+                        const roundedDifference = Math.ceil(difference);
+                        delaysList.push(`${p.name} : ${roundedDifference}`);
                         backgroundColors.push('#dc3545');
                         borderColors.push('#bd2130');
                     }

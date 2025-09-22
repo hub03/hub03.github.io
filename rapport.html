@@ -43,48 +43,24 @@
         const referenceLines = {
             id: 'referenceLines',
             beforeDatasetsDraw(chart) {
-                const { ctx, chartArea: { top, bottom, left, right, width, height }, scales: { x, y } } = chart;
+                const { ctx, chartArea: { top, bottom, left, right, width, height }, scales: { x } } = chart;
                 ctx.save();
 
                 const lines = [
-                    { value: 90, color: 'red' },
                     { value: 100, color: 'green' },
                     { value: 125, color: 'gold' },
                     { value: 150, color: 'gold' }
                 ];
-                
-                // Position Y pour les légendes, maintenant au-dessus de l'axe X
-                const labelsYPos = bottom + 35;
 
                 lines.forEach(line => {
                     const xPos = x.getPixelForValue(line.value);
                     if (xPos > left && xPos < right) {
-                        // Dessin de la ligne
                         ctx.beginPath();
                         ctx.strokeStyle = line.color;
                         ctx.setLineDash([5, 5]);
                         ctx.moveTo(xPos, top);
                         ctx.lineTo(xPos, bottom);
                         ctx.stroke();
-
-                        // Sauvegarde l'état du canvas avant la rotation
-                        ctx.save();
-                        
-                        // Réglage de la couleur et de la police du texte
-                        ctx.fillStyle = line.color;
-                        ctx.font = 'bold 12px Arial';
-                        ctx.textAlign = 'center';
-                        ctx.textBaseline = 'middle';
-
-                        // Déplacement du point de rotation au bas de la zone de tracé
-                        ctx.translate(xPos, labelsYPos);
-                        // Rotation du texte de 90 degrés vers la gauche
-                        ctx.rotate(-Math.PI / 2);
-                        // Dessin du texte
-                        ctx.fillText(`${line.value}%`, 0, 0);
-                        
-                        // Restaure l'état précédent du canvas
-                        ctx.restore();
                     }
                 });
                 ctx.restore();
@@ -114,9 +90,7 @@
                     { name: 'Pro', R: 'K22', O: 'I22' },
                     { name: 'Assu', R: 'K28', O: 'I28' },
                     { name: 'Access', R: 'K29', O: 'I29' },
-                    { name: 'Canal+', R: 'K21', O: 'I21' },
-                    // Ligne vide pour créer de l'espace en bas
-                    { name: ' ', R: null, O: null }
+                    { name: 'Canal+', R: 'K21', O: 'I21' }
                 ];
 
                 const chartLabels = [];
@@ -128,16 +102,6 @@
                 let score = 0;
 
                 priorities.forEach(p => {
-                    // Pour la ligne vide, nous n'avons pas de valeurs
-                    if (p.R === null && p.O === null) {
-                        chartLabels.push(p.name);
-                        chartData.push(0);
-                        backgroundColors.push('rgba(0,0,0,0)');
-                        borderColors.push('rgba(0,0,0,0)');
-                        datalabelsText.push('');
-                        return;
-                    }
-
                     const rCell = worksheet[p.R];
                     const oCell = worksheet[p.O];
                     const rValue = rCell ? (rCell.v || 0) : 0;
@@ -169,7 +133,7 @@
                     }
                 });
 
-                document.getElementById('scoreDisplay').textContent = `Score : ${score}/${priorities.length - 1}`;
+                document.getElementById('scoreDisplay').textContent = `Score : ${score}/${priorities.length}`;
                 displayPrioritiesChart(chartLabels, chartData, backgroundColors, borderColors, datalabelsText);
                 updateDelaysList(delaysList);
             };
@@ -215,9 +179,11 @@
                     scales: {
                         x: {
                             beginAtZero: true,
-                            max: 160,
+                            max: 150,
                             ticks: {
-                                display: false,
+                                callback: function(value) {
+                                    return value + '%';
+                                }
                             }
                         }
                     }

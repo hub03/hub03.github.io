@@ -9,6 +9,7 @@
         body { font-family: Arial, sans-serif; display: flex; flex-direction: column; align-items: center; padding: 20px; }
         h1 { color: #333; }
         .container { width: 80%; max-width: 900px; margin-top: 20px; }
+        .hidden { display: none; }
     </style>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -16,7 +17,7 @@
 </head>
 <body>
     <h1>Tableau de bord des priorités</h1>
-    <p>Sélectionnez votre fichier Excel pour afficher le suivi des objectifs.</p>
+    <p id="instructionText">Sélectionnez votre fichier Excel pour afficher le suivi des objectifs.</p>
 
     <input type="file" id="fileInput" accept=".xlsx">
     
@@ -27,9 +28,33 @@
     <script>
         document.getElementById('fileInput').addEventListener('change', handleFile, false);
 
+        // Définir un plugin pour la ligne de 100%
+        const targetLine = {
+            id: 'targetLine',
+            beforeDatasetsDraw(chart) {
+                const { ctx, chartArea: { top, bottom, left, right, width, height }, scales: { x, y } } = chart;
+                ctx.save();
+
+                const targetX = x.getPixelForValue(100);
+                if (targetX > left && targetX < right) {
+                    ctx.beginPath();
+                    ctx.strokeStyle = 'red';
+                    ctx.setLineDash([5, 5]);
+                    ctx.moveTo(targetX, top);
+                    ctx.lineTo(targetX, bottom);
+                    ctx.stroke();
+                    ctx.restore();
+                }
+            }
+        };
+
         async function handleFile(e) {
             const file = e.target.files[0];
             if (!file) return;
+
+            // Masquer les éléments
+            document.getElementById('fileInput').classList.add('hidden');
+            document.getElementById('instructionText').classList.add('hidden');
 
             const reader = new FileReader();
             reader.onload = function(event) {
@@ -37,7 +62,6 @@
                 const workbook = XLSX.read(data, { type: 'array' });
                 const worksheet = workbook.Sheets[workbook.SheetNames[0]];
 
-                // Définition des priorités et des cellules correspondantes
                 const priorities = [
                     { name: 'Box VR', R: 'K18', O: 'I18' },
                     { name: 'Abo', R: 'K24', O: 'I24' },
@@ -52,15 +76,13 @@
                 const chartLabels = [];
                 const chartData = [];
                 const backgroundColors = [];
+                const borderColors = [];
 
                 priorities.forEach(p => {
                     const rCell = worksheet[p.R];
                     const oCell = worksheet[p.O];
-
-                    // Vérifier si les cellules existent et ont une valeur
                     const rValue = rCell ? (rCell.v || 0) : 0;
                     const oValue = oCell ? (oCell.v || 0) : 0;
-
                     let percentage = 0;
                     if (oValue !== 0) {
                         percentage = (rValue / oValue) * 100;
@@ -69,22 +91,23 @@
                     chartLabels.push(p.name);
                     chartData.push(percentage);
 
-                    // Définir une couleur en fonction du pourcentage
                     if (percentage >= 100) {
-                        backgroundColors.push('rgba(75, 192, 192, 0.8)'); // Vert pour 100% ou plus
+                        backgroundColors.push('#28a745'); // Vert vif
+                        borderColors.push('#1e7e34');
                     } else if (percentage >= 80) {
-                        backgroundColors.push('rgba(255, 206, 86, 0.8)'); // Jaune pour 80% à 99%
+                        backgroundColors.push('#ffc107'); // Jaune
+                        borderColors.push('#d39e00');
                     } else {
-                        backgroundColors.push('rgba(255, 99, 132, 0.8)'); // Rouge pour moins de 80%
+                        backgroundColors.push('#dc3545'); // Rouge
+                        borderColors.push('#bd2130');
                     }
                 });
-
-                displayPrioritiesChart(chartLabels, chartData, backgroundColors);
+                displayPrioritiesChart(chartLabels, chartData, backgroundColors, borderColors);
             };
             reader.readAsArrayBuffer(file);
         }
 
-        function displayPrioritiesChart(labels, data, colors) {
+        function displayPrioritiesChart(labels, data, colors, borders) {
             const ctx = document.getElementById('prioritiesChart').getContext('2d');
             
             if (window.myChartInstance) {
@@ -99,21 +122,22 @@
                         label: 'Pourcentage de réalisation',
                         data: data,
                         backgroundColor: colors,
-                        borderColor: colors.map(c => c.replace('0.8', '1')),
+                        borderColor: borders,
                         borderWidth: 1
                     }]
                 },
                 options: {
-                    indexAxis: 'y', // Convertit l'histogramme en mode horizontal
+                    indexAxis: 'y',
                     responsive: true,
+                    plugins: {
+                        legend: {
+                            display: false // Masque la légende
+                        }
+                    },
                     scales: {
                         x: {
                             beginAtZero: true,
                             max: 200,
-                            title: {
-                                display: true,
-                                text: 'Pourcentage de réalisation (%)'
-                            },
                             ticks: {
                                 callback: function(value) {
                                     return value + '%';
@@ -121,7 +145,8 @@
                             }
                         }
                     }
-                }
+                },
+                plugins: [targetLine] // Ajoute le plugin de la ligne de 100%
             });
         }
     </script>

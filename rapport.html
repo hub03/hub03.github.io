@@ -2,12 +2,12 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Analyse des priorités commerciales</title>
     
     <style>
         body { font-family: Arial, sans-serif; display: flex; flex-direction: column; align-items: center; padding: 10px; }
-        h1#dynamicTitle { color: #333; margin-top: 0; margin-bottom: 10px; font-size: 1.5em; }
+        h1#dynamicTitle { color: #333; margin-top: 0; margin-bottom: 10px; font-size: 1.1em; }
         .score-display { text-align: center; font-size: 1.5em; font-weight: bold; margin-bottom: 5px; }
         .container { width: 95%; max-width: 900px; height: 320px; margin-top: 10px; }
         .hidden { display: none; }
@@ -68,13 +68,20 @@
             margin-top: 5px;
             margin-bottom: 5px;
         }
+
         .input-group input {
             width: 50px;
             text-align: center;
-            border: 1px solid #ccc;
-            border-radius: 4px;
+            border: none;
+            outline: none;
         }
-
+        .input-group-count input {
+            width: 30px;
+            text-align: center;
+            border: none;
+            outline: none;
+        }
+        
         .input-label {
             margin-left: 5px;
             font-size: 1em;
@@ -94,29 +101,35 @@
         Choisir un fichier
     </label>
     <input type="file" id="fileInput" accept=".xlsx" class="hidden-input">
-
-    <div id="metrics" class="metrics-container hidden">
-        <div class="metric-item">
-            <h3> Google</h3>
-            <div class="input-group">
-                <input type="tel" id="google-note" step="0.01" min="0" max="5">
-                <span class="input-label">/5</span>
-            </div>
-            <input type="tel" id="google-notes-count" min="0" max="99">
-        </div>
-        <div class="metric-item">
-            <h3> Goodays</h3>
-            <div class="input-group">
-                <input type="tel" id="goodays-note" step="0.01" min="0" max="5">
-                <span class="input-label">/5</span>
-            </div>
-            <input type="tel" id="goodays-notes-count" min="0" max="99">
-        </div>
-    </div>
     
     <div id="scoreDisplay" class="score-display hidden"></div>
     <div class="container">
         <canvas id="prioritiesChart"></canvas>
+    </div>
+    
+    <div id="metrics" class="metrics-container hidden">
+        <div class="metric-item">
+            <h3>Google</h3>
+            <div class="input-group">
+                <input type="tel" id="google-note" step="0.01" min="0" max="5">
+                <span class="input-label">/5</span>
+            </div>
+            <div class="input-group-count">
+                <input type="tel" id="google-notes-count" min="0" max="99">
+                <span class="input-label">notes</span>
+            </div>
+        </div>
+        <div class="metric-item">
+            <h3>Goodays</h3>
+            <div class="input-group">
+                <input type="tel" id="goodays-note" step="0.01" min="0" max="5">
+                <span class="input-label">/5</span>
+            </div>
+            <div class="input-group-count">
+                <input type="tel" id="goodays-notes-count" min="0" max="99">
+                <span class="input-label">notes</span>
+            </div>
+        </div>
     </div>
     
     <div id="summaryBlock" class="summary-block hidden">
@@ -162,8 +175,6 @@
             document.querySelector('.custom-file-button').classList.add('hidden');
             document.getElementById('scoreDisplay').classList.remove('hidden');
             document.getElementById('summaryBlock').classList.remove('hidden');
-            // Affiche la nouvelle section d'indicateurs
-            document.getElementById('metrics').classList.remove('hidden');
 
             const reader = new FileReader();
             reader.onload = function(event) {
@@ -181,7 +192,7 @@
                 const priorities = [
                     { name: 'Box VR', R: 'K18', O: 'I18' },
                     { name: 'Abo', R: 'K24', O: 'I24' },
-                    { name: 'Mig VR', R: 'K20', O: 'I20' },
+                    { name: 'Mig VR', 'R': 'K20', 'O': 'I20' },
                     { name: 'Terminaux', R: 'K27', O: 'I27' },
                     { name: 'Pro', R: 'K22', O: 'I22' },
                     { name: 'Assu', R: 'K28', O: 'I28' },
@@ -232,6 +243,9 @@
                 document.getElementById('scoreDisplay').textContent = `Score : ${score}/${priorities.length}`;
                 displayPrioritiesChart(chartLabels, chartData, backgroundColors, borderColors, datalabelsText);
                 updateDelaysList(delaysList);
+
+                // Affiche les champs de saisie après le chargement
+                document.getElementById('metrics').classList.remove('hidden');
             };
             reader.readAsArrayBuffer(file);
         }

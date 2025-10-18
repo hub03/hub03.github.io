@@ -44,7 +44,7 @@
 
         /* Styles spécifiques pour les champs de saisie */
         input[id="adultes"], input[id="enfants"], input[id="superficie"], input[id="fixeCout"], 
-        input[id^="coutLigne"], input[id="maisonCout"] {
+        input[id^="coutLigne"], input[id="maisonCout"], input[id="eqAutres"] {
             width: 70px;
             box-sizing: border-box; 
         }
@@ -61,7 +61,6 @@
 
         #selectChainesServices {
             width: 100%;
-            height: 120px;
             box-sizing: border-box;
             margin: 10px 0;
         }
@@ -247,7 +246,7 @@
                 <option>Free</option>
                 <option>Autre</option>
             </select>
-            <input type="number" id="fixeCout" placeholder="coût"> €/mois
+            <input type="number" id="fixeCout" placeholder="coût">€/mois
         </p>
         <p>
             <select id="fixeUsages">
@@ -260,7 +259,8 @@
             Nombre d'équipement du foyer (mobiles, tablettes, PC, TV, consoles...)
             <br><input type="tel" maxlength="2" id="eqAutres" placeholder="autres">
         </p>
-        <select multiple id="selectChainesServices">
+        <select multiple id="selectChainesServices" size=1>
+				<option hidden disabled selected>Centres d'intêret et abonnements SVOD</option>
             <optgroup label="Centres d'Intérêt">
                 <option>Sport</option>
                 <option>Ciné</option>
@@ -304,7 +304,7 @@
                 <option>Somfy</option>
                 <option>Autre</option>
             </select>
-            <input type="number" id="maisonCout" step="1.00" min="0" max="999.99" placeholder="coût">€/mois
+            <input type="number" id="maisonCout" step="1.00" min="0" max="999.99">€/mois
         </p>
         <textarea rows="3" id="commentMaison" placeholder="Commentaires"></textarea>
     </div>
@@ -313,7 +313,7 @@
         <h2>UNIVERS MOBILE</h2>
         <table>
             <tr>
-                <th>Ligne</th>
+                <th>&nbsp;</th>
                 <th>Gigas</th>
                 <th>Terminal</th>
                 <th>Repris</th>
@@ -364,7 +364,7 @@
         <input type="radio" name="vente" id="venteOui"><label for="venteOui">✔️ Oui</label>
         <input type="radio" name="vente" id="venteNon"><label for="venteNon">❌ Non</label>
     </p>
-    <textarea rows="3" id="commentSynthese" placeholder="Conclusion"></textarea>
+    <textarea rows="3" id="commentSynthese" placeholder="Conclusion, relances..."></textarea>
 </div>
 
 <p>

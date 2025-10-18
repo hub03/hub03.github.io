@@ -19,7 +19,6 @@
             font-size: 1.4rem;
         }
 
-        /* sections et champs */
         h2 {
             margin: 16px 0 8px;
             padding: 6px 8px;
@@ -34,7 +33,6 @@
             margin: 6px;
             border: 1px solid #ccc;
             border-radius: 6px;
-            /* 6. Correction taille input */
             width: auto; 
         }
 
@@ -44,16 +42,37 @@
             resize: none;
         }
 
-        /* 6. Correction taille input pour les champs numériques spécifiques */
+        /* Styles spécifiques pour les champs de saisie */
         input[id="adultes"], input[id="enfants"], input[id="superficie"], input[id="fixeCout"], 
-        input[id$="Cout"], input[id^="g"] {
-            width: 60px; /* Taille réduite comme dans l'original */
+        input[id^="coutLigne"], input[id="maisonCout"] {
+            width: 70px;
             box-sizing: border-box; 
+        }
+        
+        input[id^="tLigne"] {
+            width: 140px; /* Ajusté pour une meilleure lisibilité */
+            box-sizing: border-box; 
+        }
+        
+        input[id^="gLigne"] {
+            width: 45px;
+            box-sizing: border-box; 
+        }
+
+        #selectChainesServices {
+            width: 100%;
+            height: 120px;
+            box-sizing: border-box;
+            margin: 10px 0;
         }
         
         input[type="checkbox"], input[type="radio"] {
             transform: scale(1.2);
             vertical-align: middle;
+        }
+
+        ::placeholder {
+            font-size: 0.8em;
         }
 
         .section {
@@ -67,9 +86,8 @@
             display: block !important;
         }
 
-        /* couleurs pastel */
         #infos {
-            background: #f5f5f5;
+            background: #ffffff;
         }
 
         #fixe {
@@ -100,13 +118,10 @@
             text-align: center;
         }
         
-        /* 7. Pour aligner le "€/m" avec les inputs */
         .cost-cell {
-            white-space: nowrap; /* Empêche le retour à la ligne */
+            white-space: nowrap;
         }
         
-
-        /* boutons */
         button {
             margin: 4px;
             padding: 8px 14px;
@@ -120,7 +135,6 @@
             background: #eee;
         }
 
-        /* burger menu */
         #menuBurger {
             position: fixed;
             top: 10px;
@@ -150,18 +164,18 @@
         }
 
         #menuOptions button {
-            width: 100%;
+            width: 160px;
             border: none;
             background: none;
             padding: 8px;
             text-align: left;
+            display: block;
         }
 
         #menuOptions button:hover {
             background: #eee;
         }
 
-        /* historique */
         #historyPanel {
             display: none;
             margin-top: 20px;
@@ -204,7 +218,8 @@
     </p>
     <p>
         <input type="text" id="activitePro" placeholder="Métier">
-        <label for="teletravail">(télétravail</label><input type="checkbox" id="teletravail">)</p>
+        <label for="teletravail">Télétravail</label><input type="checkbox" id="teletravail">
+    </p>
     <p>
         Foyer : <input type="tel" maxlength="2" id="adultes" placeholder="adulte(s)">
         <input type="tel" maxlength="2" id="enfants" placeholder="enfant(s)">
@@ -218,7 +233,6 @@
             <option>Autre</option>
         </select>
     </p>
-    <textarea rows="2" id="commentInfos" placeholder="Commentaires généraux sur le client"></textarea>
 </div>
 
 <div id="containerSections">
@@ -235,7 +249,38 @@
             </select>
             <input type="number" id="fixeCout" placeholder="coût"> €/mois
         </p>
-        <textarea rows="3" id="commentFixe" placeholder="Commentaires sur l'Univers Fixe"></textarea>
+        <p>
+            <select id="fixeUsages">
+                <option hidden disabled selected>📞 usages tel fixe</option>
+                <option>Fixes</option>
+                <option>Fixes et mobiles</option>
+            </select>
+        </p>
+        <p>
+            Nombre d'équipement du foyer (mobiles, tablettes, PC, TV, consoles...)
+            <br><input type="tel" maxlength="2" id="eqAutres" placeholder="autres">
+        </p>
+        <select multiple id="selectChainesServices">
+            <optgroup label="Centres d'Intérêt">
+                <option>Sport</option>
+                <option>Ciné</option>
+                <option>Séries</option>
+                <option>Découverte</option>
+                <option>Jeunesse</option>
+                <option>Musique</option>
+                <option>Info</option>
+            </optgroup>
+            <optgroup label="Abonnements SVOD / Ciné">
+                <option>Canal+</option>
+                <option>Netflix</option>
+                <option>Prime Video</option>
+                <option>Disney+</option>
+                <option>HBO Max</option>
+                <option>Autre Abo</option>
+            </optgroup>
+        </select>
+        
+        <textarea rows="3" id="commentFixe" placeholder="Commentaires"></textarea>
     </div>
 
     <div id="maison" class="section">
@@ -247,11 +292,21 @@
                 <option>Appartement</option>
             </select>
             <input type="tel" maxlength="3" id="superficie">m²
-            (<label for="absencesProlongees">absences prolongées</label><input type="checkbox"
-                                                                            id="absencesProlongees"> |
-            <label for="cambriolages">cambriolages passés</label><input type="checkbox" id="cambriolages">)
+            <br><label for="absencesProlongees">absences prolongées</label><input type="checkbox" id="absencesProlongees"> &nbsp; <label for="cambriolages">cambriolages passés</label><input type="checkbox" id="cambriolages">
         </p>
-        <textarea rows="3" id="commentMaison" placeholder="Commentaires sur l'Univers Maison"></textarea>
+        <p>
+            <select id="surveillanceType">
+                <option hidden disabled selected>🎦 surveillance</option>
+                <option>Aucun</option>
+                <option>Orange</option>
+                <option>Verisure</option>
+                <option>Sector alarm</option>
+                <option>Somfy</option>
+                <option>Autre</option>
+            </select>
+            <input type="number" id="maisonCout" step="1.00" min="0" max="999.99" placeholder="coût">€/mois
+        </p>
+        <textarea rows="3" id="commentMaison" placeholder="Commentaires"></textarea>
     </div>
 
     <div id="mobile" class="section">
@@ -263,42 +318,42 @@
                 <th>Terminal</th>
                 <th>Repris</th>
                 <th>Assu</th>
-                <th>Coût (€/m)</th> 
+                <th>Coût</th> 
             </tr>
             <tr>
-                <td>1 - Client</td>
-                <td><input type="tel" id="gClient" ></td>
-                <td><input type="text" id="tClient"></td>
-                <td><input type="checkbox" id="repriseClient"></td>
-                <td><input type="checkbox" id="assClient"></td>
-                <td class="cost-cell"><input type="number" id="clientCout"></td>
+                <td>1</td>
+                <td><input type="tel" id="gLigne1" maxlength=3></td>
+                <td><input type="text" id="tLigne1"></td>
+                <td><input type="checkbox" id="repriseLigne1"></td>
+                <td><input type="checkbox" id="assLigne1"></td>
+                <td class="cost-cell"><input type="number" id="coutLigne1">€/m</td>
             </tr>
             <tr>
-                <td>2 - Ligne 2</td>
-                <td><input type="tel" id="gLigne2" ></td>
+                <td>2</td>
+                <td><input type="tel" id="gLigne2" maxlength=3></td>
                 <td><input type="text" id="tLigne2"></td>
                 <td><input type="checkbox" id="repriseLigne2"></td>
                 <td><input type="checkbox" id="assLigne2"></td>
-                <td class="cost-cell"><input type="number" id="coutLigne2"></td>
+                <td class="cost-cell"><input type="number" id="coutLigne2">€/m</td>
             </tr>
             <tr>
-                <td>3 - Ligne 3</td>
-                <td><input type="tel" id="gLigne3" ></td>
+                <td>3</td>
+                <td><input type="tel" id="gLigne3" maxlength=3></td>
                 <td><input type="text" id="tLigne3"></td>
                 <td><input type="checkbox" id="repriseLigne3"></td>
                 <td><input type="checkbox" id="assLigne3"></td>
-                <td class="cost-cell"><input type="number" id="coutLigne3"></td>
+                <td class="cost-cell"><input type="number" id="coutLigne3">€/m</td>
             </tr>
             <tr>
-                <td>4 - Ligne 4</td>
-                <td><input type="tel" id="gLigne4" ></td>
+                <td>4</td>
+                <td><input type="tel" id="gLigne4" maxlength=3></td>
                 <td><input type="text" id="tLigne4"></td>
                 <td><input type="checkbox" id="repriseLigne4"></td>
                 <td><input type="checkbox" id="assLigne4"></td>
-                <td class="cost-cell"><input type="number" id="coutLigne4"></td>
+                <td class="cost-cell"><input type="number" id="coutLigne4">€/m</td>
             </tr>
         </table>
-        <textarea rows="3" id="commentMobile" placeholder="Commentaires sur l'Univers Mobile"></textarea>
+        <textarea rows="3" id="commentMobile" placeholder="Commentaires"></textarea>
     </div>
 </div>
 
@@ -309,7 +364,7 @@
         <input type="radio" name="vente" id="venteOui"><label for="venteOui">✔️ Oui</label>
         <input type="radio" name="vente" id="venteNon"><label for="venteNon">❌ Non</label>
     </p>
-    <textarea rows="3" id="commentSynthese" placeholder="Commentaires / Conclusion"></textarea>
+    <textarea rows="3" id="commentSynthese" placeholder="Conclusion"></textarea>
 </div>
 
 <p>
@@ -336,74 +391,65 @@
     </table>
 </div>
 
-<footer>Lambert M. — version avec menu et logique finale</footer>
+<footer>Lambert M. 18/10/2025</footer>
 
 <script>
     document.addEventListener('DOMContentLoaded', () => {
         const date = document.getElementById('date');
-        // Initialiser la date du jour
         date.value = new Date().toISOString().split('T')[0];
 
         const motif = document.getElementById('motif');
-        // Inclure toutes les sections qui doivent être manipulées
         const sections = ['fixe', 'maison', 'mobile', 'synthese'].map(id => document.getElementById(id));
         const container = document.getElementById('containerSections');
 
         function hideAll() {
-            // Cache toutes les sections sauf 'infos' qui est gérée séparément
             sections.forEach(s => s.classList.remove('visible'));
         }
 
-        // Fonction pour réordonner les sections dans le conteneur
         function setOrder(order) {
             order.forEach(id => {
                 const el = document.getElementById(id);
                 if (el) container.appendChild(el);
             });
-            // La synthèse reste après le container.
         }
 
-        // === LOGIQUE DE VISIBILITÉ ET D'ORDRE ===
         function updateVisibilityAndOrder() {
             const m = motif.value;
 
-            // 1. On cache toutes les sections qui ne sont pas l'intro
             hideAll();
-            document.getElementById('infos').classList.add('visible'); // S'assurer que infos est toujours là
+            document.getElementById('infos').classList.add('visible');
 
-            // 2. Si un motif est sélectionné (pas l'option par défaut)
             if (m !== '🤝 motif de visite') {
-                // Définir l'ordre des sections Box/Abo
                 if (m === 'Box' || m === 'Autre') {
                     setOrder(['fixe', 'maison', 'mobile']);
                 } else if (m === 'Abo' || m === 'RM') {
                     setOrder(['mobile', 'fixe', 'maison']);
                 }
 
-                // 3. Rendre toutes les sections visibles
                 sections.forEach(s => s.classList.add('visible'));
             }
         }
 
-        // Écoute l'événement de changement pour mettre à jour la vue
         motif.addEventListener('change', updateVisibilityAndOrder);
-
-        // Appel initial pour s'assurer que seule 'infos' est visible au chargement
         updateVisibilityAndOrder();
-        // ======================================
 
-
-        // 2. Inclure les textareas dans la sélection pour la sauvegarde
         const allInputs = document.querySelectorAll('input,select,textarea');
-        const historyKey = 'ficheHistoriqueComplet_v2'; // Clé pour l'index des fiches
-        const historyDataKey = 'ficheHistoriqueData_v2'; // Nouvelle clé pour les données complètes
+        const historyKey = 'ficheHistoriqueComplet_v2';
+        const historyDataKey = 'ficheHistoriqueData_v2';
 
         function collectData() {
             const d = {};
             allInputs.forEach(el => {
                 if (!el.id) return;
-                // 2. Sauvegarde des commentaires et autres champs
-                d[el.id] = (el.type === 'checkbox' || el.type === 'radio') ? el.checked : el.value;
+                
+                // Gestion spécifique des sélecteurs multiples
+                if (el.tagName === 'SELECT' && el.multiple) {
+                    d[el.id] = Array.from(el.selectedOptions).map(option => option.value);
+                }
+                // Gestion normale des autres champs
+                else {
+                    d[el.id] = (el.type === 'checkbox' || el.type === 'radio') ? el.checked : el.value;
+                }
             });
             d.dateSauvegarde = new Date().toLocaleString('fr-FR', {
                 day: '2-digit',
@@ -418,42 +464,54 @@
         function applyData(data) {
             allInputs.forEach(el => {
                 if (data.hasOwnProperty(el.id)) {
-                    if (el.type === 'checkbox' || el.type === 'radio') el.checked = data[el.id];
-                    else el.value = data[el.id];
+                    // Gestion spécifique des sélecteurs multiples
+                    if (el.tagName === 'SELECT' && el.multiple) {
+                        const selectedValues = Array.isArray(data[el.id]) ? data[el.id] : [];
+                        Array.from(el.options).forEach(option => {
+                            option.selected = selectedValues.includes(option.value);
+                        });
+                    }
+                    // Gestion normale des autres champs
+                    else if (el.type === 'checkbox' || el.type === 'radio') {
+                        el.checked = data[el.id];
+                    }
+                    else {
+                        el.value = data[el.id];
+                    }
                 }
             });
-            // Mettre à jour la visibilité après le chargement des données
             updateVisibilityAndOrder();
         }
 
         function clearForm() {
             allInputs.forEach(el => {
-                if (el.type === 'checkbox' || el.type === 'radio') el.checked = false;
-                else el.value = '';
+                if (el.type === 'checkbox' || el.type === 'radio') {
+                    el.checked = false;
+                } else if (el.tagName === 'SELECT' && el.multiple) {
+                    Array.from(el.options).forEach(option => option.selected = false);
+                } else {
+                    el.value = '';
+                }
             });
-            // Remettre la sélection de motif à l'état initial
             motif.value = motif.querySelector('option[hidden]').value;
-            updateVisibilityAndOrder(); // Masquer tout sauf 'infos'
+            updateVisibilityAndOrder();
         }
         
-        // Fonction pour gérer la sauvegarde des données complètes dans une seule clé
         function saveToLocalStorage() {
             const data = collectData();
             const id = 'fiche_' + Date.now();
             
-            // 2. Récupérer/Mettre à jour l'historique de l'index (clé `historyKey`)
             let histIndex = JSON.parse(localStorage.getItem(historyKey) || '[]');
             histIndex.unshift({id, date: data.dateSauvegarde, nom: data.nomClient || '(inconnu)', motif: data.motif || ''});
             localStorage.setItem(historyKey, JSON.stringify(histIndex));
 
-            // 2. Récupérer/Mettre à jour les données complètes (clé `historyDataKey`)
             let histData = JSON.parse(localStorage.getItem(historyDataKey) || '{}');
-            histData[id] = data; // Stocker les données complètes (y compris les commentaires)
+            histData[id] = data;
             localStorage.setItem(historyDataKey, JSON.stringify(histData));
 
             updateHistory();
             alert('✅ Fiche sauvegardée');
-            clearForm(); // nouvelle fiche directe
+            clearForm();
         }
 
         function updateHistory() {
@@ -466,15 +524,12 @@
             }
             hist.forEach(h => {
                 const tr = document.createElement('tr');
-                tr.innerHTML = `<td>${h.date}</td><td>${h.nom}</td><td>${h.motif}</td> <td><button data-id="${h.id}" class="loadHist">1. Voir</button></td>`;
+                tr.innerHTML = `<td>${h.date}</td><td>${h.nom}</td><td>${h.motif}</td> <td><button data-id="${h.id}" class="loadHist">👁️ Voir</button></td>`;
                 body.appendChild(tr);
             });
             document.querySelectorAll('.loadHist').forEach(btn => {
-                // 1. Changement du nom du bouton
-                btn.textContent = '👁️ Voir'; 
                 btn.onclick = () => {
                     const id = btn.dataset.id;
-                    // 2. Récupérer les données complètes depuis la nouvelle clé de données
                     const histData = JSON.parse(localStorage.getItem(historyDataKey) || '{}');
                     const data = histData[id];
                     
@@ -488,7 +543,6 @@
             });
         }
 
-        // === gestion boutons ===
         document.getElementById('saveBtn').onclick = saveToLocalStorage;
 
         const histPanel = document.getElementById('historyPanel');
@@ -497,7 +551,6 @@
             if (histPanel.style.display === 'block') updateHistory();
         };
 
-        // menu burger
         const burger = document.getElementById('menuBurger');
         const menu = document.getElementById('menuOptions');
         burger.onclick = () => {
@@ -505,13 +558,11 @@
         };
 
         document.getElementById('exportBtn').onclick = () => {
-            // 5. Exporter l'historique COMPLET
             const histData = localStorage.getItem(historyDataKey) || '{}';
             const blob = new Blob([histData], {type: 'application/json'});
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            // 4. Changement du format du nom de fichier
             const today = new Date().toLocaleDateString('fr-FR').replace(/\//g, '-');
             a.download = `Sauvegarde fiches 4P - ${today}.json`;
             a.click();
@@ -530,12 +581,10 @@
                     try {
                         const importedData = JSON.parse(evt.target.result);
                         
-                        // Fusionner les données importées avec les données existantes
                         let currentData = JSON.parse(localStorage.getItem(historyDataKey) || '{}');
                         const mergedData = {...currentData, ...importedData};
                         localStorage.setItem(historyDataKey, JSON.stringify(mergedData));
 
-                        // Mettre à jour l'index
                         const newHistIndex = Object.keys(mergedData).map(id => {
                             const data = mergedData[id];
                             return {
@@ -544,7 +593,7 @@
                                 nom: data.nomClient || '(inconnu)',
                                 motif: data.motif || ''
                             };
-                        }).sort((a, b) => b.id.localeCompare(a.id)); // Trier par ID (le plus récent d'abord)
+                        }).sort((a, b) => b.id.localeCompare(a.id));
                         
                         localStorage.setItem(historyKey, JSON.stringify(newHistIndex));
                         

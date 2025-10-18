@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Fiche Découverte</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <style>
+        body {
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+            margin: 16px;
+            color: #111;
+            text-align: center;
+            background: #f7f7f8;
+        }
+
+        h1 {
+            text-align: center;
+            margin: 8px 0 16px;
+            font-size: 1.4rem;
+        }
+
+        /* sections et champs */
+        h2 {
+            margin: 16px 0 8px;
+            padding: 6px 8px;
+            border-radius: 6px;
+            font-size: 1.05rem;
+            text-align: center;
+        }
+
+        select, input[type="text"], input[type="tel"], input[type="number"], textarea {
+            font-size: 1rem;
+            padding: 6px;
+            margin: 6px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            /* 6. Correction taille input */
+            width: auto; 
+        }
+
+        textarea {
+            width: 100%;
+            box-sizing: border-box;
+            resize: none;
+        }
+
+        /* 6. Correction taille input pour les champs numériques spécifiques */
+        input[id="adultes"], input[id="enfants"], input[id="superficie"], input[id="fixeCout"], 
+        input[id$="Cout"], input[id^="g"] {
+            width: 60px; /* Taille réduite comme dans l'original */
+            box-sizing: border-box; 
+        }
+        
+        input[type="checkbox"], input[type="radio"] {
+            transform: scale(1.2);
+            vertical-align: middle;
+        }
+
+        .section {
+            display: none;
+            border-radius: 10px;
+            padding: 10px;
+            margin-bottom: 12px;
+        }
+
+        .visible {
+            display: block !important;
+        }
+
+        /* couleurs pastel */
+        #infos {
+            background: #f5f5f5;
+        }
+
+        #fixe {
+            background: #ffe5e5;
+        }
+
+        #maison {
+            background: #fff8d6;
+        }
+
+        #mobile {
+            background: #e5f0ff;
+        }
+
+        #synthese {
+            background: #e6ffe6;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 8px;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 6px;
+            text-align: center;
+        }
+        
+        /* 7. Pour aligner le "€/m" avec les inputs */
+        .cost-cell {
+            white-space: nowrap; /* Empêche le retour à la ligne */
+        }
+        
+
+        /* boutons */
+        button {
+            margin: 4px;
+            padding: 8px 14px;
+            border: 1px solid #bbb;
+            border-radius: 6px;
+            background: #fff;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #eee;
+        }
+
+        /* burger menu */
+        #menuBurger {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: #fff;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            width: 40px;
+            height: 40px;
+            font-size: 22px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        #menuOptions {
+            position: fixed;
+            top: 60px;
+            right: 10px;
+            background: white;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            display: none;
+            z-index: 999;
+        }
+
+        #menuOptions button {
+            width: 100%;
+            border: none;
+            background: none;
+            padding: 8px;
+            text-align: left;
+        }
+
+        #menuOptions button:hover {
+            background: #eee;
+        }
+
+        /* historique */
+        #historyPanel {
+            display: none;
+            margin-top: 20px;
+            background: #f2f2f2;
+            border-radius: 8px;
+            padding: 10px;
+        }
+
+        #historyTable {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        #historyTable th, #historyTable td {
+            border: 1px solid #ccc;
+            padding: 6px;
+        }
+
+        #historyTable th {
+            background: #e0e0e0;
+        }
+    </style>
+
+</head>
+<body>
+<div id="menuBurger">☰</div>
+<div id="menuOptions">
+    <button id="exportBtn">📤 Exporter l'historique</button>
+    <button id="importBtn">📥 Importer l'historique</button>
+</div>
+
+<h1>FICHE DÉCOUVERTE</h1>
+<input type="hidden" id="date"/>
+
+<div id="infos" class="section visible">
+    <h2>INFORMATIONS</h2>
+    <p>
+        <input type="text" id="nomClient" placeholder="Nom du client">
+        <input type="tel" id="numeroClient" maxlength="10" placeholder="Numéro du client">
+    </p>
+    <p>
+        <input type="text" id="activitePro" placeholder="Métier">
+        <label for="teletravail">(télétravail</label><input type="checkbox" id="teletravail">)</p>
+    <p>
+        Foyer : <input type="tel" maxlength="2" id="adultes" placeholder="adulte(s)">
+        <input type="tel" maxlength="2" id="enfants" placeholder="enfant(s)">
+    </p>
+    <p>
+        <select id="motif">
+            <option hidden disabled selected>🤝 motif de visite</option>
+            <option>Box</option>
+            <option>Abo</option>
+            <option>RM</option>
+            <option>Autre</option>
+        </select>
+    </p>
+    <textarea rows="2" id="commentInfos" placeholder="Commentaires généraux sur le client"></textarea>
+</div>
+
+<div id="containerSections">
+    <div id="fixe" class="section">
+        <h2>UNIVERS FIXE</h2>
+        <p>
+            <select id="fixeOperateur">
+                <option hidden disabled selected>🛜 opérateur</option>
+                <option>SFR</option>
+                <option>Orange</option>
+                <option>Bouygues</option>
+                <option>Free</option>
+                <option>Autre</option>
+            </select>
+            <input type="number" id="fixeCout" placeholder="coût"> €/mois
+        </p>
+        <textarea rows="3" id="commentFixe" placeholder="Commentaires sur l'Univers Fixe"></textarea>
+    </div>
+
+    <div id="maison" class="section">
+        <h2>UNIVERS MAISON</h2>
+        <p>
+            <select id="logementType">
+                <option hidden disabled selected>🏠 logement</option>
+                <option>Maison</option>
+                <option>Appartement</option>
+            </select>
+            <input type="tel" maxlength="3" id="superficie">m²
+            (<label for="absencesProlongees">absences prolongées</label><input type="checkbox"
+                                                                            id="absencesProlongees"> |
+            <label for="cambriolages">cambriolages passés</label><input type="checkbox" id="cambriolages">)
+        </p>
+        <textarea rows="3" id="commentMaison" placeholder="Commentaires sur l'Univers Maison"></textarea>
+    </div>
+
+    <div id="mobile" class="section">
+        <h2>UNIVERS MOBILE</h2>
+        <table>
+            <tr>
+                <th>Ligne</th>
+                <th>Gigas</th>
+                <th>Terminal</th>
+                <th>Repris</th>
+                <th>Assu</th>
+                <th>Coût (€/m)</th> 
+            </tr>
+            <tr>
+                <td>1 - Client</td>
+                <td><input type="tel" id="gClient" ></td>
+                <td><input type="text" id="tClient"></td>
+                <td><input type="checkbox" id="repriseClient"></td>
+                <td><input type="checkbox" id="assClient"></td>
+                <td class="cost-cell"><input type="number" id="clientCout"></td>
+            </tr>
+            <tr>
+                <td>2 - Ligne 2</td>
+                <td><input type="tel" id="gLigne2" ></td>
+                <td><input type="text" id="tLigne2"></td>
+                <td><input type="checkbox" id="repriseLigne2"></td>
+                <td><input type="checkbox" id="assLigne2"></td>
+                <td class="cost-cell"><input type="number" id="coutLigne2"></td>
+            </tr>
+            <tr>
+                <td>3 - Ligne 3</td>
+                <td><input type="tel" id="gLigne3" ></td>
+                <td><input type="text" id="tLigne3"></td>
+                <td><input type="checkbox" id="repriseLigne3"></td>
+                <td><input type="checkbox" id="assLigne3"></td>
+                <td class="cost-cell"><input type="number" id="coutLigne3"></td>
+            </tr>
+            <tr>
+                <td>4 - Ligne 4</td>
+                <td><input type="tel" id="gLigne4" ></td>
+                <td><input type="text" id="tLigne4"></td>
+                <td><input type="checkbox" id="repriseLigne4"></td>
+                <td><input type="checkbox" id="assLigne4"></td>
+                <td class="cost-cell"><input type="number" id="coutLigne4"></td>
+            </tr>
+        </table>
+        <textarea rows="3" id="commentMobile" placeholder="Commentaires sur l'Univers Mobile"></textarea>
+    </div>
+</div>
+
+<div id="synthese" class="section">
+    <h2>SYNTHÈSE</h2>
+    <p>
+        Vente réalisée :
+        <input type="radio" name="vente" id="venteOui"><label for="venteOui">✔️ Oui</label>
+        <input type="radio" name="vente" id="venteNon"><label for="venteNon">❌ Non</label>
+    </p>
+    <textarea rows="3" id="commentSynthese" placeholder="Commentaires / Conclusion"></textarea>
+</div>
+
+<p>
+    <button id="saveBtn">💾 Sauvegarder et terminer</button>
+    <button id="showHistoryBtn">📜 Historique</button>
+</p>
+
+<div id="historyPanel">
+    <h2>Historique des fiches</h2>
+    <table id="historyTable">
+        <thead>
+        <tr>
+            <th>Date</th>
+            <th>Nom client</th>
+            <th>Motif</th>
+            <th>Action</th>
+        </tr>
+        </thead>
+        <tbody id="historyBody">
+        <tr>
+            <td colspan="4">Aucune fiche enregistrée</td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<footer>Lambert M. — version avec menu et logique finale</footer>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const date = document.getElementById('date');
+        // Initialiser la date du jour
+        date.value = new Date().toISOString().split('T')[0];
+
+        const motif = document.getElementById('motif');
+        // Inclure toutes les sections qui doivent être manipulées
+        const sections = ['fixe', 'maison', 'mobile', 'synthese'].map(id => document.getElementById(id));
+        const container = document.getElementById('containerSections');
+
+        function hideAll() {
+            // Cache toutes les sections sauf 'infos' qui est gérée séparément
+            sections.forEach(s => s.classList.remove('visible'));
+        }
+
+        // Fonction pour réordonner les sections dans le conteneur
+        function setOrder(order) {
+            order.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) container.appendChild(el);
+            });
+            // La synthèse reste après le container.
+        }
+
+        // === LOGIQUE DE VISIBILITÉ ET D'ORDRE ===
+        function updateVisibilityAndOrder() {
+            const m = motif.value;
+
+            // 1. On cache toutes les sections qui ne sont pas l'intro
+            hideAll();
+            document.getElementById('infos').classList.add('visible'); // S'assurer que infos est toujours là
+
+            // 2. Si un motif est sélectionné (pas l'option par défaut)
+            if (m !== '🤝 motif de visite') {
+                // Définir l'ordre des sections Box/Abo
+                if (m === 'Box' || m === 'Autre') {
+                    setOrder(['fixe', 'maison', 'mobile']);
+                } else if (m === 'Abo' || m === 'RM') {
+                    setOrder(['mobile', 'fixe', 'maison']);
+                }
+
+                // 3. Rendre toutes les sections visibles
+                sections.forEach(s => s.classList.add('visible'));
+            }
+        }
+
+        // Écoute l'événement de changement pour mettre à jour la vue
+        motif.addEventListener('change', updateVisibilityAndOrder);
+
+        // Appel initial pour s'assurer que seule 'infos' est visible au chargement
+        updateVisibilityAndOrder();
+        // ======================================
+
+
+        // 2. Inclure les textareas dans la sélection pour la sauvegarde
+        const allInputs = document.querySelectorAll('input,select,textarea');
+        const historyKey = 'ficheHistoriqueComplet_v2'; // Clé pour l'index des fiches
+        const historyDataKey = 'ficheHistoriqueData_v2'; // Nouvelle clé pour les données complètes
+
+        function collectData() {
+            const d = {};
+            allInputs.forEach(el => {
+                if (!el.id) return;
+                // 2. Sauvegarde des commentaires et autres champs
+                d[el.id] = (el.type === 'checkbox' || el.type === 'radio') ? el.checked : el.value;
+            });
+            d.dateSauvegarde = new Date().toLocaleString('fr-FR', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+            return d;
+        }
+
+        function applyData(data) {
+            allInputs.forEach(el => {
+                if (data.hasOwnProperty(el.id)) {
+                    if (el.type === 'checkbox' || el.type === 'radio') el.checked = data[el.id];
+                    else el.value = data[el.id];
+                }
+            });
+            // Mettre à jour la visibilité après le chargement des données
+            updateVisibilityAndOrder();
+        }
+
+        function clearForm() {
+            allInputs.forEach(el => {
+                if (el.type === 'checkbox' || el.type === 'radio') el.checked = false;
+                else el.value = '';
+            });
+            // Remettre la sélection de motif à l'état initial
+            motif.value = motif.querySelector('option[hidden]').value;
+            updateVisibilityAndOrder(); // Masquer tout sauf 'infos'
+        }
+        
+        // Fonction pour gérer la sauvegarde des données complètes dans une seule clé
+        function saveToLocalStorage() {
+            const data = collectData();
+            const id = 'fiche_' + Date.now();
+            
+            // 2. Récupérer/Mettre à jour l'historique de l'index (clé `historyKey`)
+            let histIndex = JSON.parse(localStorage.getItem(historyKey) || '[]');
+            histIndex.unshift({id, date: data.dateSauvegarde, nom: data.nomClient || '(inconnu)', motif: data.motif || ''});
+            localStorage.setItem(historyKey, JSON.stringify(histIndex));
+
+            // 2. Récupérer/Mettre à jour les données complètes (clé `historyDataKey`)
+            let histData = JSON.parse(localStorage.getItem(historyDataKey) || '{}');
+            histData[id] = data; // Stocker les données complètes (y compris les commentaires)
+            localStorage.setItem(historyDataKey, JSON.stringify(histData));
+
+            updateHistory();
+            alert('✅ Fiche sauvegardée');
+            clearForm(); // nouvelle fiche directe
+        }
+
+        function updateHistory() {
+            const hist = JSON.parse(localStorage.getItem(historyKey) || '[]');
+            const body = document.getElementById('historyBody');
+            body.innerHTML = '';
+            if (!hist.length) {
+                body.innerHTML = '<tr><td colspan="4">Aucune fiche enregistrée</td></tr>';
+                return;
+            }
+            hist.forEach(h => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `<td>${h.date}</td><td>${h.nom}</td><td>${h.motif}</td> <td><button data-id="${h.id}" class="loadHist">1. Voir</button></td>`;
+                body.appendChild(tr);
+            });
+            document.querySelectorAll('.loadHist').forEach(btn => {
+                // 1. Changement du nom du bouton
+                btn.textContent = '👁️ Voir'; 
+                btn.onclick = () => {
+                    const id = btn.dataset.id;
+                    // 2. Récupérer les données complètes depuis la nouvelle clé de données
+                    const histData = JSON.parse(localStorage.getItem(historyDataKey) || '{}');
+                    const data = histData[id];
+                    
+                    if (!data) {
+                        alert('Fiche introuvable');
+                        return;
+                    }
+                    applyData(data);
+                    alert('Fiche rechargée.');
+                };
+            });
+        }
+
+        // === gestion boutons ===
+        document.getElementById('saveBtn').onclick = saveToLocalStorage;
+
+        const histPanel = document.getElementById('historyPanel');
+        document.getElementById('showHistoryBtn').onclick = () => {
+            histPanel.style.display = histPanel.style.display === 'block' ? 'none' : 'block';
+            if (histPanel.style.display === 'block') updateHistory();
+        };
+
+        // menu burger
+        const burger = document.getElementById('menuBurger');
+        const menu = document.getElementById('menuOptions');
+        burger.onclick = () => {
+            menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+        };
+
+        document.getElementById('exportBtn').onclick = () => {
+            // 5. Exporter l'historique COMPLET
+            const histData = localStorage.getItem(historyDataKey) || '{}';
+            const blob = new Blob([histData], {type: 'application/json'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            // 4. Changement du format du nom de fichier
+            const today = new Date().toLocaleDateString('fr-FR').replace(/\//g, '-');
+            a.download = `Sauvegarde fiches 4P - ${today}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+            menu.style.display = 'none';
+        };
+
+        document.getElementById('importBtn').onclick = () => {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'application/json';
+            input.onchange = e => {
+                const file = e.target.files[0];
+                const reader = new FileReader();
+                reader.onload = evt => {
+                    try {
+                        const importedData = JSON.parse(evt.target.result);
+                        
+                        // Fusionner les données importées avec les données existantes
+                        let currentData = JSON.parse(localStorage.getItem(historyDataKey) || '{}');
+                        const mergedData = {...currentData, ...importedData};
+                        localStorage.setItem(historyDataKey, JSON.stringify(mergedData));
+
+                        // Mettre à jour l'index
+                        const newHistIndex = Object.keys(mergedData).map(id => {
+                            const data = mergedData[id];
+                            return {
+                                id: id,
+                                date: data.dateSauvegarde,
+                                nom: data.nomClient || '(inconnu)',
+                                motif: data.motif || ''
+                            };
+                        }).sort((a, b) => b.id.localeCompare(a.id)); // Trier par ID (le plus récent d'abord)
+                        
+                        localStorage.setItem(historyKey, JSON.stringify(newHistIndex));
+                        
+                        updateHistory();
+                        alert('Import réussi ! Les fiches ont été fusionnées.');
+                    } catch {
+                        alert('Erreur lors de l’import. Assurez-vous que le fichier est au bon format.');
+                    }
+                };
+                reader.readAsText(file);
+            };
+            input.click();
+            menu.style.display = 'none';
+        };
+
+        updateHistory();
+    });
+</script>
+</body>
+</html>

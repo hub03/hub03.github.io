@@ -207,23 +207,24 @@
   }
 
   sendBtn.addEventListener('click', () => {
-    const url = getSelectedUrl();
-    const raw = getRawPhone();
-    const body = buildMessage(url);
-    const smsUrl = buildSmsUrl(toE, body);
+  const url  = getSelectedUrl();
+  const raw  = getRawPhone();
 
-    try {
-      window.location.href = smsUrl;
-      // Petit retour visuel
-      toast.style.display = 'block';
-      toast.style.color = '#0a6';
-      toast.textContent = 'envoi en cours...';
-    } catch (e) {
-      // Fallback discret
-      toast.style.display = 'block';
-      toast.style.color = '#c00';
-      toast.textContent = 'Impossible d’ouvrir l’application SMS sur cet appareil.';
-    }
-  });
+  if (!raw) {
+    toast.style.display = 'block';
+    toast.style.color = '#c00';
+    toast.textContent = 'Veuillez saisir un numéro de mobile.';
+    return;
+  }
+
+  const body   = buildMessage(url);
+  const smsUrl = buildSmsUrl(raw, body);
+
+  window.location.href = smsUrl;
+
+  toast.style.display = 'block';
+  toast.style.color = '#0a6';
+  toast.textContent = 'Ouverture de l’application SMS…';
+});
 </script>
 </body>

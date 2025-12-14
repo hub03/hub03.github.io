@@ -57,31 +57,31 @@ button:disabled {
 <select id="offer">
   <option value="" disabled selected>Choisir une offre</option>
 
-  <option value="https://hub03.github.io/starter.html" data-price="27,99 €/mois">
+  <option value="https://urlr.me/!starter" data-price="27,99 €/mois">
     Starter
   </option>
 
-  <option value="https://hub03.github.io/powers.html" data-price="30,99 €/mois">
+  <option value="https://urlr.me/!powers" data-price="30,99 €/mois">
     Power S
   </option>
 
-  <option value="https://hub03.github.io/power.html" data-price="36,99 €/mois">
+  <option value="https://urlr.me/!power" data-price="36,99 €/mois">
     Power
   </option>
 
-  <option value="https://hub03.github.io/premium.html" data-price="44,99 €/mois">
+  <option value="https://urlr.me/!premium" data-price="44,99 €/mois">
     Premium
   </option>
 
-  <option value="https://hub03.github.io/5g.html" data-price="39,99 €/mois">
+  <option value="https://urlr.me/!5g" data-price="39,99 €/mois">
     Box 5G
   </option>
 
-  <option value="https://hub03.github.io/5gtv.html" data-price="44,99 €/mois">
+  <option value="https://urlr.me/tZdEKQ" data-price="44,99 €/mois">
     Box 5G + TV
   </option>
 
-  <option value="https://hub03.github.io/5g-26ans.html" data-price="29,99 €/mois">
+  <option value="https://urlr.me/s7WNUv" data-price="29,99 €/mois">
     Box 5G -26 ans
   </option>
 </select>
@@ -116,10 +116,8 @@ send.addEventListener('click', () => {
   const url = offer.value;
 
   const message =
-    `Suite à votre demande effectuée en boutique SFR, ` +
-    `nous avons le plaisir de vous transmettre votre devis personnalisé pour une offre Box SFR.\n\n` +
+    `Suite à votre visite en boutique SFR, nous avons le plaisir de vous transmettre votre devis personnalisé pour une offre Box SFR.\n\n` +
     `Vous pouvez le consulter à l’adresse suivante :\n${url}\n\n` +
-    `Nous restons à votre disposition pour toute information complémentaire.\n\n` +
     `Cordialement,\nVotre conseiller SFR`;
 
   window.location.href = `sms:${to}?body=${encodeURIComponent(message)}`;

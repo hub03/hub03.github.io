@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>SFR Fibre Power</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Roboto', Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f8f8f8;
+      color: #111;
+    }
+
+    .container {
+      max-width: 700px;
+      margin: 20px auto;
+      padding: 20px;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    /* Header avec titre et prix/engagement */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    h1 {
+      font-size: 26px;
+      margin: 0;
+      color: #e2001a;
+    }
+
+    .price-box {
+      text-align: right;
+    }
+
+    .price-box .price {
+      font-size: 28px;
+      font-weight: bold;
+      margin: 0;
+    }
+
+    .price-box .engagement {
+      margin: 0;
+      color: #777;
+      font-size: 14px;
+    }
+
+    .subtitle {
+      font-size: 16px;
+      color: #555;
+      margin: 16px 0;
+    }
+
+    .hero-img {
+      width: 100%;
+      max-width: 200px;
+      display: block;
+      margin: 0 auto 20px auto;
+    }
+
+    .features {
+      display: flex;
+      justify-content: space-between;
+      text-align: center;
+      margin: 20px 0;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+
+    .feature {
+      background: #f1f1f1;
+      flex: 1 1 30%;
+      padding: 15px;
+      border-radius: 8px;
+      font-size: 14px;
+    }
+
+    .feature img {
+      width: 40px;
+      margin-bottom: 8px;
+    }
+
+    .included {
+      margin-top: 20px;
+      font-size: 15px;
+    }
+
+    .included img {
+      vertical-align: middle;
+      margin-right: 8px;
+    }
+
+    .cta-button {
+      display: block;
+      text-align: center;
+      margin: 25px auto 0 auto;
+      padding: 12px 25px;
+      background-color: #e2001a;
+      color: #fff;
+      font-size: 16px;
+      font-weight: bold;
+      text-decoration: none;
+      border-radius: 8px;
+      transition: background 0.3s;
+    }
+
+    .cta-button:hover {
+      background-color: #b10014;
+    }
+
+    /* Mentions légales */
+    details {
+      margin-top: 30px;
+      background: #f1f1f1;
+      padding: 15px;
+      border-radius: 8px;
+      font-size: 13px;
+      line-height: 1.4;
+    }
+
+    details summary {
+      font-weight: bold;
+      cursor: pointer;
+      outline: none;
+    }
+
+    @media (max-width: 500px) {
+      .features {
+        flex-direction: column;
+      }
+      .feature {
+        flex: 1 1 100%;
+      }
+      .header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .price-box {
+        text-align: left;
+        margin-top: 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <div class="header">
+    <h1>SFR Fibre Power</h1>
+    <div class="price-box">
+      <p class="price">36,99€ / mois</p>
+      <p class="engagement">Engagement 12 mois</p>
+    </div>
+  </div>
+
+  <p class="subtitle">Le très haut débit avec le WiFi 6</p>
+
+  <img class="hero-img" src="https://static.s-sfr.fr/media/box8connecttv-desktop-140x140-1.png" />
+
+  <div class="features">
+    <div class="feature">
+      <img src="https://static.s-sfr.fr/assets/pictos/debit_04_40_rouge.svg" />
+      <div>Jusqu'à 2 Gb/s ↓<br>1 Gb/s ↑</div>
+    </div>
+    <div class="feature">
+      <img src="https://static.s-sfr.fr/assets/pictos/wifi6_40_rouge.svg" />
+      <div>WiFi 6</div>
+    </div>
+    <div class="feature">
+      <img src="https://static.s-sfr.fr/assets/pictos/tv3_40_rouge.svg" />
+      <div>200 chaînes TV incluses</div>
+    </div>
+  </div>
+
+  <div class="included">
+    <p><img src="https://static.s-sfr.fr/assets/pictos/check_gras_40_rouge.svg" height="20" /> SFR Box 8 WiFi 6</p>
+    <p><img src="https://static.s-sfr.fr/assets/pictos/check_gras_40_rouge.svg" height="20" /> Décodeur SFR Box 7 TV</p>
+    <p><img src="https://static.s-sfr.fr/assets/pictos/check_gras_40_rouge.svg" height="20" /> Appels illimités vers les fixes et mobiles en France</p>
+	<p><img src="https://static.s-sfr.fr/assets/pictos/check_gras_40_rouge.svg" height="20" /> 1 répéteur WiFi 6</p>
+	<p><img src="https://static.s-sfr.fr/assets/pictos/check_gras_40_rouge.svg" height="20" /> -3€/mois de remise avec une option TV ou streaming de votre choix</p>
+	<p><img src="https://static.s-sfr.fr/media/Fixe/visuel-ocs-64x40.svg" height="30px" /> <img src="https://static.s-sfr.fr/media/logo-netflix-standard-pub-72x38.svg" height=30px /> <img src="https://static.s-sfr.fr/media/Fixe/Disneyavecpub_logo_72.svg" height=30px /></p>
+  </div>
+
+  <a href="https://c.sfr.fr/instore-services?idPdv=1003673&nomPdv=SFR%20Caen%20Strasbourg" class="cta-button" target="_blank">Prendre rendez-vous en boutique</a>
+
+  <div align=center style="font-size:0.8em;color:gray;">&nbsp;<br>Lors de votre visite pensez à apporter une pièce d'identité valide ainsi qu'un relevé d'identité bancaire.</div>
+
+  <details>
+    <summary>Mentions légales</summary>
+    <p>SFR FIBRE POWER<br>
+    Frais d'ouverture de service de 49€. Frais de résiliation de 59€. Engagement 12 mois. Box de SFR obligatoire et mise à disposition.<br>
+    Offres réservées aux nouveaux clients à partir du 02/12/2025 jusqu'au <span id="currentDate"></span>.<br><br>
+
+	Options TV ou streaming au choix avec remise (avec -3€/mois sur SFR Power et -5€/mois sur SFR Premium)<br>
+	Option mensuelle, valable en France métropolitaine, réservée aux abonnés Box de SFR éligibles (Power ou Premium).<br>
+	Remise de 3€/mois avec SFR Power et 5€/mois avec SFR Premium pour la souscription à une option éligible (voir les options éligibles en cours de commercialisation sur sfr.fr) avec la souscription d’une offre box éligible à partir du 18/11/2025. Liste d’option éligible susceptible d’évolution. Perte de la remise en cas de résiliation de l’offre box ou de l’option, ou en cas de changement d’offre vers une offre box non éligible. A partir de l’application de la remise à une option éligible, le changement d’option éligible est permis après une durée minimum de 30 jours. En cas de changement d’offre Box vers une autre offre Box éligible, le montant de la remise correspond au montant de la remise de la nouvelle offre éligible souscrite.<br><br>
+
+    Offres soumises à conditions, disponibles sous réserve d’éligibilité technique et géographique et de raccordement effectif du domicile du client. Boîtier de terminaison obligatoire et mis à disposition. Selon l’adresse du raccordement et l’offre souscrite, débit théorique montant maximum disponible de 1 Gb/s et débit théorique descendant maximum disponible de 1 Gb/s. Détails et tarifs des services disponibles dans la brochure tarifaire en vigueur.<br><br>
+
+    Débit : Selon l’adresse du raccordement, débit théorique montant maximum disponible de 1 Gb/s et débit théorique descendant maximum disponible de 1 Gb/s.<br><br>
+
+    Téléphonie illimitée depuis le poste fixe : branché sur la box vers les fixes de plus de 100 destinations et vers les mobiles en France métropolitaine, dans les DOM (Guadeloupe, Martinique, Réunion et Guyane française, hors Mayotte). Hors numéros courts et spéciaux et services de radio messagerie, jusqu’à 250 correspondants différents/mois. 3h maximum par appel.<br>
+    (1) Appels illimités depuis le poste fixe branché sur la box pour les clients box de SFR vers les postes fixes au Maroc, hors appels vers certains numéros restreints. Au-delà, ces appels pourront être facturés au tarif applicable aux appels en présélection vers le Maroc.<br>
+    (2) Appels illimités vers les fixes de Tunisie Telecom (numéro commençant par 002167 et 00216 81 200) réservés aux clients box, box 4K de SFR et SFR Ligne Fixe, jusqu’à 99 correspondants différents/mois. 3h maximum par appel.<br>
+    (3) Appels illimités depuis le poste fixe branché sur la box pour les clients box, Fibre de SFR et box THD de SFR vers les mobiles de Chine, hors numéros courts et spéciaux et hors appels vers plus de 250 correspondants différents dans le mois et 3H maximum par appel.<br><br>
+
+    Bouquet SFR TV 200 chaînes & services disponible en zone dégroupée sous réserve d'éligibilité technique au service de télévision. Débit IP minimum nécessaire de 3.6 Mb/s. Décodeur obligatoire et mis à disposition. Pénalités de non restitution de 150€.<br><br>
+
+    Internet Garanti : Offre soumise à conditions réservée aux abonnés titulaires d’une offre Box de SFR. Dès la souscription et en cas de problème technique sur votre connexion internet, mise à disposition par courrier d’une box de poche permettant un accès à internet par l’intermédiaire du réseau mobile 4G SFR; exclusivement fourni à l'adresse de souscription et utilisable uniquement depuis cette adresse : 30Go d’internet par mois, bridé au-delà. Dès la souscription et avant raccordement internet illimité dans la limite des 90 premiers jours. Option à 5€ par mois. Inclus sur demande avec une offre SFR Premium. Frais d’activation de la carte SIM 10€. Remise de 5€ le premier mois.<br><br>
+	Répéteurs WiFi : Offre de location soumise à conditions, 2 répéteurs inclus sur demande après le raccordement pour les détenteurs d’une offre SFR Premium. Frais d’activation de service de 10€. Conditions et détails sur sfr.fr ou en point de vente. Le logo Wi-Fi CERTIFIED™ est une marque de Wi-Fi Alliance®.<br><br>
+    SFR Multi : Offre réservée aux abonnés Box de SFR sous réserve de souscription au sein d’un même foyer (même nom/prénom, ou même RIB ou même nom/adresse ou même SIREN) jusqu’à 4 abonnements mobiles SFR compatibles. Remise(s) mensuelle(s) déduite(s) de la/des facture(s) mobile(s) sous réserve que les lignes soient actives. Perte de la/des remise(s) dès lors que les conditions ci-dessus ne sont plus remplies. Détails du partage de Gigas dans les Conditions Particulières de l’offre Multi.</p>
+  </details>
+</div>
+
+<script>
+  // Insérer automatiquement la date du jour
+  const today = new Date();
+  const formattedDate = today.toLocaleDateString('fr-FR');
+  document.getElementById('currentDate').textContent = formattedDate;
+</script>
+
+</body>
+</html>

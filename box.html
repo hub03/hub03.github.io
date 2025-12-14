@@ -107,15 +107,11 @@ function update() {
   price.textContent = opt ? 'Prix : ' + opt.dataset.price : '';
 }
 
-  send.disabled = !ok;
-  price.textContent = opt ? 'Prix : ' + opt.dataset.price : '';
-}
-
 offer.addEventListener('change', update);
 phone.addEventListener('input', update);
 
 send.addEventListener('click', () => {
-  const to  = phone.value.trim();
+  const to  = phone.value.replace(/\D/g, '');
   const url = offer.value;
 
   const message =

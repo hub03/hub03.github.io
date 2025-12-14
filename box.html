@@ -1,230 +1,134 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Devis box</title>
+
 <style>
-  :root { color-scheme: light dark; }
-  body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 20px;
-    background: #f9f9f9;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-start;
-    min-height: 100vh;
-    gap: 16px;
-  }
-  .wrap {
-    width: 100%;
-    max-width: 420px;
-  }
-  h1 {
-    font-size: 22px;
-    margin: 0 0 8px;
-    text-align: center;
-    color: #111;
-  }
-  label {
-    display: block;
-    font-size: 14px;
-    color: #333;
-    margin: 10px 0 6px;
-  }
-  select, input[type="tel"] {
-    width: 100%;
-    padding: 12px;
-    font-size: 16px;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    background: #fff;
-    outline: none;
-    appearance: none;
-    margin-bottom: 12px;
-  }
-  .price {
-    font-size: 18px;
-    font-weight: 600;
-    margin: 6px 0 4px;
-    color: #111;
-    text-align: center;
-  }
-  .phone {
-    width: 600px;
-  }
-  .desc {
-    font-size: 14px;
-    color: #333;
-    background: #fff;
-    border: 1px solid #e5e5e5;
-    border-radius: 8px;
-    padding: 10px;
-    line-height: 1.4;
-  }
-  .actions {
-    display: flex;
-    gap: 10px;
-    margin-top: 8px;
-  }
-  button {
-    flex: 1;
-    padding: 12px;
-    font-size: 16px;
-    border: none;
-    border-radius: 8px;
-    background: #111;
-    color: #fff;
-  }
-  button:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-  }
-  .toast {
-    font-size: 13px;
-    color: #0a6;
-    margin-top: 8px;
-    display: none;
-  }
+body {
+  font-family: Arial, sans-serif;
+  background: #f9f9f9;
+  padding: 20px;
+}
+
+.wrap {
+  max-width: 420px;
+  margin: auto;
+}
+
+h1 {
+  text-align: center;
+}
+
+select, input, button {
+  width: 100%;
+  padding: 12px;
+  margin-top: 10px;
+  font-size: 16px;
+}
+
+button {
+  background: #111;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+}
+
+button:disabled {
+  opacity: .5;
+}
+
+.price {
+  font-weight: bold;
+  text-align: center;
+  margin-top: 10px;
+}
+
+.desc {
+  background: #fff;
+  padding: 10px;
+  border-radius: 6px;
+  font-size: 14px;
+  margin-top: 5px;
+}
+
+.toast {
+  font-size: 13px;
+  margin-top: 10px;
+}
 </style>
 </head>
+
 <body>
-  <div class="wrap">
-    <h1>Devis box</h1>
+<div class="wrap">
 
-    <label for="offer">Offre box</label>
-    <select id="offer" aria-label="Choisir une offre">
-      <option value="" selected hidden disabled>Offre box</option>
+<h1>Devis box</h1>
 
-      <option
-        value="https://hub03.github.io/starter.html"
-        data-price="27,99 €/mois"
-        data-desc="Box 7 &amp; Décodeur Plus, 160 chaînes, 1Gb/s, WiFi 5, FOS 49€"
-      >Starter</option>
+<select id="offer">
+  <option value="" disabled selected>Choisir une offre</option>
 
-      <option
-        value="https://hub03.github.io/powers.html"
-        data-price="30,99 €/mois"
-        data-desc="Box 8 &amp; Décodeur Plus, 160 chaînes, 1Gb/s, WiFi 6, FOS 49€"
-      >Power S</option>
+  <option value="https://hub03.github.io/starter.html"
+    data-price="27,99 €/mois"
+    data-desc="Box 7 – 1Gb/s – WiFi 5">
+    Starter
+  </option>
 
-      <option
-        value="https://hub03.github.io/power.html"
-        data-price="36,99 €/mois"
-        data-desc="Box 8 &amp; Connect TV, 200 chaînes, 2Gb/s, WiFi 6, FOS 49€"
-      >Power</option>
+  <option value="https://hub03.github.io/power.html"
+    data-price="36,99 €/mois"
+    data-desc="Box 8 – 2Gb/s – WiFi 6">
+    Power
+  </option>
 
-      <option
-        value="https://hub03.github.io/premium.html"
-        data-price="44,99 €/mois"
-        data-desc="Box 8 &amp; Décodeur 8, 200 chaînes, 8Gb/s, WiFi 6, FOS 49€"
-      >Premium</option>
+  <option value="https://hub03.github.io/premium.html"
+    data-price="44,99 €/mois"
+    data-desc="Box 8 – 8Gb/s – WiFi 6">
+    Premium
+  </option>
+</select>
 
-      <option
-        value="https://hub03.github.io/5g.html"
-        data-price="39,99 €/mois"
-        data-desc="Box 5G, Gigas illimités, app SFR TV 200 chaînes, 1Gb/s, WiFi 6, FOS 29€"
-      >Box 5G</option>
+<div id="price" class="price"></div>
+<div id="desc" class="desc"></div>
 
-      <option
-        value="https://hub03.github.io/5gtv.html"
-        data-price="44,99 €/mois"
-        data-desc="Box 5G &amp; Connect TV, Gigas illimités, 200 chaînes, 1Gb/s, WiFi 6, FOS 29€"
-      >Box 5G + TV</option>
+<input id="phone" type="tel" placeholder="Numéro de mobile">
 
-      <option
-        value="https://hub03.github.io/5g-26ans.html"
-        data-price="29,99 €/mois"
-        data-desc="Box 5G, Gigas illimités, app SFR TV 200 chaînes, 1Gb/s, WiFi 6, FOS offerts"
-      >Box 5G -26 ans</option>
-    </select>
+<button id="send" disabled>Envoyer</button>
 
-    <div id="price" class="price" aria-live="polite"></div>
-    <div id="desc" class="desc" aria-live="polite"></div>
+<div id="toast" class="toast"></div>
 
-      <div>&nbsp;</div>
-
-    <input
-      id="phone"
-      type="tel"
-      inputmode="tel"
-      placeholder="Numéro de mobile"
-      autocomplete="tel"
-      aria-label="Numéro de mobile"
-    />
-
-    <div class="actions">
-      <button id="sendBtn" disabled>Envoyer</button>
-    </div>
-
-    <div id="toast" class="toast"></div>
-  </div>
+</div>
 
 <script>
-  const select = document.getElementById('offer');
-  const priceEl = document.getElementById('price');
-  const descEl  = document.getElementById('desc');
-  const phoneEl = document.getElementById('phone');
-  const sendBtn = document.getElementById('sendBtn');
-  const toast   = document.getElementById('toast');
+const offer = document.getElementById('offer');
+const phone = document.getElementById('phone');
+const send  = document.getElementById('send');
+const price = document.getElementById('price');
+const desc  = document.getElementById('desc');
+const toast = document.getElementById('toast');
 
-  select.addEventListener('change', function () {
-    const opt   = this.options[this.selectedIndex];
-    const price = opt.getAttribute('data-price') || '';
-    const desc  = opt.getAttribute('data-desc')  || '';
-    priceEl.textContent = price ? `Prix : ${price}` : '';
-    descEl.textContent  = desc;
-    updateSendEnabled();
-  });
+function update() {
+  const opt = offer.selectedOptions[0];
+  const ok = opt && phone.value.trim();
 
-  phoneEl.addEventListener('input', updateSendEnabled);
+  send.disabled = !ok;
 
-  function updateSendEnabled() {
-    sendBtn.disabled = !getSelectedUrl();
-  }
+  price.textContent = opt ? 'Prix : ' + opt.dataset.price : '';
+  desc.textContent  = opt ? opt.dataset.desc : '';
+}
 
-  function getSelectedUrl() {
-    const idx = select.selectedIndex;
-    if (idx < 0) return '';
-    const opt = select.options[idx];
-    return opt && opt.value ? opt.value : '';
-  }
+offer.addEventListener('change', update);
+phone.addEventListener('input', update);
 
-  function getRawPhone() {
-    return (phoneEl.value || '').trim();
-  }
+send.addEventListener('click', () => {
+  const to = phone.value.trim();
+  const url = offer.value;
+  const msg = `Votre devis SFR : ${url}`;
 
-  function buildSmsUrl(to, body) {
-    const isAndroid = /Android/i.test(navigator.userAgent);
-    const sep = isAndroid ? '?' : '&';
-    return `sms:${encodeURIComponent(to)}${sep}body=${encodeURIComponent(body)}`;
-  }
+  window.location.href = `sms:${to}?body=${encodeURIComponent(msg)}`;
 
-  function buildMessage(url) {
-    return `Nous avons le plaisir de vous transmettre votre devis SFR : ${url}`;
-  }
-
-  sendBtn.addEventListener('click', () => {
-  const url  = getSelectedUrl();
-  const raw  = getRawPhone();
-
-  if (!raw) {
-    toast.style.display = 'block';
-    toast.style.color = '#c00';
-    toast.textContent = 'Veuillez saisir un numéro de mobile.';
-    return;
-  }
-
-  const body   = buildMessage(url);
-  const smsUrl = buildSmsUrl(raw, body);
-
-  window.location.href = smsUrl;
-
-  toast.style.display = 'block';
-  toast.style.color = '#0a6';
   toast.textContent = 'Ouverture de l’application SMS…';
 });
 </script>
+
 </body>
+</html>

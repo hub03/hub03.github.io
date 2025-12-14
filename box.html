@@ -87,7 +87,7 @@ button:disabled {
 
 <div id="price" class="price"></div>
 
-<input id="phone" type="tel" placeholder="Numéro de mobile">
+<input id="phone" type="tel" placeholder="Numéro de mobile" maxlength=10>
 
 <button id="send" disabled>Envoyer</button>
 
@@ -101,7 +101,11 @@ const price = document.getElementById('price');
 
 function update() {
   const opt = offer.selectedOptions[0];
-  const ok = opt && phone.value.trim();
+  const digits = phone.value.replace(/\D/g, '');
+
+  send.disabled = !(opt && digits.length === 10);
+  price.textContent = opt ? 'Prix : ' + opt.dataset.price : '';
+}
 
   send.disabled = !ok;
   price.textContent = opt ? 'Prix : ' + opt.dataset.price : '';

@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <title>Liens de rappel SFR & RED</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    /* --- Style global --- */
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background: #f8f9fb;
+      color: #222;
+    }
+
+    header {
+      background: linear-gradient(90deg, #e2001a, #c10017);
+      color: #fff;
+      padding: 40px 20px;
+      text-align: center;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 20px;
+      font-weight: 600;
+    }
+
+    main {
+      max-width: 900px;
+      margin: 40px auto;
+      padding: 0 20px;
+      display: grid;
+      gap: 40px;
+    }
+
+    section {
+      background: #fff;
+      border-radius: 14px;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+      padding: 25px 30px;
+      transition: transform 0.2s ease;
+    }
+
+    h2 {
+      font-size: 22px;
+      font-weight: 600;
+      margin-top: 0;
+      margin-bottom: 20px;
+      border-left: 5px solid red;
+      padding-left: 10px;
+    }
+
+    .red h2 {
+      border-color: green;
+    }
+
+    .links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    a.link {
+      flex: 1 1 calc(50% - 12px);
+      text-decoration: none;
+      background: #f3f3f3;
+      color: #222;
+      font-weight: 500;
+      padding: 14px 18px;
+      border-radius: 10px;
+      text-align: center;
+      transition: all 0.2s ease;
+      border: 1px solid #e0e0e0;
+    }
+
+    @media (max-width: 600px) {
+      a.link {
+        flex: 1 1 100%;
+      }
+      main {
+        gap: 30px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Liens de rappel</h1>
+  </header>
+
+  <main>
+    <!-- SFR -->
+    <section class="sfr">
+      <h2>SFR</h2>
+      <div class="links">
+        <a class="link" href="https://appel.sfr.fr/webcallback_form?CAMPAIGN_ID=591bf8d780df1a8d4a8b4567" target="_blank">Déménagement</a>
+        <a class="link" href="https://appel.sfr.fr/webcallback_form?CAMPAIGN_ID=60ae5e5b3735652fb8000000" target="_blank">Résiliation</a>
+        <a class="link" href="tel:0171251186">Réclamation conso box</a>
+      </div>
+    </section>
+
+    <!-- RED -->
+    <section class="red">
+      <h2>RED by SFR</h2>
+      <div class="links">
+        <a class="link" href="https://appel.sfr.fr/webcallback_form?CAMPAIGN_ID=58779f7d80df1a8b128b4568" target="_blank">Déménagement</a>
+        <a class="link" href="https://appel.sfr.fr/webcallback_form?CAMPAIGN_ID=59b137e97fdf1aae778b4568" target="_blank">Résiliation box</a>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

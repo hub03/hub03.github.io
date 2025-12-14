@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>SFR Box 5G avec TV</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Roboto', Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f8f8f8;
+      color: #111;
+    }
+
+    .container {
+      max-width: 700px;
+      margin: 20px auto;
+      padding: 20px;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    /* Header avec titre et prix/engagement */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    h1 {
+      font-size: 26px;
+      margin: 0;
+      color: #e2001a;
+    }
+
+    .price-box {
+      text-align: right;
+    }
+
+    .price-box .price {
+      font-size: 28px;
+      font-weight: bold;
+      margin: 0;
+    }
+
+    .price-box .engagement {
+      margin: 0;
+      color: #777;
+      font-size: 14px;
+    }
+
+    .subtitle {
+      font-size: 16px;
+      color: #555;
+      margin: 16px 0;
+    }
+
+    .hero-img {
+      width: 100%;
+      max-width: 200px;
+      display: block;
+      margin: 0 auto 20px auto;
+    }
+
+    .features {
+      display: flex;
+      justify-content: space-between;
+      text-align: center;
+      margin: 20px 0;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+
+    .feature {
+      background: #f1f1f1;
+      flex: 1 1 30%;
+      padding: 15px;
+      border-radius: 8px;
+      font-size: 14px;
+    }
+
+    .feature img {
+      width: 40px;
+      margin-bottom: 8px;
+    }
+
+    .included {
+      margin-top: 20px;
+      font-size: 15px;
+    }
+
+    .included img {
+      vertical-align: middle;
+      margin-right: 8px;
+    }
+
+    .cta-button {
+      display: block;
+      text-align: center;
+      margin: 25px auto 0 auto;
+      padding: 12px 25px;
+      background-color: #e2001a;
+      color: #fff;
+      font-size: 16px;
+      font-weight: bold;
+      text-decoration: none;
+      border-radius: 8px;
+      transition: background 0.3s;
+    }
+
+    .cta-button:hover {
+      background-color: #b10014;
+    }
+
+    /* Mentions légales */
+    details {
+      margin-top: 30px;
+      background: #f1f1f1;
+      padding: 15px;
+      border-radius: 8px;
+      font-size: 13px;
+      line-height: 1.4;
+    }
+
+    details summary {
+      font-weight: bold;
+      cursor: pointer;
+      outline: none;
+    }
+
+    @media (max-width: 500px) {
+      .features {
+        flex-direction: column;
+      }
+      .feature {
+        flex: 1 1 100%;
+      }
+      .header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .price-box {
+        text-align: left;
+        margin-top: 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <div class="header">
+    <h1>SFR Box 5G avec TV</h1>
+    <div class="price-box">
+      <p class="price">44,99€ / mois</p>
+      <p class="engagement">Sans engagement</p>
+    </div>
+  </div>
+
+  <p class="subtitle">La 5G avec un décodeur TV</p>
+
+  <img class="hero-img" src="https://static.s-sfr.fr/media/Fixe/BoxDecodeur/box5g-connect-246.png" />
+
+  <div class="features">
+    <div class="feature">
+      <img src="https://static.s-sfr.fr/assets/pictos/5g_rouge.svg" />
+      <div>Jusqu'à 1.1 Gb/s ↓<br>150 Mb/s ↑</div>
+    </div>
+    <div class="feature">
+      <img src="https://static.s-sfr.fr/assets/pictos/wifi6_40_rouge.svg" />
+      <div>WiFi 6</div>
+    </div>
+    <div class="feature">
+      <img src="https://static.s-sfr.fr/assets/pictos/tv3_40_rouge.svg" />
+      <div>200 chaînes TV incluses</div>
+    </div>
+  </div>
+
+  <div class="included">
+    <p><img src="https://static.s-sfr.fr/assets/pictos/check_gras_40_rouge.svg" height="20" /> Box 5G WiFi 6</p>
+    <p><img src="https://static.s-sfr.fr/assets/pictos/check_gras_40_rouge.svg" height="20" /> Décodeur Connect TV Android</p>
+    <p><img src="https://static.s-sfr.fr/assets/pictos/check_gras_40_rouge.svg" height="20" /> Appels illimités vers les fixes et mobiles en France</p>
+	<p><img src="https://static.s-sfr.fr/assets/pictos/check_gras_40_rouge.svg" height="20" /> Inclus au choix pendant 6 mois :</p>
+	<p><img src="https://static.s-sfr.fr/media/logo-netflix-standard-pub-72x38.svg" height=30px /> <img src="https://static.s-sfr.fr/media/Fixe/Disneyavecpub_logo_72.svg" height=30px /> <img src="https://static.s-sfr.fr/media/Fixe/Prime_logo_72.svg" height=30px /></p>
+  </div>
+
+  <a href="https://c.sfr.fr/instore-services?idPdv=1003673&nomPdv=SFR%20Caen%20Strasbourg" class="cta-button" target="_blank">Prendre rendez-vous en boutique</a>
+
+  <div align=center style="font-size:0.8em;color:gray;">&nbsp;<br>Lors de votre visite pensez à apporter une pièce d'identité valide ainsi qu'un relevé d'identité bancaire.</div>
+
+  <details>
+    <summary>Mentions légales</summary>
+    <p>Offre Box 5G avec TV<br>
+    Offre sans engagement soumise à conditions, valable en France métropolitaine jusqu'au <span id="currentDate"></span>, à l'adresse de souscription et utilisable uniquement depuis cette adresse et sous réserve de couverture 5G. Frais d’ouverture de service de 29 €. Frais de résiliation de 19 €. Box 5G et Connect TV obligatoires et mises à disposition.<br><br>
+	Téléphone :Appels illimités en France métropolitaine vers la France métropolitaine et vers les DOM. Hors numéros spéciaux, services dont services de radiomessagerie et appels depuis boîtiers radio. 3 heures maximum par appel coupé au bout des 3 heures. Limités à 200 destinataires différents par mois. Appels via téléphone fixe branché à la Box 5G.<br><br>
+	Internet illimité en France Métropolitaine : Accès réservé à un usage strictement personnel et privé et uniquement via le service Box 5G. En cas d’usages en continu fortement consommateurs de bande passante (de type peer-to-peer ou téléchargement par exemple) de nature à saturer le réseau sur une zone donnée, et pouvant nuire aux utilisateurs SFR sur cette zone, le client sera notifié par SMS ou email de son usage déraisonnable. En cas de récidive suite à cette notification, le client verra son débit réduit jusqu’à la prochaine date de facturation.<br><br>
+	Service TV via l’application SFR TV : Service TV accessible via l'application SFR TV sur smartphone, tablette ou via le site tv.sfr.fr en utilisant votre identifiant personnel. Non compatible avec TV connectée ou lecteur multimédia TV (appareils permettant la diffusion de contenus multimédia depuis votre smartphone, votre tablette ou votre ordinateur sur TV).<br><br>
+	Service TV via la Connect TV : Service TV accessible via le décodeur Connect TV mis à disposition en utilisant votre identifiant personnel.<br><br>
+	Réseau 5G en cours de déploiement, valable sous réserve de couverture. Détails de couverture sur http://www.sfr.fr/couverture. Débit descendant maximum théorique de 1,1 Gb/s et débit montant maximum théorique jusqu’à 150 Mbits/s.<br><br>
+	Netflix Standard avec pub et Bouquet Famille inclus pendant 6 mois puis 5,99 €/mois<br><br>
+	Offre soumise à conditions réservée aux nouveaux clients pour toute souscription à une offre Box 5G avec TV. En cas de changement d’offre Box 5G au cours des 6 mois, perte de la remise supplémentaire. Option mensuelle, valable en France métropolitaine, réservée aux abonnés Box 5G avec TV de SFR, permettant d’accéder à Netflix Standard avec pub et à des chaînes TV du Bouquet Famille. Option résiliable à tout moment depuis votre espace client ou au Service Client.<br><br>
+	Bouquet Famille : Accès au bouquet Famille via le décodeur TV. Liste des chaînes et des programmes susceptibles d’évolution.<br><br>
+	Netflix : Le service Netflix est distribué par Netflix, accessible dans la limite de 1 écran via l’application dédiée uniquement, sur terminaux compatibles et depuis le décodeur TV pour les abonnés Box, après activation d’un compte Netflix et acceptation des conditions d’utilisation (https://help.netflix.com/fr/legal/termsofuse). Fonctionnalités téléchargement et partage de comptes indisponibles. Des limitations s'appliquent (https://help.netflix.com/fr/node/126831/fr). L’abonné SFR est un client Netflix pour l’utilisation du service.  Netflix et SFR se réservent la possibilité de remplacer l'offre Netflix Standard avec pub par toute offre équivalente ou supérieure, aux mêmes conditions.<br><br>
+	Prime et Bouquet Famille inclus 6 mois puis 6,99 €/mois<br><br>
+	Offre soumise à conditions réservée aux nouveaux clients pour toute souscription à une offre Box 5G avec TV. En cas de changement d’offre Box 5G au cours des 6 mois, perte de la remise supplémentaire. Option mensuelle, valable en France métropolitaine, réservée aux abonnés Box 5G avec TV de SFR, permettant d’accéder à Prime et à des chaînes TV du Bouquet Famille. Option résiliable à tout moment depuis votre espace client ou au Service Client.<br><br>
+	Bouquet Famille : accès au bouquet Famille via le décodeur TV. Liste des chaînes et des programmes susceptibles d’évolution.<br><br>
+	Prime : le service Prime est distribué par Amazon. Abonnement mensuel sans engagement permettant l’accès aux avantages Prime (liste accessible sur https://www.amazon.fr/amazonprime). Accessible après activation du service auprès de SFR, création d’un compte Amazon et acceptation des Conditions d’Utilisation (consultables sur https://www.amazon.fr/gp/help/customer/display.html?nodeId=201910780). <br><br>
+	Disney+ Standard avec pub et Bouquet Famille inclus 6 mois puis 6,99 €/mois<br><br>
+	Offre soumise à conditions réservée aux nouveaux clients pour toute souscription à une offre Box 5G avec TV. En cas de changement d’offre Box 5G au cours des 6 mois, perte de la remise supplémentaire. Option mensuelle, valable en France métropolitaine, depuis l'Union Européenne et les DOM, , réservée aux abonnés Box 5G avec TV de SFR, permettant d’accéder au Service DISNEY+ et à des chaînes TV du Bouquet Famille. Option résiliable à tout moment depuis votre espace client ou au Service Client.<br><br>
+	Bouquet Famille : accès au bouquet Famille via le décodeur TV. Liste des chaînes et des programmes susceptibles d’évolution.<br><br>
+	Disney+ :dans la limite de 2 écrans en simultané. Accès à DISNEY+ via l’application dédiée depuis le décodeur SFR, Smart TV, smartphone, tablette, ordinateurs compatibles, après création d’un compte DISNEY+ et acceptation des conditions d’utilisation de Disney+ (https://www.disneyplus.com/fr-fr/legal/conditions-générales-d’abonnement) qui traitera vos données personnelles en qualité de responsable de traitement pour l’exécution du contrat.​<br><br>
+	Contrôle de localisation : Le Service internet Box 5G est un service fixe utilisant la technologie 5G de SFR. Aussi, il sera fourni et utilisé exclusivement depuis l’adresse de souscription du Client. Le Client s’interdit toute utilisation frauduleuse, abusive ou excessive des Services (telle que notamment : créer un serveur vocal et/ou rerouter et/ou détourner des communications; détourner la finalité ou dégrader le Service; diffuser tout virus ou fichier informatique conçu pour limiter, interrompre ou détruire le réseau et/ou tout terminal ou autre outil de télécommunication, transmettre toute publicité non sollicitée ou non autorisée...) pouvant ainsi perturber la disponibilité des dits serveurs ou réseau. De même, afin d’assurer la sécurité, la gestion et la conformité du réseau SFR, le Client s’interdit d’utiliser le service Box 5G depuis une adresse autre que celle pour laquelle il a souscrit ; sa fourniture depuis l’adresse d’éligibilité étant consubstantielle au service Box 5G SFR se réserve donc la possibilité de suspendre et/ ou de résilier, l’accès au réseau SFR du Client qui contreviendrait aux usages interdits.<br><br>
+  </details>
+</div>
+
+<script>
+  // Insérer automatiquement la date du jour
+  const today = new Date();
+  const formattedDate = today.toLocaleDateString('fr-FR');
+  document.getElementById('currentDate').textContent = formattedDate;
+</script>
+
+</body>
+</html>

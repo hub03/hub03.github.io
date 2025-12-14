@@ -23,6 +23,7 @@ h1 {
 
 select, input, button {
   width: 100%;
+  box-sizing: border-box;
   padding: 12px;
   margin-top: 10px;
   font-size: 16px;
@@ -36,26 +37,13 @@ button {
 }
 
 button:disabled {
-  opacity: .5;
+  opacity: 0.5;
 }
 
 .price {
   font-weight: bold;
   text-align: center;
-  margin-top: 10px;
-}
-
-.desc {
-  background: #fff;
-  padding: 10px;
-  border-radius: 6px;
-  font-size: 14px;
-  margin-top: 5px;
-}
-
-.toast {
-  font-size: 13px;
-  margin-top: 10px;
+  margin-top: 12px;
 }
 </style>
 </head>
@@ -68,33 +56,40 @@ button:disabled {
 <select id="offer">
   <option value="" disabled selected>Choisir une offre</option>
 
-  <option value="https://hub03.github.io/starter.html"
-    data-price="27,99 €/mois"
-    data-desc="Box 7 – 1Gb/s – WiFi 5">
+  <option value="https://hub03.github.io/starter.html" data-price="27,99 €/mois">
     Starter
   </option>
 
-  <option value="https://hub03.github.io/power.html"
-    data-price="36,99 €/mois"
-    data-desc="Box 8 – 2Gb/s – WiFi 6">
+  <option value="https://hub03.github.io/powers.html" data-price="30,99 €/mois">
+    Power S
+  </option>
+
+  <option value="https://hub03.github.io/power.html" data-price="36,99 €/mois">
     Power
   </option>
 
-  <option value="https://hub03.github.io/premium.html"
-    data-price="44,99 €/mois"
-    data-desc="Box 8 – 8Gb/s – WiFi 6">
+  <option value="https://hub03.github.io/premium.html" data-price="44,99 €/mois">
     Premium
+  </option>
+
+  <option value="https://hub03.github.io/5g.html" data-price="39,99 €/mois">
+    Box 5G
+  </option>
+
+  <option value="https://hub03.github.io/5gtv.html" data-price="44,99 €/mois">
+    Box 5G + TV
+  </option>
+
+  <option value="https://hub03.github.io/5g-26ans.html" data-price="29,99 €/mois">
+    Box 5G -26 ans
   </option>
 </select>
 
 <div id="price" class="price"></div>
-<div id="desc" class="desc"></div>
 
 <input id="phone" type="tel" placeholder="Numéro de mobile">
 
 <button id="send" disabled>Envoyer</button>
-
-<div id="toast" class="toast"></div>
 
 </div>
 
@@ -103,30 +98,30 @@ const offer = document.getElementById('offer');
 const phone = document.getElementById('phone');
 const send  = document.getElementById('send');
 const price = document.getElementById('price');
-const desc  = document.getElementById('desc');
-const toast = document.getElementById('toast');
 
 function update() {
   const opt = offer.selectedOptions[0];
   const ok = opt && phone.value.trim();
 
   send.disabled = !ok;
-
   price.textContent = opt ? 'Prix : ' + opt.dataset.price : '';
-  desc.textContent  = opt ? opt.dataset.desc : '';
 }
 
 offer.addEventListener('change', update);
 phone.addEventListener('input', update);
 
 send.addEventListener('click', () => {
-  const to = phone.value.trim();
+  const to  = phone.value.trim();
   const url = offer.value;
-  const msg = `Votre devis SFR : ${url}`;
 
-  window.location.href = `sms:${to}?body=${encodeURIComponent(msg)}`;
+  const message =
+    `Suite à votre demande effectuée en boutique SFR, ` +
+    `nous avons le plaisir de vous transmettre votre devis personnalisé pour une offre Box SFR.\n\n` +
+    `Vous pouvez le consulter à l’adresse suivante :\n${url}\n\n` +
+    `Nous restons à votre disposition pour toute information complémentaire.\n\n` +
+    `Cordialement,\nVotre conseiller SFR`;
 
-  toast.textContent = 'Ouverture de l’application SMS…';
+  window.location.href = `sms:${to}?body=${encodeURIComponent(message)}`;
 });
 </script>
 

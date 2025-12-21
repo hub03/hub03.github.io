@@ -142,6 +142,33 @@
         margin-top: 10px;
       }
     }
+	.hero-flex {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px; /* espace entre les images et le + */
+  margin: 20px 0;
+}
+
+.plus-sign {
+  font-size: 2.5em;
+  font-weight: bold;
+  color: #e2001a;
+}
+
+@media (max-width: 500px) {
+  .hero-flex {
+    flex-direction: column;
+  }
+  .plus-sign {
+    font-size: 2em;
+    margin: 10px 0;
+  }
+  .hero-img {
+    width: 50%;
+    max-width: 150px;
+  }
+}
   </style>
 </head>
 <body>
@@ -156,19 +183,11 @@
     </div>
   </div>
 
-  <table align=center border=0 width=100% height=200px>
-	<tr>
-	  <td>
-		  <div align=center><img class="hero-img" src="https://static.s-sfr.fr/assets/pictos/sim_40_rouge.svg" /></div>
-	  </td>
-	  <td>
-		  <div align=center><span style="font-size:2em;font-weight:bold;">+</span></div>
-	  </td>
-	  <td>
-		  <div align=center><img class="hero-img" src="https://static.s-sfr.fr/assets/pictos/smartphone_euro.svg" /></div>
-	  </td>
-  </tr>
-</table>
+  <div class="hero-flex">
+  <img class="hero-img" src="https://static.s-sfr.fr/assets/pictos/sim_40_rouge.svg" />
+  <span class="plus-sign">+</span>
+  <img class="hero-img" src="https://static.s-sfr.fr/assets/pictos/smartphone_euro.svg" />
+</div>
 
   <div class="features">
     <div class="feature">

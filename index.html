@@ -6,378 +6,207 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
   <style>
-    @mixin vp-anim($radius,$pname, $deg: 360deg) {
-  @-webkit-keyframes rot-#{$pname} {
-    from {
-      -webkit-transform: rotate(0deg)
-                 translatey(-$radius)
-                 rotate(0deg);
-    }
-    to {
-      -webkit-transform: rotate(360deg)
-                 translatey(-$radius) 
-                 rotate(-$deg);
-    }
-  }
-  @-moz-keyframes rot-#{$pname} {
-    from {
-      -moz-transform: rotate(0deg)
-                 translatey(-$radius)
-                 rotate(0deg);
-    }
-    to {
-      -moz-transform: rotate(360deg)
-                 translatey(-$radius) 
-                 rotate(-$deg);
-    }
-  }
-  @-keyframes rot-#{$pname} {
-    from {
-      transform: rotate(0deg)
-                 translatey(-$radius)
-                 rotate(0deg);
-    }
-    to {
-      transform: rotate(360deg)
-                 translatey(-$radius) 
-                 rotate(-$deg);
-    }
-  }
+    :root {
+  --color: var(--yellow-5);
+  --shadow: var(--yellow-8);
+  --glare: hsl(0 0% 100% / 0.75);
+  --font-size: var(--font-size-fluid-3);
+  --transition: 0.2s;
 }
 
-$baseUnit: 0.1;        // Speed of Orrery. At 1, 1 sec = 1 day
-$sunRad: 72px;          // Radius of the sun, added to orbit radii
-$rFactor: 2;            // Adding a radius factor so orbit radii are easier to observe
-$middleOffset: 800px;
-
-$scale: 0.75;              // Play around with changing this to change the visible motion default: 0.75
-
-$middle: $middleOffset*(1/$scale);
-
-$planets: (
-  ('mer',8.8s*$baseUnit,(6px*$rFactor)+$sunRad,1.75px,#888),
-  ('ven',22.5s*$baseUnit,(9px*$rFactor)+$sunRad,2.75px,#f5f9be),
-  ('ear',36.5s*$baseUnit,(15px*$rFactor)+$sunRad,3.5px,#4b94f9),
-  ('mar',68.7s*$baseUnit,(23px*$rFactor)+$sunRad,3px,#dd411a),
-  ('jup',433.2s*$baseUnit,(78px*$rFactor)+$sunRad,35px,#eaad3b),
-  ('sat',1075.9s*$baseUnit,(145px*$rFactor)+$sunRad,29px,#d6cd93),
-  ('ura',3068.7s*$baseUnit,(288px*$rFactor)+$sunRad,13px,#bfeef2),
-  ('nep',6019s*$baseUnit,(450px*$rFactor)+$sunRad,12px,#363ed7),
-  ('plu',9046.5s*$baseUnit,(587px*$rFactor)+$sunRad,1.5px,#963)
- );
+* {
+  box-sizing: border-box;
+}
 
 body {
-  background-color: #012;
-  background-image: url('https://cssanimation.rocks/starwars/images/bg.jpg');
-  background-size: 33%;
-  background-repeat: repeat;
-  min-height: 2700px * $scale;
+  display: grid;
+  place-items: center;
+  min-height: 100vh;
+  font-family: 'Google Sans', sans-serif, system-ui;
+  background: var(--gray-9);
 }
 
-
-.system {
-  position:relative;
-  top: 0; left: 0;
-  width:100%;
-  height:100%;
-  -webkit-transform: scale($scale);
-  -moz-transform: scale($scale);
-  transform: scale($scale);
+a {
+  --padding: var(--size-2);
+  padding: var(--padding);
+  border-radius: var(--size-4);
+  text-decoration: none;
+  color: transparent;
+  position: relative;
+  transition: background 0.2s;
 }
 
-.sun {
-  width: $sunRad*2;
-  height:$sunRad*2;
-  border-radius: $sunRad;
-  position:absolute;
-  top: $middle;
-  left:50%;
-  margin: -$sunRad;
-  //background-color: yellow;
-  background-image: url('http://sdo.gsfc.nasa.gov/assets/img/latest/latest_256_HMIIF.jpg');
-  background-size:$sunRad*2;
-  background-repeat:no-repeat;
+a:hover {
+  background: var(--gray-8);
 }
 
-@each $planet in $planets {
-  $name: nth($planet, 1);
-  $orb: nth($planet,2);
-  $rad: nth($planet,3);
-  $prad: nth($planet,4);
-  $col: nth($planet,5);
-  
-  @include vp-anim($rad,$name);
-  
-    .#{$name} {
-      width: $prad * 2;
-      height: $prad*2;
-      border-radius:50%;
-      background-color:$col;
-      position: absolute;
-      top: $middle;
-      left: 50%;
-      margin: -$prad;
-      -webkit-animation: rot-#{$name} $orb infinite linear;
-      -moz-animation: rot-#{$name} $orb infinite linear;
-      animation: rot-#{$name} $orb infinite linear; 
-      z-index:200;
-    }
-  .#{$name}-path {
-        $orbitPath: $rad*2;
-        width: $orbitPath;
-        height: $orbitPath;
-        border-radius:50%;
-        z-index:100;
-        position:absolute;
-        top: $middle;
-        left:50%;
-        margin:-($orbitPath / 2);
-        border: solid 1px #444;
-      }
+span {
+  display: inline-block;
+  font-size: calc(var(--font-size) * 1.5);
+  font-weight: var(--font-weight-9);
+  transition: all 0.2s;
+  text-decoration: none;
+  text-shadow:
+    calc(var(--hover) * (var(--font-size) * -0)) calc(var(--hover) * (var(--font-size) * 0)) var(--shadow),
+    calc(var(--hover) * (var(--font-size) * -0.02)) calc(var(--hover) * (var(--font-size) * 0.02)) var(--shadow),
+    calc(var(--hover) * (var(--font-size) * -0.04)) calc(var(--hover) * (var(--font-size) * 0.04)) var(--shadow),
+    calc(var(--hover) * (var(--font-size) * -0.06)) calc(var(--hover) * (var(--font-size) * 0.06)) var(--shadow),
+    calc(var(--hover) * (var(--font-size) * -0.08)) calc(var(--hover) * (var(--font-size) * 0.08)) var(--shadow),
+    calc(var(--hover) * (var(--font-size) * -0.10)) calc(var(--hover) * (var(--font-size) * 0.10)) var(--shadow);
+/*     calc(var(--hover) * -2px) calc(var(--hover) * 2px) var(--shadow),
+    calc(var(--hover) * -3px) calc(var(--hover) * 3px) var(--shadow),
+    calc(var(--hover) * -4px) calc(var(--hover) * 4px) var(--shadow), */
+/*     calc(var(--hover) * -5px) calc(var(--hover) * 5px) var(--shadow); */
+  transform: translate(calc(var(--hover) * (var(--font-size) * 0.10)), calc(var(--hover) * (var(--font-size) * -0.10)));
 }
 
-@include vp-anim(7px,lune);
-
-.lune {
-  width:2px;
-  height:2px;
-  background-color: #fff;
-  position:absolute;
-  $lunOrb: 2.7s * $baseUnit;
-  top: 50%;
-  left:50%;
-  margin:-1.5px;
-  -webkit-animation: rot-lune $lunOrb infinite linear;
-  -moz-animation: rot-lune $lunOrb infinite linear;
-  animation: rot-lune $lunOrb infinite linear;
+span:last-of-type {
+  position: absolute;
+  inset: var(--padding);
+  background: linear-gradient(
+    108deg,
+    transparent 0 55%,
+    var(--glare) 55% 60%,
+    transparent 60% 70%,
+    var(--glare) 70% 85%,
+    transparent 85%
+  ) calc(var(--pos) * -200%) 0% / 200% 100%, var(--color);
+  -webkit-background-clip: text;
+  color: transparent;
+  z-index: 2;
+  text-shadow: none;
+  transform: translate(calc(var(--hover) * (var(--font-size) * 0.10)), calc(var(--hover) * (var(--font-size) * -0.10)));
 }
 
-.mar {
-  background-image: repeating-linear-gradient(
-    to bottom,
-    #fff,
-    #fff 1px,
-    transparent 1px,
-    transparent 5px
-  );
+span:last-of-type {
+  transition: transform 0.2s, background-position 0s;
 }
 
-@include vp-anim(7px,pho);
-@include vp-anim(9px,dem);
-
-.pho, .dem {
-  width:1px;
-  height:1px;
-  background-color: #fff;
-  position:absolute;
-  top: 50%;
-  left:50%;
+a:hover span:last-of-type {
+  transition: transform 0.2s, background-position calc(var(--hover) * 1.5s) calc(var(--hover) * 0.25s);
 }
 
-.pho {
-  $phoOrb: 1.5s * $baseUnit;  // Should be 0.33s but spins like it's having a fit.
-  margin:-1px;
-  -webkit-animation: rot-pho $phoOrb infinite linear;
-  -moz-animation: rot-pho $phoOrb infinite linear;
-  animation: rot-pho $phoOrb infinite linear;
+a {
+  --hover: 0.4;
+  --pos: 0;
 }
 
-.dem {
-  $demOrb: 2s * $baseUnit;  // Should be 1.25s, spins too fast
-  margin:-1px;
-  -webkit-animation: rot-dem $demOrb infinite linear;
-  -moz-animation: rot-dem $demOrb infinite linear;
-  animation: rot-dem $demOrb infinite linear;
+a:hover {
+  --hover: 1;
+  --pos: 1;
 }
 
-$jupR: 35px;
-.jove {
-  width:2px;
-  height:2px;
-  background-color: #fff;
-  position:absolute;
-  top: $jupR;
-  left:50%;
+a:active {
+  --hover: 0;
 }
 
-
-@include vp-anim($jupR + 4px,io);
-@include vp-anim($jupR + 6px,eur);
-@include vp-anim($jupR + 10px,gan);
-@include vp-anim($jupR + 18px,cal);
-
-.io {
-  $jioOrb: 2s*$baseUnit;
-  -webkit-animation: rot-io $jioOrb infinite linear;
-  -moz-animation: rot-io $jioOrb infinite linear;
-  animation: rot-io $jioOrb infinite linear;
+a:active span:last-of-type {
+  --hover: 0;
+  --pos: 1;
 }
 
-.eur {
-  $jeurOrb: 3.5s*$baseUnit;
-  -webkit-animation: rot-eur $jeurOrb infinite linear;
-  -moz-animation: rot-eur $jeurOrb infinite linear;
-  animation: rot-eur $jeurOrb infinite linear;
+a svg {
+	position: absolute;
+	z-index: 3;
+	width: calc(var(--font-size) * 0.5);
+	aspect-ratio: 1;
 }
 
-.gan {
-  $jganOrb: 7s*$baseUnit;
-  -webkit-animation: rot-gan $jganOrb infinite linear;
-  -moz-animation: rot-gan $jganOrb infinite linear;
-  animation: rot-gan $jganOrb infinite linear;
+a svg path {
+	fill: var(--glare);
 }
 
-.cal {
-  $jcalOrb: 16.5s*$baseUnit;
-  -webkit-animation: rot-cal $jcalOrb infinite linear;
-  -moz-animation: rot-cal $jcalOrb infinite linear;
-  animation: rot-cal $jcalOrb infinite linear;
+/* Animation for sparkles */
+
+a:hover svg {
+	animation: sparkle 0.75s calc((var(--delay-step) * var(--d)) * 1s) both;
 }
 
-.jup {
-  background-image: repeating-linear-gradient(
-    6deg,
-    #797663 22px,
-    #e1dcde 16px,
-    #c3a992 30px,
-    #e9ece2 30px
-  );
+@keyframes sparkle {
+	50% {
+		transform: translate(-50%, -50%) scale(var(--s, 1));
+	}
 }
 
-.spot {
-  position:absolute;
-  width:16px;height:12px;
-  border-radius: 8px / 6px;
-  top: $jupR+10;
-  left:50%;
-  background-color:#bc833b;
-  box-shadow: 0px 0px 5px #e1dcde;
-  border:solid 1px #e1dcde;
-  box-sizing:border-box;
-  -moz-box-sizing:border-box;
-  -webkit-box-sizing:border-box;
-  z-index:300;
-  .nep & {
-    background-color:darken(#343ec5, 10%);
-    border: 0;
-    box-shadow: none;
-    top: 50%;
-    left:45%;
-    width: 10px;
-    height: 6px;
-    margin: -2px;
-    border-radius: 5px / 3px;
-    border-left:solid 1px #7ed6fe;
-  }
+a svg {
+	--delay-step: 0.15;
+	top: calc(var(--y, 50) * 1%);
+	left:  calc(var(--x, 0) * 1%);
+	transform: translate(-50%, -50%) scale(0);
 }
 
-$satD: 29px * 2;
-div[class$="-ring"] {
-  border-radius: 50%;
-  position:absolute;
-  top: 50%;
-  left:50%;
-  opacity: 0.7;
-  $tilt: 45deg;
-  -webkit-transform: rotatex($tilt);
-  -moz-transform: rotatex($tilt);
-  transform: rotatex($tilt);
+a svg:nth-of-type(1) {
+	--x: 0;
+	--y: 20;
+	--s: 1.1;
+	--d: 1;
 }
 
-.a-ring {
-  $ringD: $satD + 61;
-  $ringW: 5px;
-  border:solid $ringW #96866f;
-  width: $ringD;
-  height: $ringD;
-  margin: -($ringD / 2) - $ringW;
-}
-.b-ring {
-  $ringD: $satD + 46;
-  $ringW: 10px;
-  border:solid $ringW #554c3c;
-  width: $ringD;
-  height: $ringD;
-  margin: -($ringD / 2) - $ringW;
+a svg:nth-of-type(2) {
+	--x: 15;
+	--y: 80;
+	--s: 1.25;
+	--d: 2;
 }
 
-.c-ring {
-  $ringD: $satD + 37;
-  $ringW: 9px;
-  border:solid $ringW #574f4a;
-  width: $ringD;
-  height: $ringD;
-  margin: -($ringD / 2) - $ringW;
+a svg:nth-of-type(3) {
+	--x: 45;
+	--y: 40;
+	--s: 1.1;
+	--d: 3;
 }
 
-.f-ring {
-  $ringD: $satD + 75;
-  $ringW: 2px;
-  border:solid $ringW #908e8d;
-  width: $ringD;
-  height: $ringD;
-  margin: -($ringD / 2) - $ringW;
+a svg:nth-of-type(4) {
+	--x: 75;
+	--y: 60;
+	--s: 0.9;
+	--d: 2;
 }
 
-$uraD: 13px * 2;
-.e-ring {
-  $ringD: $uraD + 50;
-  $ringW: 7px;
-  border:solid $ringW #908e8d;
-  width: $ringD;
-  height: $ringD;
-  margin: -($ringD / 2) - $ringW;
-  $tilt: 0deg;
-  $axis: 89deg;
-  -webkit-transform: rotatex($tilt) rotatey($axis) !important;
-  -moz-transform: rotatex($tilt) rotatey($axis) !important;
-  transform: rotatex($tilt) rotatey($axis) !important;
-}
-
-.plu, .plu-path {
-  top: $middle + 287.4px;
+a svg:nth-of-type(5) {
+	--x: 100;
+	--y: 30;
+	--s: 0.8;
+	--d: 4;
 }
   </style>
 </head>
 <body>
-  <div class="system">
-  <div class="sun"></div>
-  <div class="mer-path"></div>
-    <div class="mer"></div>
-  <div class="ven-path"></div>
-  <div class="ven"></div>
-  <div class="ear-path"></div>
-  <div class="ear"><div class="lune"></div></div>
-  <div class="mar-path"></div>
-  <div class="mar">
-    <div class="pho"></div>
-    <div class="dem"></div>
-  </div>
-  <div class="jup-path"></div>
-  <div class="jup">
-    <div class="spot"></div>
-    <div class="jove io"></div>
-    <div class="jove eur"></div>
-    <div class="jove gan"></div>
-    <div class="jove cal"></div>
-  </div>
-  <div class="sat-path"></div>
-  <div class="sat">
-    <div class="f-ring"></div>
-    <div class="a-ring"></div>
-    <div class="b-ring"></div>
-    <div class="c-ring"></div>
-  </div>
-  <div class="ura-path"></div>
-  <div class="ura">
-    <div class="e-ring"></div>
-  </div>
-  <div class="nep-path"></div>
-  <div class="nep">
-    <div class="spot"></div>
-  </div>
-  <div class="plu-path"></div>
-  <div class="plu"></div>
-</div>
+  <a href="#">
+      <!-- Drop as many sparkles in as you need and scope the speed -->
+      <svg viewBox="0 0 96 96" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path
+          d="M93.781 51.578C95 50.969 96 49.359 96 48c0-1.375-1-2.969-2.219-3.578 0 0-22.868-1.514-31.781-10.422-8.915-8.91-10.438-31.781-10.438-31.781C50.969 1 49.375 0 48 0s-2.969 1-3.594 2.219c0 0-1.5 22.87-10.406 31.781-8.908 8.913-31.781 10.422-31.781 10.422C1 45.031 0 46.625 0 48c0 1.359 1 2.969 2.219 3.578 0 0 22.873 1.51 31.781 10.422 8.906 8.911 10.406 31.781 10.406 31.781C45.031 95 46.625 96 48 96s2.969-1 3.562-2.219c0 0 1.523-22.871 10.438-31.781 8.913-8.908 31.781-10.422 31.781-10.422Z"
+          fill="#000"
+        />
+      </svg>
+      <svg viewBox="0 0 96 96" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path
+          d="M93.781 51.578C95 50.969 96 49.359 96 48c0-1.375-1-2.969-2.219-3.578 0 0-22.868-1.514-31.781-10.422-8.915-8.91-10.438-31.781-10.438-31.781C50.969 1 49.375 0 48 0s-2.969 1-3.594 2.219c0 0-1.5 22.87-10.406 31.781-8.908 8.913-31.781 10.422-31.781 10.422C1 45.031 0 46.625 0 48c0 1.359 1 2.969 2.219 3.578 0 0 22.873 1.51 31.781 10.422 8.906 8.911 10.406 31.781 10.406 31.781C45.031 95 46.625 96 48 96s2.969-1 3.562-2.219c0 0 1.523-22.871 10.438-31.781 8.913-8.908 31.781-10.422 31.781-10.422Z"
+          fill="#000"
+        />
+      </svg>
+      <svg viewBox="0 0 96 96" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path
+          d="M93.781 51.578C95 50.969 96 49.359 96 48c0-1.375-1-2.969-2.219-3.578 0 0-22.868-1.514-31.781-10.422-8.915-8.91-10.438-31.781-10.438-31.781C50.969 1 49.375 0 48 0s-2.969 1-3.594 2.219c0 0-1.5 22.87-10.406 31.781-8.908 8.913-31.781 10.422-31.781 10.422C1 45.031 0 46.625 0 48c0 1.359 1 2.969 2.219 3.578 0 0 22.873 1.51 31.781 10.422 8.906 8.911 10.406 31.781 10.406 31.781C45.031 95 46.625 96 48 96s2.969-1 3.562-2.219c0 0 1.523-22.871 10.438-31.781 8.913-8.908 31.781-10.422 31.781-10.422Z"
+          fill="#000"
+        />
+      </svg>
+      <svg viewBox="0 0 96 96" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path
+          d="M93.781 51.578C95 50.969 96 49.359 96 48c0-1.375-1-2.969-2.219-3.578 0 0-22.868-1.514-31.781-10.422-8.915-8.91-10.438-31.781-10.438-31.781C50.969 1 49.375 0 48 0s-2.969 1-3.594 2.219c0 0-1.5 22.87-10.406 31.781-8.908 8.913-31.781 10.422-31.781 10.422C1 45.031 0 46.625 0 48c0 1.359 1 2.969 2.219 3.578 0 0 22.873 1.51 31.781 10.422 8.906 8.911 10.406 31.781 10.406 31.781C45.031 95 46.625 96 48 96s2.969-1 3.562-2.219c0 0 1.523-22.871 10.438-31.781 8.913-8.908 31.781-10.422 31.781-10.422Z"
+          fill="#000"
+        />
+      </svg>
+      <svg viewBox="0 0 96 96" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path
+          d="M93.781 51.578C95 50.969 96 49.359 96 48c0-1.375-1-2.969-2.219-3.578 0 0-22.868-1.514-31.781-10.422-8.915-8.91-10.438-31.781-10.438-31.781C50.969 1 49.375 0 48 0s-2.969 1-3.594 2.219c0 0-1.5 22.87-10.406 31.781-8.908 8.913-31.781 10.422-31.781 10.422C1 45.031 0 46.625 0 48c0 1.359 1 2.969 2.219 3.578 0 0 22.873 1.51 31.781 10.422 8.906 8.911 10.406 31.781 10.406 31.781C45.031 95 46.625 96 48 96s2.969-1 3.562-2.219c0 0 1.523-22.871 10.438-31.781 8.913-8.908 31.781-10.422 31.781-10.422Z"
+          fill="#000"
+        />
+      </svg>
+      <!-- End sparkles -->
+      <span>Click!</span>
+      <span aria-hidden="true">Click!</span>
+    </a>
 </body>
 </html>

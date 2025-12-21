@@ -1,0 +1,503 @@
+
+<!doctype html>
+<html>
+    <head>
+		<title>
+			Devis & Outils
+	    </title>
+	    <meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, user-scalable=no"/>
+		<link rel="icon" type="image/x-icon" href="favicon.ico"/>
+		<style>
+			@font-face{font-family:'Poppins';font-style: normal;font-weight:400;src: url(https://static.s-sfr.fr/assets/fonts/Poppins-Regular.woff2) format('woff2');}
+			a:link,a:visited,a:hover,a:active{color:black;text-decoration:none;}	
+			body{font-family:Poppins;color:black;}
+			input:focus{outline:none;}		
+			input{border:none;}
+			input.modele{width:380px; height:30px;font-size:16px;color:blue;text-align:center;}
+			input.prix{width:280px; height:30px;font-size:16px;color:blue;text-align:center;}
+			input.prixcourt{width:60px; height:30px;font-size:16px;color:blue;text-align:center;}
+			input.date{border:0px;font-family:arial;font-size:1em;}
+			input.suivant{width:100%;background-color:red;color:white;font-weight:bold;height:40px;border-radius:50px 0px 50px 0px;}
+			span.client{text-transform:uppercase;}
+			button{background-color:transparent;box-shadow:5px 5px 15px red;border:none;}
+			button.offrebox{width:200px;}
+			section.offrebox{background-color:transparent;box-shadow:5px 5px 15px red;border:none;width:200px;}
+			section.option{box-shadow:5px 5px 15px red;border:none;width:200px;}
+			table.conseiller{text-align:center; border-spacing:20px;}
+			h2{text-align:center;}
+    	</style>
+		<script>
+			function baboum(id){if(document.getElementById(id).style.display=='none'){document.getElementById(id).style.display='block';}else{document.getElementById(id).style.display='none';}}
+		</script>
+		<script type="text/javascript">
+			function imprimer(){window.print();}
+		</script>
+	</head>
+	<body>
+		<table align="center">
+			<tr>
+				<td align="right">
+					<a href="./index.html"><img src="https://static.s-sfr.fr/assets/logos/SFR.svg" height="30px" /></a>
+				</td>
+				<td>
+					<font size=4><b><a href="./index.html">Devis</a></b></font>
+				</td>
+			</tr>
+		</table>
+		<div>&nbsp;</div>
+		
+<!-- BLOC CHOIX BOX OU ABO -->
+		
+		<div id="choix">
+			<h2>Sélectionnez un choix</h2>
+			<table class="conseiller" align=center>
+            	<tr>
+             	  	<td width="150px">
+						<button class="offrebox" onclick="baboum('choix'); baboum('offrebox');"><img src="https://static.s-sfr.fr/assets/pictos/box_40_rouge.svg" height="100px"> <h3>Box</h3></button>
+               		</td>
+					<td width="150px">
+						<button class="offrebox" onclick="baboum('choix'); baboum('offreabo');"><img src="https://static.s-sfr.fr/assets/pictos/mobile_40_rouge.svg" height="100px"> <h3>Abo</h3></button>
+    	           	</td>
+				</tr>
+        	</table>
+		</div>
+		
+<!-- BLOC OFFRE BOX -->
+		
+		<div id="offrebox" style="display:none">
+			<h2>Quelle offre ?</h2>
+			<table class="conseiller" align=center>
+            	<tr>
+             	  	<td>
+						<button class="offrebox" value="
+							<b>SFR Box Starter</b> 
+							<br/><img src='https://static.s-sfr.fr/media/nb7-stb7-telco-transparent.webp' height='100px'/>
+							<br/><font size=2>160 chaînes TV
+							<br/>jusqu'à 1 Gb/s &darr;</font>
+							<br/><font size=2 color=gray>engagement 12 mois</font>
+							<br/>
+							<br/><font size=2>frais d'ouverture de service : 49€</font>
+							<br/>
+							<br/><b><font size=4>27,99</font></b>€/mois
+							" onclick="choixoffrebox.innerHTML=this.value; baboum('offrebox'); baboum('resultatbox'); baboum('infos'); imprimer();"><img src="https://static.s-sfr.fr/media/nb7-stb7-telco-transparent.webp" height="100px"/> <h3>Starter</h3></button>
+               		</td>
+					<td>
+						<button class="offrebox" value="
+							<b>SFR Box Power S</b>
+							<br/><img src='https://static.s-sfr.fr/media/Fixe/visuels/nb8-stb7-140x140.png' height='100px'/>
+							<br/><font size=2>160 chaînes TV
+							<br/>jusqu'à 1 Gb/s &darr;</font>
+							<br/><font size=2 color=gray>engagement 12 mois</font>
+							<br/>
+							<br/><font size=2>frais d'ouverture de service : 49€</font>
+							<br/>
+							<br/><b><font size=4>30,99</font></b>€/mois
+							" onclick="choixoffrebox.innerHTML=this.value; baboum('offrebox'); baboum('resultatbox'); baboum('infos'); imprimer();"><img src="https://static.s-sfr.fr/media/Fixe/visuels/nb8-stb7-140x140.png" height="100px"/> <h3>Power S</h3></button>
+	               	</td>
+				</tr>
+				<tr>
+					<td>
+						<button class="offrebox" value="
+							<b>SFR Box Power</b>
+							<br/><img src='https://static.s-sfr.fr/media/box8connecttv-desktop-140x140-1.png' height='100px'/>
+							<br/><font size=2>200 chaînes TV
+							<br/>jusqu'à 2 Gb/s &darr;</font>
+							<br/><font size=2 color=gray>engagement 12 mois</font>
+							<br/>
+							<br/><font size=2>frais d'ouverture de service : 49€</font>
+							<br/>
+							<br/><b><font size=4>36,99</font></b>€/mois
+							" onclick="choixoffrebox.innerHTML=this.value; baboum('offrebox'); baboum('resultatbox'); baboum('infos'); imprimer();"><img src="https://static.s-sfr.fr/media/box8connecttv-desktop-140x140-1.png" height="100px"/> <h3>Power</h3></button>
+	               	</td>
+					<td>
+						<button class="offrebox" value="
+							<b>SFR Box Premium</b>
+							<br/><img src='https://static.s-sfr.fr/media/Fixe/BoxDecodeur/box10plus-face-246x246.png' height='100px'/>
+							<br/><font size=2>200 chaînes TV
+							<br/>jusqu'à 8 Gb/s &darr;</font>
+							<br/><font size=2 color=gray>sans engagement</font>
+							<br/>
+							<br/><font size=2>frais d'ouverture de service : 49€</font>
+							<br/>
+							<br/><b><font size=4>44,99</font></b>€/mois
+							" onclick="choixoffrebox.innerHTML=this.value; baboum('offrebox'); baboum('resultatbox'); baboum('infos'); imprimer();"><img src="https://static.s-sfr.fr/media/Fixe/BoxDecodeur/box10plus-face-246x246.png" height="100px"/> <h3>Premium</h3></button>
+            	   	</td>
+           		</tr>
+				<tr>
+					<td>
+						<button class="offrebox" value="
+							<b>SFR Box 5G</b>
+							<br/><img src='https://static.s-sfr.fr/media/Fixe/MEA/bannieres/visuel-Box-5G.webp' height='100px'/>
+							<br/><font size=2>internet illimité en 5G
+							<br/>jusqu'à 1,1Gb/s &darr;</font>
+							<br/>200 chaînes TV avec l'appli SFR TV</font>
+							<br/><font size=2 color=gray>sans engagement</font>
+							<br/>
+							<br/><font size=2>frais d'ouverture de service : 29€</font>
+							<br/>
+							<br/><b><font size=4>39,99</font></b>€/mois
+							" onclick="choixoffrebox.innerHTML=this.value; baboum('offrebox'); baboum('resultatbox'); baboum('infos'); imprimer();"><img src="https://static.s-sfr.fr/media/Fixe/MEA/bannieres/visuel-Box-5G.webp" height="100px"/> <h3>Box 5G</h3></button>
+    	           	</td>
+					<td>
+						<button class="offrebox" value="
+							<b>SFR Box 5G + TV</b>
+							<br/><img src='https://static.s-sfr.fr/media/Fixe/BoxDecodeur/box5g-connect-246.png' height='100px'/>
+							<br/><font size=2>internet illimité en 5G
+							<br/>jusqu'à 1,1Gb/s &darr;</font>
+							<br/>200 chaînes TV</font>
+							<br/>décodeur Connect TV inclus</font>
+							<br/><font size=2 color=gray>sans engagement</font>
+							<br/>
+							<br/><font size=2>frais d'ouverture de service : 29€</font>
+							<br/>
+							<br/><b><font size=4>44,99</font></b>€/mois
+							" onclick="choixoffrebox.innerHTML=this.value; baboum('offrebox'); baboum('resultatbox'); baboum('infos'); imprimer();"><img src="https://static.s-sfr.fr/media/Fixe/BoxDecodeur/box5g-connect-246.png" height="100px"/> <h3>Box 5G + TV</h3></button>
+    	           	</td>
+				</tr>
+				<tr>
+					<td>
+						<button class="offrebox" value="
+							<b>SFR Box 5G -26 ans</b>
+							<br/><img src='https://static.s-sfr.fr/media/Fixe/MEA/bannieres/visuel-Box-5G.webp' height='100px'/>
+							<br/><font size=2>internet illimité en 5G
+							<br/>jusqu'à 1,1Gb/s &darr;</font>
+							<br/>200 chaînes TV avec l'appli SFR TV</font>
+							<br/><font size=2 color=gray>sans engagement</font>
+							<br/>
+							<br/><font size=2>frais d'ouverture de service : <strike>29€</strike> <b>offerts</b></font>
+							<br/>
+							<br/><font size=2><strike>39,99€</strike></font>
+							<br><b><font size=4>29,99</font></b>€/mois
+							" onclick="choixoffrebox.innerHTML=this.value; baboum('offrebox'); baboum('resultatbox'); baboum('infos'); imprimer();"><img src="https://static.s-sfr.fr/media/Fixe/MEA/bannieres/visuel-Box-5G.webp" height="100px"/> <h3>Box 5G -26 ans</h3></button>
+    	           	</td>
+				</tr>
+        	</table>
+		</div>
+
+		
+<!-- BLOC OFFRE ABO -->
+		
+		<div id="offreabo" style="display:none">
+			<h2>Quel forfait ?</h2>
+			<table class="conseiller" align=center>
+            	<tr>
+             	  	<td width=250px>
+						<button class="offrebox" value="
+							<b><font size=4>2H 1Go</font></b> 
+							<br/><font size=2>2 heures d'appels, SMS/MMS illimités
+							<br/>1 Go d'internet
+							<br/>sans engagement</font>
+							<br/>
+							<br/><b><font size=4>5,99</font></b>€/mois
+							<br/><font size=2 color=gray>prix client box : 1,99€/mois </font>
+							" onclick="choixoffremobile.innerHTML=this.value; baboum('offreabo'); baboum('choixavecsansmobile');"><img src="https://static.s-sfr.fr/assets/pictos/sim_40_rouge.svg" height=50px> <h3>2H 1Go</h3></button>
+               		</td>
+					<td>
+						<button class="offrebox" value="
+							<b>60Go 5G</b> 
+							<br/><font size=2>appels SMS et MMS illimités
+							<br/>60 Go d'internet en 5G
+							<br/>sans engagement</font>
+							<br/>
+							<br/><b><font size=4>15,99</font></b>€/mois
+							<br/><font size=2 color=gray>prix client box : 8,99€/mois</font>
+							" onclick="choixoffremobile.innerHTML=this.value; baboum('offreabo'); baboum('choixavecsansmobile');"><img src="https://static.s-sfr.fr/assets/pictos/sim_40_rouge.svg" height=50px> <h3>60Go</h3></button>
+    	           	</td>
+				</tr>
+				<tr>
+					<td width=250px>
+						<button class="offrebox" value="
+							<b>200Go 5G</b> 
+							<br/><font size=2>appels SMS et MMS illimités
+							<br/>200 Go d'internet en 5G
+							<br/>sans engagement</font>
+							<br/>
+							<br/><b><font size=4>19,99</font></b>€/mois
+							<br/><font size=2 color=gray>prix client box : 14,99€/mois</font>
+							" onclick="choixoffremobile.innerHTML=this.value; baboum('offreabo'); baboum('choixavecsansmobile');"><img src="https://static.s-sfr.fr/assets/pictos/sim_40_rouge.svg" height=50px> <h3>200Go</h3></button>
+    	           	</td>
+					<td>
+						<button class="offrebox" value="
+							<b>250Go 5G</b> 
+							<br/><font size=2>appels SMS et MMS illimités
+							<br/>250 Go d'internet en 5G</font>
+							<br/>sans engagement</font>
+							<br/>
+							<br/><b><font size=4>26,99</font></b>€/mois
+							<br/><font size=2 color=gray>prix client box : 21,99€/mois</font>
+							" onclick="choixoffremobile.innerHTML=this.value; baboum('offreabo'); baboum('choixavecsansmobile');"><img src="https://static.s-sfr.fr/assets/pictos/sim_40_rouge.svg" height=50px> <h3>250Go</h3></button>
+    	           	</td>
+				</tr>
+				<tr>
+					<td>
+						<button class="offrebox" value="
+							<b>90 Go 5G</b> 
+							<br/><font size=2>appels SMS et MMS illimités
+							<br/>90 Go d'internet en 5G
+							<br/>engagement 24 mois</font>
+							<br/>
+							<br/><b><font size=4>29,99</font></b>€/mois
+							<br/><font size=2 color=gray>prix client box 22,99€/mois</font>
+							" onclick="choixoffremobile.innerHTML=this.value; baboum('offreabo'); baboum('equipementmobile');"><img src="https://static.s-sfr.fr/assets/pictos/sim_40_rouge.svg" height=50px> <h3>90Go</h3></button>
+    	           	</td>
+					<td>
+						<button class="offrebox" value="
+							<b>Illimité 5G</b> 
+							<br/><font size=2>appels SMS et MMS illimités
+							<br/Internet illimité en 5G
+							<br/>engagement 24 mois</font>
+							<br/>
+							<br/><b><font size=4>39,99</font></b>€/mois
+							<br/><font size=2 color=gray>prix client box : 31,99€/mois</font>
+							" onclick="choixoffremobile.innerHTML=this.value; baboum('offreabo'); baboum('equipementmobile');"><img src="https://static.s-sfr.fr/assets/pictos/sim_40_rouge.svg" height=50px> <h3>Illimité 5G</h3></button>
+    	           	</td>
+				</tr>	
+        	</table>
+		</div>
+		
+<!-- BLOC CHOIX AVEC SANS MOBILE -->
+		
+		<div id="choixavecsansmobile" style="display:none">
+			<h2>Un mobile avec ceci ?</h2>
+			<table class="conseiller" align=center>
+            	<tr>
+             	  	<td width="150px">
+						<button class="offrebox" onclick="baboum('choixavecsansmobile'); baboum('resultatabo'); baboum('infos'); imprimer();"><img src="https://static.s-sfr.fr/assets/pictos/sim_40_rouge.svg" height=50px> <h3>ECO</h3></button>
+               		</td>
+					<td width="150px">
+						<button class="offrebox" onclick="baboum('choixavecsansmobile'); baboum('equipementmobile');"><img src="https://static.s-sfr.fr/assets/pictos/sim_40_rouge.svg" height=50px> + <img src="https://static.s-sfr.fr/media/b2b-apple-iphone-14-pro--noir--m--1--face.png" height=50px> <h3>ECO + terminal</h3></button>
+    	           	</td>
+				</tr>
+        	</table>
+		</div>
+		
+<!-- BLOC EQUIPEMENT MOBILE -->
+		
+		<div id="equipementmobile" style="display:none">
+			<h2>📱 Saisissez le mobile</h2>
+			<table align=center>
+            	<tr>
+             	  	<td colspan=2 align=center>
+						<fieldset>
+							<legend><label for="modelemob">Marque & modèle</label></legend>
+							<input class="modele" id="modelemob" onkeyup="modelemobile.innerHTML=this.value" type="text">
+						</fieldset>
+               		</td>
+				</tr>
+				<tr>
+					<td colspan=2 align=center>
+						<fieldset>
+							<legend><label for="prixtel">Détails du paiement</label></legend>
+							<input class="prix" id="prixtel" onkeyup="prixmobile.innerHTML=this.value" type="text">
+						</fieldset>
+				</tr>
+				<tr>
+					<td colspan=2>
+						<input class="suivant" type="button" value="SUIVANT" onclick="baboum('equipementmobile'); baboum('assurance');">
+					</td>
+				</tr>
+			</table>
+		</div>
+					
+<!-- BLOC ASSURANCE -->
+		
+		<div id="assurance" style="display:none">
+			<h2>On assure ?</h2>
+			<table class="conseiller" align=center>
+            	<tr>
+             	  	<td width="150px">
+						<button class="offrebox" value="✔️ Votre mobile est protégé par l'assurance mobile by CHUBB à 2,99€/mois<br/><font size=2 color=gray> - engagement 12 mois<br/> - prélevée par CHUBB</font>" onclick="assu.innerHTML=this.value; baboum('assurance'); baboum('choixavecsansreprise');"><img src="https://static.s-sfr.fr/assets/pictos/check_circle_40_vert.svg"/> <h3>CM1</h3> 2,99€/mois</button>
+               		</td>
+					<td width="150px">
+						<button class="offrebox" value="✔️ Votre mobile est protégé par l'assurance mobile by CHUBB à 6,99€/mois<br/><font size=2 color=gray> - engagement 12 mois<br/> - prélevée par CHUBB</font>" onclick="assu.innerHTML=this.value; baboum('assurance'); baboum('choixavecsansreprise');"><img src="https://static.s-sfr.fr/assets/pictos/check_circle_40_vert.svg"/> <h3>CM2</h3> 6,99€/mois</button>
+    	           	</td>
+				</tr>
+				<tr>
+					<td>
+						<button class="offrebox" value="✔️ Votre mobile est protégé par l'assurance mobile by CHUBB à 8,99€/mois<br/><font size=2 color=gray> - engagement 12 mois<br/> - prélevée par CHUBB</font>" onclick="assu.innerHTML=this.value; baboum('assurance'); baboum('choixavecsansreprise');"><img src="https://static.s-sfr.fr/assets/pictos/check_circle_40_vert.svg"/> <h3>CM3</h3> 8,99€/mois</button>
+	               	</td>
+					<td>
+						<button class="offrebox" value="✔️ Votre mobile est protégé par l'assurance mobile by CHUBB à 10,99€/mois<br/><font size=2 color=gray> - engagement 12 mois<br/> - prélevée par CHUBB</font>" onclick="assu.innerHTML=this.value; baboum('assurance'); baboum('choixavecsansreprise');"><img src="https://static.s-sfr.fr/assets/pictos/check_circle_40_vert.svg"/> <h3>CM4</h3> 10,99€/mois</button>
+	               	</td>
+				</tr>
+				<tr>
+					<td>
+						<button class="offrebox" value="✔️ Votre mobile est protégé par l'assurance mobile by CHUBB à 13,99€/mois<br/><font size=2 color=gray> - engagement 12 mois<br/> - prélevée par CHUBB</font>" onclick="assu.innerHTML=this.value; baboum('assurance'); baboum('choixavecsansreprise');"><img src="https://static.s-sfr.fr/assets/pictos/check_circle_40_vert.svg"/> <h3>CM5</h3> 13,99€/mois</button>
+            	   	</td>
+					<td>
+						<button class="offrebox" value="✔️ Votre mobile est protégé par l'assurance mobile by CHUBB à 14,99€/mois<br/><font size=2 color=gray> - engagement 12 mois<br/> - prélevée par CHUBB</font>" onclick="assu.innerHTML=this.value; baboum('assurance'); baboum('choixavecsansreprise');"><img src="https://static.s-sfr.fr/assets/pictos/check_circle_40_vert.svg"/> <h3>CM6</h3> 14,99€/mois</button>
+               		</td>
+           		</tr>
+				<tr>
+					<td>
+						<button class="offrebox" value="✔️ Votre mobile est protégé par l'assurance mobile by CHUBB à 16,99€/mois<br/><font size=2 color=gray> - engagement 12 mois<br/> - prélevée par CHUBB</font>" onclick="assu.innerHTML=this.value; baboum('assurance'); baboum('choixavecsansreprise');"><img src="https://static.s-sfr.fr/assets/pictos/check_circle_40_vert.svg"/> <h3>CM7</h3> 16,99€/mois</button>
+					</td>
+					<td>
+						<button class="offrebox" value="<font color=gray size=2>❌ vous avez choisi de ne pas assurer votre mobile<br/>sachez qu'il vous est possible d'assurer votre mobile jusqu'à 60 jours après la date d'achat</font>" onclick="assu.innerHTML=this.value; baboum('assurance'); baboum('choixavecsansreprise');"><img src="https://static.s-sfr.fr/assets/pictos/croix_cercle_40_rouge.svg"/> <h3>refusée</h3> &nbsp;</button>
+					</td>
+				</tr>
+        	</table>
+		</div>
+					
+<!-- BLOC CHOIX AVEC SANS REPRISE -->
+		
+		<div id="choixavecsansreprise" style="display:none">
+			<h2>Et la reprise mobile alors ?</h2>
+			<table class="conseiller" align=center>
+            	<tr>
+             	  	<td width="150px">
+						<button class="offrebox" onclick="baboum('choixavecsansreprise'); baboum('resultatabo'); baboum('infos'); imprimer();"><img src="https://static.s-sfr.fr/assets/pictos/croix_cercle_40_rouge.svg" height="50px"/> <h3>Sans reprise</h3></button>
+               		</td>
+					<td width="150px">
+						<button class="offrebox" onclick="baboum('choixavecsansreprise'); baboum('reprise');"><img src="https://static.s-sfr.fr/assets/pictos/smartphonereprise_40_rouge.svg" height=50px/> <h3>Avec reprise</h3></button>
+    	           	</td>
+				</tr>
+        	</table>
+		</div>
+		
+<!-- BLOC REPRISE MOBILE -->
+		
+		<div id="reprise" style="display:none">
+			<h2>♻️ Saisissez la reprise</h2>
+			<table align=center>
+            	<tr>
+             	  	<td>
+						<fieldset>
+							<legend><label for="modelereprisemobile">Marque & modèle</label></legend>
+							<input class="modele" id="modelereprisemobile" onkeyup="modelereprise.innerHTML=this.value" type="text" value="">
+						</fieldset>
+               		</td>
+				</tr>
+				<tr>
+             	  	<td align=center>
+						<fieldset>
+							<legend><label for="reprisemobile">Montant de la reprise</label></legend>
+							- <input class="prixcourt" id="reprisemobile" onkeyup="reprisex.innerHTML=this.value" type="tel" maxlength=4> €
+						</fieldset>
+               		</td>
+				</tr>
+				<tr>
+             	  	<td align=center>
+						<fieldset>
+							<legend><label for="bonusmobile">Bonus reprise</label></legend>
+							- <input class="prixcourt" id="bonusmobile" onkeyup="bonusx.innerHTML=this.value" type="tel" maxlength=4> €
+						</fieldset>
+               		</td>
+				</tr>
+				<tr>
+					<td>
+						<input class="suivant" type="button" value="TERMINER" onclick="baboum('reprise'); baboum('resultatabo'); baboum('resultatreprise'); baboum('infos'); imprimer();">
+					</td>
+				</tr>
+			</table>
+		</div>
+																													
+<!-- BLOC RESULTAT BOX -->
+
+		<div id="resultatbox" style="display:none;">
+			<table align=center width=600px>
+				<tr>
+					<td>
+						<fieldset>
+							<legend>
+								🛜 <u>Abonnement box</u>&nbsp;
+							</legend>
+							<span id="choixoffrebox">❓</span>
+							<br /><span id="ig"></span>
+							<span id="repwifi"></span>
+							<span id="canal"></span>
+							<span id="rmcprimel1"></span>
+							<span id="rmcbeinprimel1"></span>
+						</fieldset>
+				    </td>
+				</tr>
+			</table>
+		</div>
+		
+<!-- BLOC RESULTAT ABO -->
+
+		<div id="resultatabo" style="display:none;">
+			<table align=center width=600px>
+				<tr>
+					<td>
+						<fieldset>
+							<legend>
+								📶 <u>Forfait mobile</u>&nbsp;
+							</legend>
+							<span id="choixoffremobile">❓</span>
+						</fieldset>
+				    </td>
+				</tr>
+				<tr>
+					<td>
+						<fieldset>
+							<legend>
+								📱 <u>Equipement</u>&nbsp;
+							</legend>
+							<b><span id="modelemobile"><font color=gray size=2>❌ vous avez choisi de ne pas acheter de mobile</font></span></b> <span id="prixmobile"></span>
+								<font size="2" color="gray"><br/>Carte SIM : 10€</font>
+						</fieldset>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<fieldset>
+							<legend>
+								🤳 <u>Assurance de votre mobile</u>&nbsp;
+							</legend>
+							<span id="assu"><font color=gray size=2>seuls les mobiles achetés chez SFR peuvent être assurés</font></span>
+						</fieldset>
+					</td>
+				</tr>
+			</table>
+		</div>
+					
+<!-- BLOC RESULTAT REPRISE -->
+
+		<div id="resultatreprise" style="display:none;">
+			<table align=center width=600px>
+				<tr>
+					<td>
+						<fieldset>
+							<legend>
+								♻️ <u>Reprise de votre ancien mobile</u>&nbsp;
+							</legend>
+							Modèle repris : <b><span id="modelereprise"></span></b> 
+							<br/>Montant de la reprise : <b>-<span id="reprisex"></span>€</b>
+							<br/>Bonus reprise : <b>-<span id="bonusx"></span>€</b>
+						</fieldset>
+					</td>
+				</tr>
+			</table>
+		</div>
+		
+<!-- BLOC RESULTAT INFOS -->
+		
+		<div id="infos" style="display:none;">
+			<table align=center width=600px>
+				<tr>
+					<td>
+						<fieldset>
+							<legend>
+								🤵 <u>Conseiller</u>&nbsp;
+							</legend>
+							&nbsp;
+						</fieldset>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<fieldset>
+							<legend>
+								📄 <u>Conditions</u>&nbsp;
+							</legend>
+							<font size=1>Offre valable le __ / __ / ____
+							<br/> pensez à apporter votre pièce d'identité et votre RIB.</font>
+						</fieldset>
+					</td>
+				</tr>
+			</table>
+		</div>
+	</body>
+</html>

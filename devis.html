@@ -69,6 +69,13 @@ button:disabled {
   <option value="https://urlr.me/5XGreK">Illimité</option>
 </select>
 
+<input
+  id="terminal"
+  type="text"
+  placeholder="Terminal (ex : iPhone 15 – 589€)"
+  style="display:none;"
+>
+  
 <input id="phone" type="tel" placeholder="Numéro de mobile" maxlength="10">
 
 <button id="send" disabled>Envoyer</button>
@@ -80,12 +87,13 @@ const offerBox    = document.getElementById('offerBox');
 const offerMobile = document.getElementById('offerMobile');
 const phone       = document.getElementById('phone');
 const send        = document.getElementById('send');
+const terminal    = document.getElementById('terminal');
 
 function update() {
   const boxSelected    = offerBox.selectedIndex > 0;
   const mobileSelected = offerMobile.selectedIndex > 0;
   const digits         = phone.value.replace(/\D/g, '');
-
+  terminal.style.display = offerMobile.selectedIndex > 0 ? 'block' : 'none';
   send.disabled = !(digits.length === 10 && (boxSelected || mobileSelected));
 }
 
@@ -106,6 +114,10 @@ send.addEventListener('click', () => {
     message += `📱 Offre Mobile :\n${offerMobile.value}\n\n`;
   }
 
+  if (terminal.value.trim() !== '') {
+  message += `📲 Terminal :\n${terminal.value.trim()}\n\n`;
+  }
+  
   message += `Cordialement,\nVotre conseiller SFR`;
 
   const separator = /iphone|ipad|ipod/i.test(navigator.userAgent) ? '&' : '?';

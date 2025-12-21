@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Devis box</title>
+
+<style>
+body {
+  font-family: Arial, sans-serif;
+  background: #f9f9f9;
+  padding: 20px;
+}
+
+.wrap {
+  max-width: 420px;
+  margin: auto;
+}
+
+h1 {
+  text-align: center;
+}
+
+select, input, button {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 12px;
+  margin-top: 10px;
+  font-size: 16px;
+  outline: none;
+}
+
+button {
+  background: #111;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+}
+
+button:disabled {
+  opacity: 0.5;
+}
+
+.price {
+  font-weight: bold;
+  text-align: center;
+  margin-top: 12px;
+}
+</style>
+</head>
+
+<body>
+<div class="wrap">
+
+<h1>Devis box</h1>
+
+<select id="offer">
+  <option value="" disabled selected>Choisir une offre</option>
+
+  <option value="https://urlr.me/!starter" data-price="27,99 €/mois">
+    Starter
+  </option>
+
+  <option value="https://urlr.me/!powers" data-price="30,99 €/mois">
+    Power S
+  </option>
+
+  <option value="https://urlr.me/!power" data-price="36,99 €/mois">
+    Power
+  </option>
+
+  <option value="https://urlr.me/!premium" data-price="44,99 €/mois">
+    Premium
+  </option>
+
+  <option value="https://urlr.me/!5g" data-price="39,99 €/mois">
+    Box 5G
+  </option>
+
+  <option value="https://urlr.me/tZdEKQ" data-price="44,99 €/mois">
+    Box 5G + TV
+  </option>
+
+  <option value="https://urlr.me/s7WNUv" data-price="29,99 €/mois">
+    Box 5G -26 ans
+  </option>
+</select>
+
+<div id="price" class="price"></div>
+
+<input id="phone" type="tel" placeholder="Numéro de mobile" maxlength=10>
+
+<button id="send" disabled>Envoyer</button>
+
+</div>
+
+<script>
+const offer = document.getElementById('offer');
+const phone = document.getElementById('phone');
+const send  = document.getElementById('send');
+const price = document.getElementById('price');
+
+function update() {
+  const opt = offer.selectedOptions[0];
+  const digits = phone.value.replace(/\D/g, '');
+
+  send.disabled = !(opt && digits.length === 10);
+  price.textContent = opt ? 'Prix : ' + opt.dataset.price : '';
+}
+
+offer.addEventListener('change', update);
+phone.addEventListener('input', update);
+
+send.addEventListener('click', () => {
+  const to  = phone.value.replace(/\D/g, '');
+  const url = offer.value;
+
+  const message =
+    `Suite à votre visite en boutique SFR, nous avons le plaisir de vous transmettre votre devis personnalisé pour une offre Box SFR.\n\n` +
+    `Vous pouvez le consulter à l’adresse suivante :\n${url}\n\n` +
+    `Cordialement,\nVotre conseiller SFR`;
+
+  window.location.href = `sms:${to}?body=${encodeURIComponent(message)}`;
+});
+</script>
+
+</body>
+</html>

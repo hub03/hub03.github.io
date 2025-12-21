@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Devis Box & Mobile</title>
+
+<style>
+body {
+  font-family: Arial, sans-serif;
+  background: #f9f9f9;
+  padding: 20px;
+}
+
+.wrap {
+  max-width: 420px;
+  margin: auto;
+}
+
+h1 {
+  text-align: center;
+}
+
+select, input, button {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 12px;
+  margin-top: 12px;
+  font-size: 16px;
+  outline: none;
+}
+
+button {
+  background: #111;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+}
+
+button:disabled {
+  opacity: 0.5;
+}
+</style>
+</head>
+
+<body>
+<div class="wrap">
+
+<h1>Devis Box & Mobile</h1>
+
+<select id="offerBox">
+  <option value="" disabled selected>Choisir une offre box</option>
+  <option value="https://urlr.me/!starter">Starter</option>
+  <option value="https://urlr.me/!powers">Power S</option>
+  <option value="https://urlr.me/!power">Power</option>
+  <option value="https://urlr.me/!premium">Premium</option>
+  <option value="https://urlr.me/!5g">Box 5G</option>
+  <option value="https://urlr.me/tZdEKQ">Box 5G + TV</option>
+  <option value="https://urlr.me/s7WNUv">Box 5G -26 ans</option>
+</select>
+
+<select id="offerMobile">
+  <option value="" disabled selected>Choisir un forfait mobile</option>
+  <option value="https://urlr.me/MP4GcN">2h 1Go</option>
+  <option value="https://urlr.me/zDPrHc">60Go</option>
+  <option value="https://urlr.me/HqYFrg">200Go</option>
+  <option value="https://urlr.me/py3cBt">250Go</option>
+  <option value="https://urlr.me/PfgSrw">90Go</option>
+  <option value="https://urlr.me/5XGreK">Illimité</option>
+</select>
+
+<input id="phone" type="tel" placeholder="Numéro de mobile" maxlength="10">
+
+<button id="send" disabled>Envoyer</button>
+
+</div>
+
+<script>
+const offerBox    = document.getElementById('offerBox');
+const offerMobile = document.getElementById('offerMobile');
+const phone       = document.getElementById('phone');
+const send        = document.getElementById('send');
+
+function update() {
+  const boxSelected    = offerBox.selectedIndex > 0;
+  const mobileSelected = offerMobile.selectedIndex > 0;
+  const digits         = phone.value.replace(/\D/g, '');
+
+  send.disabled = !(digits.length === 10 && (boxSelected || mobileSelected));
+}
+
+offerBox.addEventListener('change', update);
+offerMobile.addEventListener('change', update);
+phone.addEventListener('input', update);
+
+send.addEventListener('click', () => {
+  const to = phone.value.replace(/\D/g, '');
+  let message =
+    `Suite à votre visite en boutique SFR, nous avons le plaisir de vous transmettre votre devis personnalisé.\n\n`;
+
+  if (offerBox.selectedIndex > 0) {
+    message += `📦 Offre Box :\n${offerBox.value}\n\n`;
+  }
+
+  if (offerMobile.selectedIndex > 0) {
+    message += `📱 Offre Mobile :\n${offerMobile.value}\n\n`;
+  }
+
+  message += `Cordialement,\nVotre conseiller SFR`;
+
+  const separator = /iphone|ipad|ipod/i.test(navigator.userAgent) ? '&' : '?';
+  window.location.href = `sms:${to}${separator}body=${encodeURIComponent(message)}`;
+});
+</script>
+
+</body>
+</html>

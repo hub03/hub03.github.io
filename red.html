@@ -2,11 +2,41 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>RED – Générateur de lien proxy</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>RED – Générateur de lien</title>
+
   <style>
-    body { font-family: sans-serif; }
-    label { display: block; margin-top: 10px; }
-    a { word-break: break-all; }
+    body {
+      font-family: system-ui, sans-serif;
+      padding: 12px;
+      max-width: 480px;
+      margin: auto;
+    }
+
+    label {
+      display: block;
+      margin-top: 12px;
+      font-size: 14px;
+    }
+
+    select, input {
+      width: 100%;
+      padding: 8px;
+      font-size: 16px;
+      margin-top: 4px;
+    }
+
+    #finalLink {
+      display: block;
+      margin-top: 16px;
+      padding: 10px;
+      background: #f3f3f3;
+      border-radius: 6px;
+      font-size: 13px;
+      word-break: break-all;
+      text-decoration: none;
+      color: #000;
+    }
   </style>
 </head>
 <body>
@@ -17,7 +47,7 @@
 
   <!-- LIGNE -->
   <label>
-    Ligne :
+    Ligne
     <select name="line" id="line">
       <option value="">-- choisir --</option>
 
@@ -51,15 +81,15 @@
     </select>
   </label>
 
-  <!-- OPERATION -->
+  <!-- OPTION -->
   <label>
-    Opération :
+    Option
     <select id="operation"></select>
   </label>
 
   <!-- ID PARRAIN -->
   <label>
-    ID Parrain :
+    ID Parrain
     <input type="text" name="idParrain" id="idParrain">
   </label>
 
@@ -68,15 +98,9 @@
   <input type="hidden" name="codeOption" id="codeOption">
   <input type="hidden" name="pointsConsommes" id="pointsConsommes">
   <input type="hidden" name="universe" value="RED">
-
-  <br><br>
-  <button type="submit">Envoyer vers RED</button>
 </form>
 
-<p>
-  Lien final :<br>
-  <a id="finalLink" target="_blank"></a>
-</p>
+<a id="finalLink" target="_blank"></a>
 
 <script>
 const OPTIONS = {
@@ -92,6 +116,7 @@ const OPTIONS = {
   }
 };
 
+const form = document.getElementById("proxyForm");
 const lineSelect = document.getElementById("line");
 const operationSelect = document.getElementById("operation");
 const idParrainInput = document.getElementById("idParrain");
@@ -99,7 +124,6 @@ const envInput = document.getElementById("environment");
 const codeInput = document.getElementById("codeOption");
 const pointsInput = document.getElementById("pointsConsommes");
 const link = document.getElementById("finalLink");
-const form = document.getElementById("proxyForm");
 
 let currentEnv = null;
 
@@ -116,7 +140,7 @@ lineSelect.addEventListener("change", () => {
     const o = OPTIONS[currentEnv][key];
     const option = document.createElement("option");
     option.value = key;
-    option.innerText = `${o.label} (${o.points} pts)`;
+    option.innerText = o.label;
     operationSelect.appendChild(option);
   }
 
@@ -124,8 +148,12 @@ lineSelect.addEventListener("change", () => {
   updateLink();
 });
 
-operationSelect.addEventListener("change", updateOperation);
-form.addEventListener("change", updateLink);
+operationSelect.addEventListener("change", () => {
+  updateOperation();
+  updateLink();
+});
+
+idParrainInput.addEventListener("input", updateLink);
 
 function updateOperation() {
   const key = operationSelect.value;

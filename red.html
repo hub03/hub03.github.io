@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>RED – Générateur de lien proxy</title>
+  <style>
+    body { font-family: sans-serif; }
+    label { display: block; margin-top: 10px; }
+    a { word-break: break-all; }
+  </style>
+</head>
+<body>
+
+<form id="proxyForm"
+  action="https://www.red-by-sfr.fr/mon-espace-client/parrainage-proxy.html"
+  method="get">
+
+  <!-- LIGNE -->
+  <label>
+    Ligne :
+    <select name="line" id="line">
+      <option value="">-- choisir --</option>
+
+      <option value="0250109832" data-env="FIXE" data-parrain="REDE6139B3">0250109832 – Charlie CHEVALIER</option>
+      <option value="0603875924" data-env="MOBILE" data-parrain="RED43FE30A">0603875924 – Eric WILLAERT</option>
+      <option value="0616121253" data-env="MOBILE" data-parrain="REDB0E2EE8">0616121253 – Eric WILLAERT</option>
+      <option value="0982336075" data-env="FIXE" data-parrain="REDF62DE61">0982336075 – Geoffrey YVON</option>
+      <option value="0761589821" data-env="MOBILE" data-parrain="REDAE53B4A">0761589821 – Geoffrey YVON</option>
+      <option value="0601851791" data-env="MOBILE" data-parrain="RED25AF700">0601851791 – Greedy Factory</option>
+      <option value="0603306030" data-env="MOBILE" data-parrain="RED6750F0C">0603306030 – GreedYogurt</option>
+      <option value="0612990848" data-env="MOBILE" data-parrain="REDD650D19">0612990848 – Jean-François MAHE</option>
+      <option value="0768317051" data-env="MOBILE" data-parrain="RED7AAEF8E">0768317051 – Jeannine RENIER</option>
+      <option value="0616511145" data-env="MOBILE" data-parrain="RED5C4A5D2">0616511145 – Lambert MONTAIGNE</option>
+      <option value="0214402122" data-env="FIXE" data-parrain="RED9A6AFC2">0214402122 – Lambert MONTAIGNE</option>
+      <option value="0634223543" data-env="MOBILE" data-parrain="REDA3918FB">0634223543 – Lambert MONTAIGNE</option>
+      <option value="0646609398" data-env="MOBILE" data-parrain="RED43B2F41">0646609398 – Laurent MONTAIGNE</option>
+
+      <option value="0777834537" data-env="MOBILE" data-parrain="Aucun">0777834537 – Loïc MALGRAS</option>
+      <option value="0626625355" data-env="MOBILE" data-parrain="Aucun">0626625355 – Loïc MALGRAS</option>
+      <option value="0623618242" data-env="MOBILE" data-parrain="Aucun">0623618242 – Loïc MALGRAS</option>
+      <option value="0614581108" data-env="MOBILE" data-parrain="Aucun">0614581108 – Loïc MALGRAS</option>
+      <option value="0629341379" data-env="MOBILE" data-parrain="Aucun">0629341379 – Loïc MALGRAS</option>
+
+      <option value="0290016043" data-env="FIXE" data-parrain="REDDB44627">0290016043 – Maryvonne MAHE</option>
+      <option value="0625042243" data-env="MOBILE" data-parrain="RED8D4EE07">0625042243 – Maryvonne MAHE</option>
+      <option value="0977718198" data-env="FIXE" data-parrain="RED2B8D9C3">0977718198 – Olivier FOURCADE</option>
+      <option value="0674581949" data-env="MOBILE" data-parrain="RED6322AFF">0674581949 – Olivier FOURCADE</option>
+      <option value="0231081987" data-env="FIXE" data-parrain="RED4F86B0C">0231081987 – Sylvie MONTAIGNE</option>
+      <option value="0679813382" data-env="MOBILE" data-parrain="RED8DE1CB9">0679813382 – Sylvie MONTAIGNE</option>
+      <option value="0614713247" data-env="MOBILE" data-parrain="REDA1D0F28">0614713247 – YFLM</option>
+    </select>
+  </label>
+
+  <!-- OPERATION -->
+  <label>
+    Opération :
+    <select id="operation"></select>
+  </label>
+
+  <!-- ID PARRAIN -->
+  <label>
+    ID Parrain :
+    <input type="text" name="idParrain" id="idParrain">
+  </label>
+
+  <!-- CHAMPS CACHÉS -->
+  <input type="hidden" name="environment" id="environment">
+  <input type="hidden" name="codeOption" id="codeOption">
+  <input type="hidden" name="pointsConsommes" id="pointsConsommes">
+  <input type="hidden" name="universe" value="RED">
+
+  <br><br>
+  <button type="submit">Envoyer vers RED</button>
+</form>
+
+<p>
+  Lien final :<br>
+  <a id="finalLink" target="_blank"></a>
+</p>
+
+<script>
+const OPTIONS = {
+  MOBILE: {
+    DON_5:  { label: "Don 5€", code: "RPD1", points: 5 },
+    DON_10: { label: "Don 10€", code: "RPD2", points: 10 },
+    REMISE: { label: "Remise 10€", code: "SGG1", points: 10 }
+  },
+  FIXE: {
+    DON_5:  { label: "Don 5€", code: "DONS_PARRAINAGE_RED_5E", points: 5 },
+    DON_10: { label: "Don 10€", code: "DONS_PARRAINAGE_RED_10E", points: 10 },
+    REMISE: { label: "Remise 15€", code: "GCO_15E_RED", points: 15 }
+  }
+};
+
+const lineSelect = document.getElementById("line");
+const operationSelect = document.getElementById("operation");
+const idParrainInput = document.getElementById("idParrain");
+const envInput = document.getElementById("environment");
+const codeInput = document.getElementById("codeOption");
+const pointsInput = document.getElementById("pointsConsommes");
+const link = document.getElementById("finalLink");
+const form = document.getElementById("proxyForm");
+
+let currentEnv = null;
+
+lineSelect.addEventListener("change", () => {
+  const opt = lineSelect.selectedOptions[0];
+  if (!opt) return;
+
+  currentEnv = opt.dataset.env;
+  envInput.value = currentEnv;
+  idParrainInput.value = opt.dataset.parrain;
+
+  operationSelect.innerHTML = "";
+  for (const key in OPTIONS[currentEnv]) {
+    const o = OPTIONS[currentEnv][key];
+    const option = document.createElement("option");
+    option.value = key;
+    option.innerText = `${o.label} (${o.points} pts)`;
+    operationSelect.appendChild(option);
+  }
+
+  updateOperation();
+  updateLink();
+});
+
+operationSelect.addEventListener("change", updateOperation);
+form.addEventListener("change", updateLink);
+
+function updateOperation() {
+  const key = operationSelect.value;
+  if (!key) return;
+  const o = OPTIONS[currentEnv][key];
+  codeInput.value = o.code;
+  pointsInput.value = o.points;
+}
+
+function updateLink() {
+  const params = new URLSearchParams(new FormData(form));
+  const url = form.action + "?" + params.toString();
+  link.href = url;
+  link.innerText = url;
+}
+</script>
+
+</body>
+</html>

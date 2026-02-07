@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Extracteur Excel</title>
+
+  <!-- SheetJS -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      padding: 1rem;
+      background: #f9f9f9;
+    }
+
+    h1 {
+      font-size: 1.2rem;
+      margin-bottom: 1rem;
+    }
+
+    input[type="file"] {
+      width: 100%;
+      margin-bottom: 1rem;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+    }
+
+    th, td {
+      padding: 0.6rem;
+      border-bottom: 1px solid #ddd;
+      text-align: left;
+    }
+
+    th {
+      background: #efefef;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+
+<h1>Résumé du fichier Excel</h1>
+
+<input type="file" id="fileInput" accept=".xlsx">
+
+<table id="resultTable" style="display:none;">
+  <thead>
+    <tr>
+      <th>Champ</th>
+      <th>Valeur</th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
+
+<script>
+  const fileInput = document.getElementById('fileInput');
+  const table = document.getElementById('resultTable');
+  const tbody = table.querySelector('tbody');
+
+  // 👉 CONFIG ICI : cellules à lire
+  const fields = [
+    { label: "Nom client", cell: "B2" },
+    { label: "Numéro de dossier", cell: "D5" },
+    { label: "Date", cell: "C10" },
+    { label: "Montant total", cell: "F20" }
+  ];
+
+  fileInput.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+
+    reader.onload = (evt) => {
+      const data = new Uint8Array(evt.target.result);
+      const workbook = XLSX.read(data, { type: 'array' });
+
+      // Première feuille
+      const sheetName = workbook.SheetNames[0];
+      const sheet = workbook.Sheets[sheetName];
+
+      tbody.innerHTML = "";
+
+      fields.forEach(field => {
+        const cell = sheet[field.cell];
+        const value = cell ? cell.v : "—";
+
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${field.label}</td>
+          <td>${value}</td>
+        `;
+        tbody.appendChild(row);
+      });
+
+      table.style.display = "table";
+    };
+
+    reader.readAsArrayBuffer(file);
+  });
+</script>
+
+</body>
+</html>

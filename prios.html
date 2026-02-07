@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Priorités - Vue simplifiée</title>
 
-  <!-- Librairie pour lire les fichiers Excel (.xlsx) -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 
   <style>
@@ -51,7 +50,6 @@
       background: #fafafa;
     }
 
-    /* Lignes spécifiques */
     .row-magasin {
       background: #f2f2f2;
     }
@@ -60,7 +58,6 @@
       background: #e0e0e0;
     }
 
-    /* Styles pour la valeur R */
     .r-ok {
       color: #1a7f37;
       font-weight: 700;
@@ -103,102 +100,81 @@
   /* =====================================================
      CONFIGURATION EXCEL
      R = Réalisé
-     P = % R/O (texte : +66,7% ou -20%)
+     O = Objectif
+     ⚠️ Toutes les cellules ont été décalées d’1 colonne à gauche
      ===================================================== */
 
   const rows = [
     {
       label: "Antoine",
       cells: [
-        { R: "AK10", P: "AL10" },
-        { R: "BC10", P: "BE10" },
-        { R: "BO10", P: "BP10" },
-        { R: "BR10", P: "BS10" }, // P4 Access
-        { R: "AW10", P: "AX10" },
-        { R: "AZ10", P: "BA10" },
-        { R: "AQ10", P: "AR10" },
-        { R: "AT10", P: "AU10" }
+        { R: "AJ10", O: "AK10" },
+        { R: "BB10", O: "BC10" },
+        { R: "BN10", O: "BO10" },
+        { R: "BQ10", O: "BR10" }, // P4 Access
+        { R: "AV10", O: "AW10" },
+        { R: "AY10", O: "AZ10" },
+        { R: "AP10", O: "AQ10" },
+        { R: "AS10", O: "AT10" }
       ]
     },
     {
       label: "Nicolas",
       cells: [
-        { R: "AK11", P: "AL11" },
-        { R: "BC11", P: "BD11" },
-        { R: "BO11", P: "BP11" },
-        { R: "BR11", P: "BS11" },
-        { R: "AW11", P: "AX11" },
-        { R: "AZ11", P: "BA11" },
-        { R: "AQ11", P: "AR11" },
-        { R: "AT11", P: "AU11" }
+        { R: "AJ11", O: "AK11" },
+        { R: "BB11", O: "BC11" },
+        { R: "BN11", O: "BO11" },
+        { R: "BQ11", O: "BR11" },
+        { R: "AV11", O: "AW11" },
+        { R: "AY11", O: "AZ11" },
+        { R: "AP11", O: "AQ11" },
+        { R: "AS11", O: "AT11" }
       ]
     },
     {
       label: "Rémy",
       cells: [
-        { R: "AK12", P: "AL12" },
-        { R: "BC12", P: "BD12" },
-        { R: "BO12", P: "BP12" },
-        { R: "BR12", P: "BS12" },
-        { R: "AW12", P: "AX12" },
-        { R: "AZ12", P: "BA12" },
-        { R: "AQ12", P: "AR12" },
-        { R: "AT12", P: "AU12" }
+        { R: "AJ12", O: "AK12" },
+        { R: "BB12", O: "BC12" },
+        { R: "BN12", O: "BO12" },
+        { R: "BQ12", O: "BR12" },
+        { R: "AV12", O: "AW12" },
+        { R: "AY12", O: "AZ12" },
+        { R: "AP12", O: "AQ12" },
+        { R: "AS12", O: "AT12" }
       ]
     },
     {
       label: "Magasin",
       rowClass: "row-magasin",
       cells: [
-        { R: "AK15", P: "AL15" },
-        { R: "BC15", P: "BD15" },
-        { R: "BO15", P: "BP15" },
-        { R: "BR15", P: "BS15" },
-        { R: "AW15", P: "AX15" },
-        { R: "AZ15", P: "BA15" },
-        { R: "AQ15", P: "AR15" },
-        { R: "AT15", P: "AU15" }
+        { R: "AJ15", O: "AK15" },
+        { R: "BB15", O: "BC15" },
+        { R: "BN15", O: "BO15" },
+        { R: "BQ15", O: "BR15" },
+        { R: "AV15", O: "AW15" },
+        { R: "AY15", O: "AZ15" },
+        { R: "AP15", O: "AQ15" },
+        { R: "AS15", O: "AT15" }
       ]
     },
     {
       label: "OU1",
       rowClass: "row-secteur",
       cells: [
-        { R: "AK16", P: "AL16" },
-        { R: "BC16", P: "BD16" },
-        { R: "BO16", P: "BP16" },
-        { R: "BR16", P: "BS16" },
-        { R: "AW16", P: "AX16" },
-        { R: "AZ16", P: "BA16" },
-        { R: "AQ16", P: "AR16" },
-        { R: "AT16", P: "AU16" }
+        { R: "AJ16", O: "AK16" },
+        { R: "BB16", O: "BC16" },
+        { R: "BN16", O: "BO16" },
+        { R: "BQ16", O: "BR16" },
+        { R: "AV16", O: "AW16" },
+        { R: "AY16", O: "AZ16" },
+        { R: "AP16", O: "AQ16" },
+        { R: "AS16", O: "AT16" }
       ]
     }
   ];
 
   /* ===================================================== */
-
-  function parsePercent(value) {
-  if (value === null || value === undefined) return null;
-
-  // Si Excel renvoie déjà un nombre (ex: 0.667)
-  if (typeof value === "number") {
-    return value;
-  }
-
-  // Si Excel renvoie un texte "+66,7%"
-  if (typeof value === "string") {
-    const clean = value
-      .replace("%", "")
-      .replace(",", ".")
-      .trim();
-
-    const parsed = parseFloat(clean);
-    return isNaN(parsed) ? null : parsed / 100;
-  }
-
-  return null;
-}
 
   fileInput.addEventListener("change", (e) => {
     const file = e.target.files[0];
@@ -217,36 +193,22 @@
         const tr = document.createElement("tr");
         if (row.rowClass) tr.classList.add(row.rowClass);
 
-        // Libellé (vendeur / magasin / secteur)
         tr.innerHTML = `<td>${row.label}</td>`;
 
         row.cells.forEach((cell, index) => {
           let r = sheet[cell.R]?.v ?? "";
-          const percentText = sheet[cell.P]?.v ?? "";
+          let o = sheet[cell.O]?.v ?? "";
 
-          const percent = parsePercent(percentText);
-
-          let o = "";
-          if (typeof r === "number" && percent !== null) {
-            const factor = 1 + percent;
-            if (factor !== 0) {
-              o = Math.round(r / factor);
-            }
-          }
-
-          // P4 Access : arrondi à l'entier supérieur
+          // P4 Access : arrondi du R à l'entier supérieur
           if (index === 3 && typeof r === "number") {
             r = Math.ceil(r);
           }
 
-          // Couleur du R selon le signe du %
+          // Couleur du R selon comparaison R / O
           let rClass = "";
-if (typeof percentText === "string") {
-  if (percentText.trim().startsWith("+")) rClass = "r-ok";
-  if (percentText.trim().startsWith("-")) rClass = "r-bad";
-} else if (typeof percentText === "number") {
-  rClass = percentText >= 0 ? "r-ok" : "r-bad";
-}
+          if (typeof r === "number" && typeof o === "number") {
+            rClass = r >= o ? "r-ok" : "r-bad";
+          }
 
           tr.innerHTML += `
             <td>

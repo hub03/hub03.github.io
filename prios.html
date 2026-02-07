@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Priorités - Vue simplifiée</title>
 
-  <!-- Librairie pour lire les fichiers Excel (.xlsx) -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 
   <style>
@@ -44,12 +43,31 @@
       font-weight: 600;
     }
 
-    /* Première colonne : libellés (vendeurs, magasin, secteur) */
     th:first-child,
     td:first-child {
       text-align: left;
       font-weight: 600;
       background: #fafafa;
+    }
+
+    /* Lignes spécifiques */
+    .row-magasin {
+      background: #f2f2f2;
+    }
+
+    .row-secteur {
+      background: #e0e0e0;
+    }
+
+    /* Styles R */
+    .r-ok {
+      color: #1a7f37;
+      font-weight: 700;
+    }
+
+    .r-bad {
+      color: #c62828;
+      font-weight: 700;
     }
   </style>
 </head>
@@ -82,46 +100,78 @@
   const tbody = table.querySelector("tbody");
 
   /* =====================================================
-     CONFIGURATION EXCEL – C’EST ICI QUE TU MODIFIES
+     CONFIGURATION EXCEL – TU MODIFIES ICI
+     R = Réalisé (déjà OK)
+     O = Objectif (À ADAPTER)
      ===================================================== */
 
-  /*
-    Chaque entrée du tableau "rows" correspond à UNE LIGNE
-    dans le tableau final (vendeur, magasin ou secteur)
-
-    label  → texte affiché dans la première colonne
-    cells  → cellules Excel correspondant à P1 → P8
-  */
-
   const rows = [
-    // ---------- VENDEUR 1 ----------
     {
       label: "Antoine",
-      cells: ["AK10", "BC10", "BO10", "BR10", "AW10", "AZ10", "AQ10", "AT10"]
+      cells: [
+        { R: "AK10", O: "AL10" },
+        { R: "BC10", O: "BD10" },
+        { R: "BO10", O: "BP10" },
+        { R: "BR10", O: "BS10" }, // P4 Access
+        { R: "AW10", O: "AX10" },
+        { R: "AZ10", O: "BA10" },
+        { R: "AQ10", O: "AR10" },
+        { R: "AT10", O: "AU10" }
+      ]
     },
-
-    // ---------- VENDEUR 2 ----------
     {
       label: "Nicolas",
-      cells: ["AK11", "BC11", "BO11", "BR11", "AW11", "AZ11", "AQ11", "AT11"]
+      cells: [
+        { R: "AK11", O: "AL11" },
+        { R: "BC11", O: "BD11" },
+        { R: "BO11", O: "BP11" },
+        { R: "BR11", O: "BS11" },
+        { R: "AW11", O: "AX11" },
+        { R: "AZ11", O: "BA11" },
+        { R: "AQ11", O: "AR11" },
+        { R: "AT11", O: "AU11" }
+      ]
     },
-
-    // ---------- VENDEUR 3 ----------
     {
       label: "Rémy",
-      cells: ["AK12", "BC12", "BO12", "BR12", "AW12", "AZ12", "AQ12", "AT12"]
+      cells: [
+        { R: "AK12", O: "AL12" },
+        { R: "BC12", O: "BD12" },
+        { R: "BO12", O: "BP12" },
+        { R: "BR12", O: "BS12" },
+        { R: "AW12", O: "AX12" },
+        { R: "AZ12", O: "BA12" },
+        { R: "AQ12", O: "AR12" },
+        { R: "AT12", O: "AU12" }
+      ]
     },
-
-    // ---------- MAGASIN ----------
     {
       label: "Magasin",
-      cells: ["AK15", "BC15", "BO15", "BR15", "AW15", "AZ15", "AQ15", "AT15"]
+      rowClass: "row-magasin",
+      cells: [
+        { R: "AK15", O: "AL15" },
+        { R: "BC15", O: "BD15" },
+        { R: "BO15", O: "BP15" },
+        { R: "BR15", O: "BS15" },
+        { R: "AW15", O: "AX15" },
+        { R: "AZ15", O: "BA15" },
+        { R: "AQ15", O: "AR15" },
+        { R: "AT15", O: "AU15" }
+      ]
     },
-
-    // ---------- SECTEUR ----------
     {
       label: "OU1",
-      cells: ["AK16", "BC16", "BO16", "BR16", "AW16", "AZ16", "AQ16", "AT16"]
+      rowClass: "row-secteur",
+      cells: [
+        { R: "AK16", O: "AL16" },
+        { R: "BC16", O: "BD16" },
+        { R: "BO16", O: "BP16" },
+        { R: "BR16", O: "BS16" },
+        { R: "AW16", O: "AX16" },
+        { R: "AZ16", O: "BA16" },
+        { R: "AQ16", O: "AR16" },
+        { R: "AT16", O: "AU16" }
+      ]
     }
   ];
 
@@ -136,23 +186,35 @@
     reader.onload = (evt) => {
       const data = new Uint8Array(evt.target.result);
       const workbook = XLSX.read(data, { type: "array" });
-
-      // 👉 Par défaut on lit la première feuille
       const sheet = workbook.Sheets[workbook.SheetNames[0]];
 
       tbody.innerHTML = "";
 
-      rows.forEach(rowConfig => {
+      rows.forEach(row => {
         const tr = document.createElement("tr");
+        if (row.rowClass) tr.classList.add(row.rowClass);
 
-        // Colonne libellé
-        tr.innerHTML = `<td>${rowConfig.label}</td>`;
+        tr.innerHTML = `<td>${row.label}</td>`;
 
-        // Colonnes P1 → P8
-        rowConfig.cells.forEach(cellRef => {
-          const cell = sheet[cellRef];
-          const value = cell ? cell.v : "";
-          tr.innerHTML += `<td>${value}</td>`;
+        row.cells.forEach((cell, index) => {
+          let r = sheet[cell.R]?.v ?? "";
+          let o = sheet[cell.O]?.v ?? "";
+
+          // P4 Access → arrondi à l'entier supérieur (index 3)
+          if (index === 3 && typeof r === "number") {
+            r = Math.ceil(r);
+          }
+
+          let rClass = "";
+          if (typeof r === "number" && typeof o === "number") {
+            rClass = r >= o ? "r-ok" : "r-bad";
+          }
+
+          tr.innerHTML += `
+            <td>
+              <span class="${rClass}">${r}</span> / ${o}
+            </td>
+          `;
         });
 
         tbody.appendChild(tr);

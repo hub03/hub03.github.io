@@ -178,18 +178,27 @@
 
   /* ===================================================== */
 
-  function parsePercent(text) {
-    if (!text) return null;
+  function parsePercent(value) {
+  if (value === null || value === undefined) return null;
 
-    // "+66,7%" -> 0.667
-    const clean = text
+  // Si Excel renvoie déjà un nombre (ex: 0.667)
+  if (typeof value === "number") {
+    return value;
+  }
+
+  // Si Excel renvoie un texte "+66,7%"
+  if (typeof value === "string") {
+    const clean = value
       .replace("%", "")
       .replace(",", ".")
       .trim();
 
-    const value = parseFloat(clean);
-    return isNaN(value) ? null : value / 100;
+    const parsed = parseFloat(clean);
+    return isNaN(parsed) ? null : parsed / 100;
   }
+
+  return null;
+}
 
   fileInput.addEventListener("change", (e) => {
     const file = e.target.files[0];

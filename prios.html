@@ -3,8 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Priorités vendeurs</title>
+  <title>Priorités - Vue simplifiée</title>
 
+  <!-- Librairie pour lire les fichiers Excel (.xlsx) -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 
   <style>
@@ -32,7 +33,7 @@
     }
 
     th, td {
-      padding: 0.4rem;
+      padding: 0.45rem;
       border: 1px solid #ddd;
       text-align: center;
       white-space: nowrap;
@@ -43,6 +44,7 @@
       font-weight: 600;
     }
 
+    /* Première colonne : libellés (vendeurs, magasin, secteur) */
     th:first-child,
     td:first-child {
       text-align: left;
@@ -53,32 +55,22 @@
 </head>
 <body>
 
-<h1>Suivi des priorités</h1>
+<h1>Tableau des priorités</h1>
 
 <input type="file" id="fileInput" accept=".xlsx">
 
 <table id="resultTable" style="display:none;">
   <thead>
     <tr>
-      <th rowspan="2">Vendeur</th>
-      <th colspan="2">P1</th>
-      <th colspan="2">P2</th>
-      <th colspan="2">P3</th>
-      <th colspan="2">P4</th>
-      <th colspan="2">P5</th>
-      <th colspan="2">P6</th>
-      <th colspan="2">P7</th>
-      <th colspan="2">P8</th>
-    </tr>
-    <tr>
-      <th>R</th><th>O</th>
-      <th>R</th><th>O</th>
-      <th>R</th><th>O</th>
-      <th>R</th><th>O</th>
-      <th>R</th><th>O</th>
-      <th>R</th><th>O</th>
-      <th>R</th><th>O</th>
-      <th>R</th><th>O</th>
+      <th></th>
+      <th>P1</th>
+      <th>P2</th>
+      <th>P3</th>
+      <th>P4</th>
+      <th>P5</th>
+      <th>P6</th>
+      <th>P7</th>
+      <th>P8</th>
     </tr>
   </thead>
   <tbody></tbody>
@@ -89,35 +81,63 @@
   const table = document.getElementById("resultTable");
   const tbody = table.querySelector("tbody");
 
-  // 👉 CONFIG EXCEL
-  const vendors = [
+  /* =====================================================
+     CONFIGURATION EXCEL – C’EST ICI QUE TU MODIFIES
+     ===================================================== */
+
+  /*
+    Chaque entrée du tableau "rows" correspond à UNE LIGNE
+    dans le tableau final (vendeur, magasin ou secteur)
+
+    label  → texte affiché dans la première colonne
+    cells  → cellules Excel correspondant à P1 → P8
+  */
+
+  const rows = [
+    // ---------- VENDEUR 1 ----------
     {
-      nameCell: "B2",
-      priorities: [
-        { R: "C2", O: "D2" },
-        { R: "E2", O: "F2" },
-        { R: "G2", O: "H2" },
-        { R: "I2", O: "J2" },
-        { R: "K2", O: "L2" },
-        { R: "M2", O: "N2" },
-        { R: "O2", O: "P2" },
-        { R: "Q2", O: "R2" }
-      ]
+      label: "Vendeur 1",
+      cells: ["C2", "D2", "E2", "F2", "G2", "H2", "I2", "J2"]
     },
+
+    // ---------- VENDEUR 2 ----------
     {
-      nameCell: "B3",
-      priorities: [
-        { R: "C3", O: "D3" },
-        { R: "E3", O: "F3" },
-        { R: "G3", O: "H3" },
-        { R: "I3", O: "J3" },
-        { R: "K3", O: "L3" },
-        { R: "M3", O: "N3" },
-        { R: "O3", O: "P3" },
-        { R: "Q3", O: "R3" }
-      ]
+      label: "Vendeur 2",
+      cells: ["C3", "D3", "E3", "F3", "G3", "H3", "I3", "J3"]
+    },
+
+    // ---------- VENDEUR 3 ----------
+    {
+      label: "Vendeur 3",
+      cells: ["C4", "D4", "E4", "F4", "G4", "H4", "I4", "J4"]
+    },
+
+    // ---------- VENDEUR 4 ----------
+    {
+      label: "Vendeur 4",
+      cells: ["C5", "D5", "E5", "F5", "G5", "H5", "I5", "J5"]
+    },
+
+    // ---------- VENDEUR 5 ----------
+    {
+      label: "Vendeur 5",
+      cells: ["C6", "D6", "E6", "F6", "G6", "H6", "I6", "J6"]
+    },
+
+    // ---------- MAGASIN ----------
+    {
+      label: "Magasin",
+      cells: ["C8", "D8", "E8", "F8", "G8", "H8", "I8", "J8"]
+    },
+
+    // ---------- SECTEUR ----------
+    {
+      label: "Secteur",
+      cells: ["C9", "D9", "E9", "F9", "G9", "H9", "I9", "J9"]
     }
   ];
+
+  /* ===================================================== */
 
   fileInput.addEventListener("change", (e) => {
     const file = e.target.files[0];
@@ -128,24 +148,26 @@
     reader.onload = (evt) => {
       const data = new Uint8Array(evt.target.result);
       const workbook = XLSX.read(data, { type: "array" });
+
+      // 👉 Par défaut on lit la première feuille
       const sheet = workbook.Sheets[workbook.SheetNames[0]];
 
       tbody.innerHTML = "";
 
-      vendors.forEach(vendor => {
-        const row = document.createElement("tr");
+      rows.forEach(rowConfig => {
+        const tr = document.createElement("tr");
 
-        const nameCell = sheet[vendor.nameCell];
-        row.innerHTML = `<td>${nameCell ? nameCell.v : "—"}</td>`;
+        // Colonne libellé
+        tr.innerHTML = `<td>${rowConfig.label}</td>`;
 
-        vendor.priorities.forEach(p => {
-          const r = sheet[p.R] ? sheet[p.R].v : "";
-          const o = sheet[p.O] ? sheet[p.O].v : "";
-
-          row.innerHTML += `<td>${r}</td><td>${o}</td>`;
+        // Colonnes P1 → P8
+        rowConfig.cells.forEach(cellRef => {
+          const cell = sheet[cellRef];
+          const value = cell ? cell.v : "";
+          tr.innerHTML += `<td>${value}</td>`;
         });
 
-        tbody.appendChild(row);
+        tbody.appendChild(tr);
       });
 
       table.style.display = "table";

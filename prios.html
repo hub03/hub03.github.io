@@ -241,10 +241,12 @@
 
           // Couleur du R selon le signe du %
           let rClass = "";
-          if (typeof percentText === "string") {
-            if (percentText.trim().startsWith("+")) rClass = "r-ok";
-            if (percentText.trim().startsWith("-")) rClass = "r-bad";
-          }
+if (typeof percentText === "string") {
+  if (percentText.trim().startsWith("+")) rClass = "r-ok";
+  if (percentText.trim().startsWith("-")) rClass = "r-bad";
+} else if (typeof percentText === "number") {
+  rClass = percentText >= 0 ? "r-ok" : "r-bad";
+}
 
           tr.innerHTML += `
             <td>

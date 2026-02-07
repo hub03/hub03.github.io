@@ -87,6 +87,10 @@
       <th>P6 MS</th>
       <th>C7 Mig</th>
       <th>C8 Canal+</th>
+      <th>Score</th>
+      <th>Tx d'assu</th>
+      <th>Tx 5Go et +</th>
+      <th>Tx reprise</th>
     </tr>
   </thead>
   <tbody></tbody>
@@ -111,12 +115,17 @@
         { R: "AJ10", O: "AK10" },
         { R: "BB10", O: "BC10" },
         { R: "BN10", O: "BO10" },
-        { R: "BQ10", O: "BR10" }, // P4 Access
+        { R: "BQ10", O: "BR10" },
         { R: "AV10", O: "AW10" },
         { R: "AY10", O: "AZ10" },
         { R: "AP10", O: "AQ10" },
         { R: "AS10", O: "AT10" }
-      ]
+      ],
+      taux: {
+        assu: "DC10",
+        go5: "CO10",
+        reprise: "CW10"
+      }
     },
     {
       label: "Nicolas",
@@ -129,7 +138,12 @@
         { R: "AY11", O: "AZ11" },
         { R: "AP11", O: "AQ11" },
         { R: "AS11", O: "AT11" }
-      ]
+      ],
+      taux: {
+        assu: "DC11",
+        go5: "CO11",
+        reprise: "CW11"
+      }
     },
     {
       label: "Rémy",
@@ -142,7 +156,12 @@
         { R: "AY12", O: "AZ12" },
         { R: "AP12", O: "AQ12" },
         { R: "AS12", O: "AT12" }
-      ]
+      ],
+      taux: {
+        assu: "DC12",
+        go5: "CO12",
+        reprise: "CW12"
+      }
     },
     {
       label: "Magasin",
@@ -156,7 +175,12 @@
         { R: "AY15", O: "AZ15" },
         { R: "AP15", O: "AQ15" },
         { R: "AS15", O: "AT15" }
-      ]
+      ],
+      taux: {
+        assu: "DC15",
+        go5: "CO15",
+        reprise: "CW15"
+      }
     },
     {
       label: "OU1",
@@ -170,7 +194,12 @@
         { R: "AY16", O: "AZ16" },
         { R: "AP16", O: "AQ16" },
         { R: "AS16", O: "AT16" }
-      ]
+      ],
+      taux: {
+        assu: "DC16",
+        go5: "CO16",
+        reprise: "CW16"
+      }
     }
   ];
 
@@ -195,32 +224,46 @@
 
         tr.innerHTML = `<td>${row.label}</td>`;
 
+        // ==== P1 → P8 avec R / O + Score partiel ====
+        let score = 0;
+
         row.cells.forEach((cell, index) => {
           let r = sheet[cell.R]?.v ?? "";
-let o = sheet[cell.O]?.v ?? "";
+          let o = sheet[cell.O]?.v ?? "";
 
-// P4 Access : arrondi du R à l'entier supérieur
-if (index === 3 && typeof r === "number") {
-  r = Math.ceil(r);
-}
+          // P4 Access : arrondi du R
+          if (index === 3 && typeof r === "number") r = Math.ceil(r);
 
-// Arrondi à l'entier supérieur pour toutes les valeurs O
-if (typeof o === "number") {
-  o = Math.ceil(o);
-}
+          // Arrondi O
+          if (typeof o === "number") o = Math.ceil(o);
 
-          // Couleur du R selon comparaison R / O
+          // Couleur du R selon R >= O
           let rClass = "";
           if (typeof r === "number" && typeof o === "number") {
             rClass = r >= o ? "r-ok" : "r-bad";
+            if (r >= o) score += 1; // +1 point si vert
           }
 
-          tr.innerHTML += `
-            <td>
-              <span class="${rClass}">${r}</span> / ${o}
-            </td>
-          `;
+          tr.innerHTML += `<td><span class="${rClass}">${r}</span> / ${o}</td>`;
         });
+
+        // ==== Colonne Score ====
+        tr.innerHTML += `<td>${score}</td>`;
+
+        // ==== Colonnes taux ====
+        const tauxAssu = sheet[row.taux.assu]?.v ?? "";
+        const tauxGo5 = sheet[row.taux.go5]?.v ?? "";
+        const tauxReprise = sheet[row.taux.reprise]?.v ?? "";
+
+        // Affichage avec % si nombre
+        const formatPercent = (v) => {
+          if (typeof v === "number") return (v * 100).toFixed(1) + "%";
+          return v;
+        };
+
+        tr.innerHTML += `<td>${formatPercent(tauxAssu)}</td>`;
+        tr.innerHTML += `<td>${formatPercent(tauxGo5)}</td>`;
+        tr.innerHTML += `<td>${formatPercent(tauxReprise)}</td>`;
 
         tbody.appendChild(tr);
       });

@@ -197,12 +197,17 @@
 
         row.cells.forEach((cell, index) => {
           let r = sheet[cell.R]?.v ?? "";
-          let o = sheet[cell.O]?.v ?? "";
+let o = sheet[cell.O]?.v ?? "";
 
-          // P4 Access : arrondi du R à l'entier supérieur
-          if (index === 3 && typeof r === "number") {
-            r = Math.ceil(r);
-          }
+// P4 Access : arrondi du R à l'entier supérieur
+if (index === 3 && typeof r === "number") {
+  r = Math.ceil(r);
+}
+
+// Arrondi à l'entier supérieur pour toutes les valeurs O
+if (typeof o === "number") {
+  o = Math.ceil(o);
+}
 
           // Couleur du R selon comparaison R / O
           let rClass = "";

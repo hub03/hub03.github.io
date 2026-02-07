@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Priorités - Vue simplifiée</title>
 
+  <!-- Librairie pour lire les fichiers Excel (.xlsx) -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 
   <style>
@@ -59,7 +60,7 @@
       background: #e0e0e0;
     }
 
-    /* Styles R */
+    /* Styles pour la valeur R */
     .r-ok {
       color: #1a7f37;
       font-weight: 700;
@@ -100,82 +101,95 @@
   const tbody = table.querySelector("tbody");
 
   /* =====================================================
-     CONFIGURATION EXCEL – TU MODIFIES ICI
-     R = Réalisé (déjà OK)
-     O = Objectif (À ADAPTER)
+     CONFIGURATION EXCEL
+     R = Réalisé
+     P = % R/O (texte : +66,7% ou -20%)
      ===================================================== */
 
   const rows = [
     {
       label: "Antoine",
       cells: [
-        { R: "AK10", O: "AL10" },
-        { R: "BC10", O: "BD10" },
-        { R: "BO10", O: "BP10" },
-        { R: "BR10", O: "BS10" }, // P4 Access
-        { R: "AW10", O: "AX10" },
-        { R: "AZ10", O: "BA10" },
-        { R: "AQ10", O: "AR10" },
-        { R: "AT10", O: "AU10" }
+        { R: "AK10", P: "AM10" },
+        { R: "BC10", P: "BE10" },
+        { R: "BO10", P: "BQ10" },
+        { R: "BR10", P: "BT10" }, // P4 Access
+        { R: "AW10", P: "AY10" },
+        { R: "AZ10", P: "BB10" },
+        { R: "AQ10", P: "AS10" },
+        { R: "AT10", P: "AV10" }
       ]
     },
     {
       label: "Nicolas",
       cells: [
-        { R: "AK11", O: "AL11" },
-        { R: "BC11", O: "BD11" },
-        { R: "BO11", O: "BP11" },
-        { R: "BR11", O: "BS11" },
-        { R: "AW11", O: "AX11" },
-        { R: "AZ11", O: "BA11" },
-        { R: "AQ11", O: "AR11" },
-        { R: "AT11", O: "AU11" }
+        { R: "AK11", P: "AM11" },
+        { R: "BC11", P: "BE11" },
+        { R: "BO11", P: "BQ11" },
+        { R: "BR11", P: "BT11" },
+        { R: "AW11", P: "AY11" },
+        { R: "AZ11", P: "BB11" },
+        { R: "AQ11", P: "AS11" },
+        { R: "AT11", P: "AV11" }
       ]
     },
     {
       label: "Rémy",
       cells: [
-        { R: "AK12", O: "AL12" },
-        { R: "BC12", O: "BD12" },
-        { R: "BO12", O: "BP12" },
-        { R: "BR12", O: "BS12" },
-        { R: "AW12", O: "AX12" },
-        { R: "AZ12", O: "BA12" },
-        { R: "AQ12", O: "AR12" },
-        { R: "AT12", O: "AU12" }
+        { R: "AK12", P: "AM12" },
+        { R: "BC12", P: "BE12" },
+        { R: "BO12", P: "BQ12" },
+        { R: "BR12", P: "BT12" },
+        { R: "AW12", P: "AY12" },
+        { R: "AZ12", P: "BB12" },
+        { R: "AQ12", P: "AS12" },
+        { R: "AT12", P: "AV12" }
       ]
     },
     {
       label: "Magasin",
       rowClass: "row-magasin",
       cells: [
-        { R: "AK15", O: "AL15" },
-        { R: "BC15", O: "BD15" },
-        { R: "BO15", O: "BP15" },
-        { R: "BR15", O: "BS15" },
-        { R: "AW15", O: "AX15" },
-        { R: "AZ15", O: "BA15" },
-        { R: "AQ15", O: "AR15" },
-        { R: "AT15", O: "AU15" }
+        { R: "AK15", P: "AM15" },
+        { R: "BC15", P: "BE15" },
+        { R: "BO15", P: "BQ15" },
+        { R: "BR15", P: "BT15" },
+        { R: "AW15", P: "AY15" },
+        { R: "AZ15", P: "BB15" },
+        { R: "AQ15", P: "AS15" },
+        { R: "AT15", P: "AV15" }
       ]
     },
     {
       label: "OU1",
       rowClass: "row-secteur",
       cells: [
-        { R: "AK16", O: "AL16" },
-        { R: "BC16", O: "BD16" },
-        { R: "BO16", O: "BP16" },
-        { R: "BR16", O: "BS16" },
-        { R: "AW16", O: "AX16" },
-        { R: "AZ16", O: "BA16" },
-        { R: "AQ16", O: "AR16" },
-        { R: "AT16", O: "AU16" }
+        { R: "AK16", P: "AM16" },
+        { R: "BC16", P: "BE16" },
+        { R: "BO16", P: "BQ16" },
+        { R: "BR16", P: "BT16" },
+        { R: "AW16", P: "AY16" },
+        { R: "AZ16", P: "BB16" },
+        { R: "AQ16", P: "AS16" },
+        { R: "AT16", P: "AV16" }
       ]
     }
   ];
 
   /* ===================================================== */
+
+  function parsePercent(text) {
+    if (!text) return null;
+
+    // "+66,7%" -> 0.667
+    const clean = text
+      .replace("%", "")
+      .replace(",", ".")
+      .trim();
+
+    const value = parseFloat(clean);
+    return isNaN(value) ? null : value / 100;
+  }
 
   fileInput.addEventListener("change", (e) => {
     const file = e.target.files[0];
@@ -194,20 +208,33 @@
         const tr = document.createElement("tr");
         if (row.rowClass) tr.classList.add(row.rowClass);
 
+        // Libellé (vendeur / magasin / secteur)
         tr.innerHTML = `<td>${row.label}</td>`;
 
         row.cells.forEach((cell, index) => {
           let r = sheet[cell.R]?.v ?? "";
-          let o = sheet[cell.O]?.v ?? "";
+          const percentText = sheet[cell.P]?.v ?? "";
 
-          // P4 Access → arrondi à l'entier supérieur (index 3)
+          const percent = parsePercent(percentText);
+
+          let o = "";
+          if (typeof r === "number" && percent !== null) {
+            const factor = 1 + percent;
+            if (factor !== 0) {
+              o = Math.round(r / factor);
+            }
+          }
+
+          // P4 Access : arrondi à l'entier supérieur
           if (index === 3 && typeof r === "number") {
             r = Math.ceil(r);
           }
 
+          // Couleur du R selon le signe du %
           let rClass = "";
-          if (typeof r === "number" && typeof o === "number") {
-            rClass = r >= o ? "r-ok" : "r-bad";
+          if (typeof percentText === "string") {
+            if (percentText.trim().startsWith("+")) rClass = "r-ok";
+            if (percentText.trim().startsWith("-")) rClass = "r-bad";
           }
 
           tr.innerHTML += `

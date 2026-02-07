@@ -3,9 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Extracteur Excel</title>
+  <title>Priorités vendeurs</title>
 
-  <!-- SheetJS -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 
   <style>
@@ -16,7 +15,7 @@
     }
 
     h1 {
-      font-size: 1.2rem;
+      font-size: 1.1rem;
       margin-bottom: 1rem;
     }
 
@@ -29,50 +28,98 @@
       width: 100%;
       border-collapse: collapse;
       background: white;
+      font-size: 0.85rem;
     }
 
     th, td {
-      padding: 0.6rem;
-      border-bottom: 1px solid #ddd;
-      text-align: left;
+      padding: 0.4rem;
+      border: 1px solid #ddd;
+      text-align: center;
+      white-space: nowrap;
     }
 
     th {
       background: #efefef;
       font-weight: 600;
     }
+
+    th:first-child,
+    td:first-child {
+      text-align: left;
+      font-weight: 600;
+      background: #fafafa;
+    }
   </style>
 </head>
 <body>
 
-<h1>Résumé du fichier Excel</h1>
+<h1>Suivi des priorités</h1>
 
 <input type="file" id="fileInput" accept=".xlsx">
 
 <table id="resultTable" style="display:none;">
   <thead>
     <tr>
-      <th>Champ</th>
-      <th>Valeur</th>
+      <th rowspan="2">Vendeur</th>
+      <th colspan="2">P1</th>
+      <th colspan="2">P2</th>
+      <th colspan="2">P3</th>
+      <th colspan="2">P4</th>
+      <th colspan="2">P5</th>
+      <th colspan="2">P6</th>
+      <th colspan="2">P7</th>
+      <th colspan="2">P8</th>
+    </tr>
+    <tr>
+      <th>R</th><th>O</th>
+      <th>R</th><th>O</th>
+      <th>R</th><th>O</th>
+      <th>R</th><th>O</th>
+      <th>R</th><th>O</th>
+      <th>R</th><th>O</th>
+      <th>R</th><th>O</th>
+      <th>R</th><th>O</th>
     </tr>
   </thead>
   <tbody></tbody>
 </table>
 
 <script>
-  const fileInput = document.getElementById('fileInput');
-  const table = document.getElementById('resultTable');
-  const tbody = table.querySelector('tbody');
+  const fileInput = document.getElementById("fileInput");
+  const table = document.getElementById("resultTable");
+  const tbody = table.querySelector("tbody");
 
-  // 👉 CONFIG ICI : cellules à lire
-  const fields = [
-    { label: "Nom client", cell: "B2" },
-    { label: "Numéro de dossier", cell: "D5" },
-    { label: "Date", cell: "C10" },
-    { label: "Montant total", cell: "F20" }
+  // 👉 CONFIG EXCEL
+  const vendors = [
+    {
+      nameCell: "B2",
+      priorities: [
+        { R: "C2", O: "D2" },
+        { R: "E2", O: "F2" },
+        { R: "G2", O: "H2" },
+        { R: "I2", O: "J2" },
+        { R: "K2", O: "L2" },
+        { R: "M2", O: "N2" },
+        { R: "O2", O: "P2" },
+        { R: "Q2", O: "R2" }
+      ]
+    },
+    {
+      nameCell: "B3",
+      priorities: [
+        { R: "C3", O: "D3" },
+        { R: "E3", O: "F3" },
+        { R: "G3", O: "H3" },
+        { R: "I3", O: "J3" },
+        { R: "K3", O: "L3" },
+        { R: "M3", O: "N3" },
+        { R: "O3", O: "P3" },
+        { R: "Q3", O: "R3" }
+      ]
+    }
   ];
 
-  fileInput.addEventListener('change', (e) => {
+  fileInput.addEventListener("change", (e) => {
     const file = e.target.files[0];
     if (!file) return;
 
@@ -80,23 +127,24 @@
 
     reader.onload = (evt) => {
       const data = new Uint8Array(evt.target.result);
-      const workbook = XLSX.read(data, { type: 'array' });
-
-      // Première feuille
-      const sheetName = workbook.SheetNames[0];
-      const sheet = workbook.Sheets[sheetName];
+      const workbook = XLSX.read(data, { type: "array" });
+      const sheet = workbook.Sheets[workbook.SheetNames[0]];
 
       tbody.innerHTML = "";
 
-      fields.forEach(field => {
-        const cell = sheet[field.cell];
-        const value = cell ? cell.v : "—";
+      vendors.forEach(vendor => {
+        const row = document.createElement("tr");
 
-        const row = document.createElement('tr');
-        row.innerHTML = `
-          <td>${field.label}</td>
-          <td>${value}</td>
-        `;
+        const nameCell = sheet[vendor.nameCell];
+        row.innerHTML = `<td>${nameCell ? nameCell.v : "—"}</td>`;
+
+        vendor.priorities.forEach(p => {
+          const r = sheet[p.R] ? sheet[p.R].v : "";
+          const o = sheet[p.O] ? sheet[p.O].v : "";
+
+          row.innerHTML += `<td>${r}</td><td>${o}</td>`;
+        });
+
         tbody.appendChild(row);
       });
 

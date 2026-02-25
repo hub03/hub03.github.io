@@ -7,7 +7,6 @@
 
   <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 
   <style>
     body {
@@ -31,7 +30,7 @@
       border-collapse: collapse;
       background: white;
       font-size: 0.85rem;
-      border: 2px solid black; /* Bordure extérieure noire */
+      border: 2px solid black;
     }
 
     th, td {
@@ -41,7 +40,7 @@
       white-space: nowrap;
     }
 
-    /* Bordures noires spécifiques */
+    /* Bordures spécifiques */
     th:nth-child(1), td:nth-child(1),
     th:nth-child(9), td:nth-child(9),
     th:nth-child(10), td:nth-child(10) {
@@ -61,7 +60,7 @@
     }
 
     #dateCell {
-      color: #1565c0; /* Bleu */
+      color: #1565c0;
       font-weight: 700;
     }
 
@@ -71,17 +70,17 @@
     .r-ok { color: #00c853; font-weight: 700; }
     .r-bad { color: #ff1744; font-weight: 700; }
 
-    #exportPDF {
+    #shareBtn {
       margin-top: 1rem;
       padding: 0.5rem 1rem;
-      font-size: 1rem;
+      font-size: 1.2rem;
       background: none;
       border: 1px solid #ccc;
       cursor: pointer;
       display: none;
     }
 
-    #exportPDF:hover {
+    #shareBtn:hover {
       background: #f0f0f0;
     }
   </style>
@@ -113,13 +112,13 @@
   <tbody></tbody>
 </table>
 
-<button id="exportPDF">📤</button>
+<button id="shareBtn">📤</button>
 
 <script>
 const fileInput = document.getElementById("fileInput");
 const table = document.getElementById("resultTable");
 const tbody = table.querySelector("tbody");
-const exportPDFBtn = document.getElementById("exportPDF");
+const shareBtn = document.getElementById("shareBtn");
 
 const rows = [
 {
@@ -188,7 +187,7 @@ let rClass="";
 if(typeof r==="number"&&typeof o==="number"){
 const ok=r>=o;
 rClass=ok?"r-ok":"r-bad";
-if(ok) score+=index<=5?1:2;
+if(ok)score+=index<=5?1:2;
 }
 
 tr.innerHTML+=`<td><span class="${rClass}">${r}</span> / ${o}</td>`;
@@ -206,24 +205,19 @@ tbody.appendChild(tr);
 });
 
 table.style.display="table";
-exportPDFBtn.style.display="inline-block";
+shareBtn.style.display="inline-block";
 };
 
 reader.readAsArrayBuffer(file);
 });
 
-/* ===== EXPORT PDF AJUSTÉ (SANS ZONE BLANCHE) ===== */
-exportPDFBtn.addEventListener("click",()=>{
-html2canvas(table).then(canvas=>{
-const imgData=canvas.toDataURL("image/png");
-const { jsPDF }=window.jspdf;
-
-const pdfWidth=canvas.width*0.264583;
-const pdfHeight=canvas.height*0.264583;
-
-const pdf=new jsPDF("l","mm",[pdfWidth,pdfHeight]);
-pdf.addImage(imgData,"PNG",0,0,pdfWidth,pdfHeight);
-pdf.save("tableau_priorites.pdf");
+/* ===== COPIE IMAGE DANS PRESSE PAPIER ===== */
+shareBtn.addEventListener("click",async()=>{
+const canvas=await html2canvas(table,{scale:2});
+canvas.toBlob(async(blob)=>{
+const item=new ClipboardItem({"image/png":blob});
+await navigator.clipboard.write([item]);
+alert("Image copiée ✅\nCollez-la directement dans WhatsApp.");
 });
 });
 </script>

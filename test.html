@@ -21,11 +21,9 @@
       margin-bottom: 1rem;
     }
 
-    input[type="file"], button {
+    input[type="file"] {
       width: 100%;
-      margin-bottom: 0.5rem;
-      padding: 0.5rem;
-      font-size: 0.9rem;
+      margin-bottom: 1rem;
     }
 
     table {
@@ -33,6 +31,7 @@
       border-collapse: collapse;
       background: white;
       font-size: 0.85rem;
+      border: 2px solid black; /* Bordure extérieure noire */
     }
 
     th, td {
@@ -40,6 +39,13 @@
       border: 1px solid #ddd;
       text-align: center;
       white-space: nowrap;
+    }
+
+    /* Bordures noires spécifiques */
+    th:nth-child(1), td:nth-child(1),
+    th:nth-child(9), td:nth-child(9),
+    th:nth-child(10), td:nth-child(10) {
+      border-right: 2px solid black;
     }
 
     th {
@@ -54,21 +60,37 @@
       background: #fafafa;
     }
 
+    #dateCell {
+      color: #1565c0; /* Bleu */
+      font-weight: 700;
+    }
+
     .row-magasin { background: #f2f2f2; }
     .row-secteur { background: #e0e0e0; }
 
     .r-ok { color: #00c853; font-weight: 700; }
     .r-bad { color: #ff1744; font-weight: 700; }
+
+    #exportPDF {
+      margin-top: 1rem;
+      padding: 0.5rem 1rem;
+      font-size: 1rem;
+      background: none;
+      border: 1px solid #ccc;
+      cursor: pointer;
+      display: none;
+    }
+
+    #exportPDF:hover {
+      background: #f0f0f0;
+    }
   </style>
 </head>
 <body>
 
 <h1>Tableau des priorités</h1>
 
-<input type="file" id="fileInput">
-
-<button id="exportImage" style="display:none;">📸 Exporter en image</button>
-<button id="exportPDF" style="display:none;">📄 Exporter en PDF</button>
+<input type="file" id="fileInput" accept=".xlsx">
 
 <table id="resultTable" style="display:none;">
   <thead>
@@ -91,14 +113,15 @@
   <tbody></tbody>
 </table>
 
+<button id="exportPDF">📤</button>
+
 <script>
 const fileInput = document.getElementById("fileInput");
 const table = document.getElementById("resultTable");
 const tbody = table.querySelector("tbody");
-const exportImageBtn = document.getElementById("exportImage");
 const exportPDFBtn = document.getElementById("exportPDF");
 
-const rows = [ /* === CONFIG IDENTIQUE À TON CODE (non modifiée) === */
+const rows = [
 {
 label:"Antoine",
 cells:[{R:"AJ10",O:"AK10"},{R:"BB10",O:"BC10"},{R:"BN10",O:"BO10"},{R:"BQ10",O:"BR10"},{R:"AV10",O:"AW10"},{R:"AY10",O:"AZ10"},{R:"AP10",O:"AQ10"},{R:"AS10",O:"AT10"}],
@@ -132,11 +155,11 @@ fileInput.addEventListener("change",(e)=>{
 const file=e.target.files[0];
 if(!file)return;
 
-fileInput.style.display="none"; // ✅ cache bouton import
+fileInput.style.display="none";
 
 const today=new Date();
 const formatted=("0"+today.getDate()).slice(-2)+"/"+("0"+(today.getMonth()+1)).slice(-2);
-document.getElementById("dateCell").textContent=formatted; // ✅ date JJ/MM
+document.getElementById("dateCell").textContent=formatted;
 
 const reader=new FileReader();
 
@@ -165,9 +188,7 @@ let rClass="";
 if(typeof r==="number"&&typeof o==="number"){
 const ok=r>=o;
 rClass=ok?"r-ok":"r-bad";
-if(ok){
-score+=index<=5?1:2;
-}
+if(ok) score+=index<=5?1:2;
 }
 
 tr.innerHTML+=`<td><span class="${rClass}">${r}</span> / ${o}</td>`;
@@ -185,32 +206,23 @@ tbody.appendChild(tr);
 });
 
 table.style.display="table";
-exportImageBtn.style.display="block";
-exportPDFBtn.style.display="block";
+exportPDFBtn.style.display="inline-block";
 };
 
 reader.readAsArrayBuffer(file);
 });
 
-/* ===== EXPORT IMAGE ===== */
-exportImageBtn.addEventListener("click",()=>{
-html2canvas(table).then(canvas=>{
-const link=document.createElement("a");
-link.download="tableau_priorites.png";
-link.href=canvas.toDataURL();
-link.click();
-});
-});
-
-/* ===== EXPORT PDF ===== */
+/* ===== EXPORT PDF AJUSTÉ (SANS ZONE BLANCHE) ===== */
 exportPDFBtn.addEventListener("click",()=>{
 html2canvas(table).then(canvas=>{
 const imgData=canvas.toDataURL("image/png");
 const { jsPDF }=window.jspdf;
-const pdf=new jsPDF("l","mm","a4");
-const imgWidth=280;
-const imgHeight=(canvas.height*imgWidth)/canvas.width;
-pdf.addImage(imgData,"PNG",10,10,imgWidth,imgHeight);
+
+const pdfWidth=canvas.width*0.264583;
+const pdfHeight=canvas.height*0.264583;
+
+const pdf=new jsPDF("l","mm",[pdfWidth,pdfHeight]);
+pdf.addImage(imgData,"PNG",0,0,pdfWidth,pdfHeight);
 pdf.save("tableau_priorites.pdf");
 });
 });

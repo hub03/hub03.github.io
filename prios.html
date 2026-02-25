@@ -101,13 +101,6 @@
   const table = document.getElementById("resultTable");
   const tbody = table.querySelector("tbody");
 
-  /* =====================================================
-     CONFIGURATION EXCEL
-     R = Réalisé
-     O = Objectif
-     ⚠️ Toutes les cellules ont été décalées d’1 colonne à gauche
-     ===================================================== */
-
   const rows = [
     {
       label: "Antoine",
@@ -203,8 +196,6 @@
     }
   ];
 
-  /* ===================================================== */
-
   fileInput.addEventListener("change", (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -224,38 +215,40 @@
 
         tr.innerHTML = `<td>${row.label}</td>`;
 
-        // ==== P1 → P8 avec R / O + Score partiel ====
         let score = 0;
 
         row.cells.forEach((cell, index) => {
           let r = sheet[cell.R]?.v ?? "";
           let o = sheet[cell.O]?.v ?? "";
 
-          // P4 Access : arrondi du R
           if (index === 3 && typeof r === "number") r = Math.ceil(r);
-
-          // Arrondi O
           if (typeof o === "number") o = Math.ceil(o);
 
-          // Couleur du R selon R >= O
           let rClass = "";
+
           if (typeof r === "number" && typeof o === "number") {
-            rClass = r >= o ? "r-ok" : "r-bad";
-            if (r >= o) score += 1; // +1 point si vert
+            const isSuccess = r >= o; // ✅ R supérieur ou égal
+
+            rClass = isSuccess ? "r-ok" : "r-bad";
+
+            if (isSuccess) {
+              if (index <= 5) {
+                score += 1; // P1 à P6
+              } else {
+                score += 2; // C7 et C8
+              }
+            }
           }
 
           tr.innerHTML += `<td><span class="${rClass}">${r}</span> / ${o}</td>`;
         });
 
-        // ==== Colonne Score ====
-        tr.innerHTML += `<td>${score}</td>`;
+        tr.innerHTML += `<td>${score} / 10</td>`;
 
-        // ==== Colonnes taux ====
         const tauxAssu = sheet[row.taux.assu]?.v ?? "";
         const tauxGo5 = sheet[row.taux.go5]?.v ?? "";
         const tauxReprise = sheet[row.taux.reprise]?.v ?? "";
 
-        // Affichage avec % si nombre
         const formatPercent = (v) => {
           if (typeof v === "number") return (v * 100).toFixed(1) + "%";
           return v;

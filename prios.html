@@ -6,6 +6,7 @@
   <title>Priorités - Vue simplifiée</title>
 
   <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
   <style>
     body {
@@ -29,6 +30,7 @@
       border-collapse: collapse;
       background: white;
       font-size: 0.85rem;
+      border: 2px solid black;
     }
 
     th, td {
@@ -36,6 +38,13 @@
       border: 1px solid #ddd;
       text-align: center;
       white-space: nowrap;
+    }
+
+    /* Bordures spécifiques */
+    th:nth-child(1), td:nth-child(1),
+    th:nth-child(9), td:nth-child(9),
+    th:nth-child(10), td:nth-child(10) {
+      border-right: 2px solid black;
     }
 
     th {
@@ -50,22 +59,29 @@
       background: #fafafa;
     }
 
-    .row-magasin {
-      background: #f2f2f2;
-    }
-
-    .row-secteur {
-      background: #e0e0e0;
-    }
-
-    .r-ok {
-      color: #00c853;
+    #dateCell {
+      color: #1565c0;
       font-weight: 700;
     }
 
-    .r-bad {
-      color: #ff1744;
-      font-weight: 700;
+    .row-magasin { background: #f2f2f2; }
+    .row-secteur { background: #e0e0e0; }
+
+    .r-ok { color: #00c853; font-weight: 700; }
+    .r-bad { color: #ff1744; font-weight: 700; }
+
+    #shareBtn {
+      margin-top: 1rem;
+      padding: 0.5rem 1rem;
+      font-size: 1.2rem;
+      background: none;
+      border: 1px solid #ccc;
+      cursor: pointer;
+      display: none;
+    }
+
+    #shareBtn:hover {
+      background: #f0f0f0;
     }
   </style>
 </head>
@@ -73,12 +89,12 @@
 
 <h1>Tableau des priorités</h1>
 
-<input type="file" id="fileInput" >
+<input type="file" id="fileInput" accept=".xlsx">
 
 <table id="resultTable" style="display:none;">
   <thead>
     <tr>
-      <th></th>
+      <th id="dateCell"></th>
       <th>P1 Box VR</th>
       <th>P2 Abo</th>
       <th>P3 Assu</th>
@@ -96,176 +112,114 @@
   <tbody></tbody>
 </table>
 
+<button id="shareBtn">📤</button>
+
 <script>
-  const fileInput = document.getElementById("fileInput");
-  const table = document.getElementById("resultTable");
-  const tbody = table.querySelector("tbody");
+const fileInput = document.getElementById("fileInput");
+const table = document.getElementById("resultTable");
+const tbody = table.querySelector("tbody");
+const shareBtn = document.getElementById("shareBtn");
 
-  const rows = [
-    {
-      label: "Antoine",
-      cells: [
-        { R: "AJ10", O: "AK10" },
-        { R: "BB10", O: "BC10" },
-        { R: "BN10", O: "BO10" },
-        { R: "BQ10", O: "BR10" },
-        { R: "AV10", O: "AW10" },
-        { R: "AY10", O: "AZ10" },
-        { R: "AP10", O: "AQ10" },
-        { R: "AS10", O: "AT10" }
-      ],
-      taux: {
-        assu: "DC10",
-        go5: "CO10",
-        reprise: "CW10"
-      }
-    },
-    {
-      label: "Nicolas",
-      cells: [
-        { R: "AJ11", O: "AK11" },
-        { R: "BB11", O: "BC11" },
-        { R: "BN11", O: "BO11" },
-        { R: "BQ11", O: "BR11" },
-        { R: "AV11", O: "AW11" },
-        { R: "AY11", O: "AZ11" },
-        { R: "AP11", O: "AQ11" },
-        { R: "AS11", O: "AT11" }
-      ],
-      taux: {
-        assu: "DC11",
-        go5: "CO11",
-        reprise: "CW11"
-      }
-    },
-    {
-      label: "Rémy",
-      cells: [
-        { R: "AJ12", O: "AK12" },
-        { R: "BB12", O: "BC12" },
-        { R: "BN12", O: "BO12" },
-        { R: "BQ12", O: "BR12" },
-        { R: "AV12", O: "AW12" },
-        { R: "AY12", O: "AZ12" },
-        { R: "AP12", O: "AQ12" },
-        { R: "AS12", O: "AT12" }
-      ],
-      taux: {
-        assu: "DC12",
-        go5: "CO12",
-        reprise: "CW12"
-      }
-    },
-    {
-      label: "Magasin",
-      rowClass: "row-magasin",
-      cells: [
-        { R: "AJ15", O: "AK15" },
-        { R: "BB15", O: "BC15" },
-        { R: "BN15", O: "BO15" },
-        { R: "BQ15", O: "BR15" },
-        { R: "AV15", O: "AW15" },
-        { R: "AY15", O: "AZ15" },
-        { R: "AP15", O: "AQ15" },
-        { R: "AS15", O: "AT15" }
-      ],
-      taux: {
-        assu: "DC15",
-        go5: "CO15",
-        reprise: "CW15"
-      }
-    },
-    {
-      label: "OU1",
-      rowClass: "row-secteur",
-      cells: [
-        { R: "AJ16", O: "AK16" },
-        { R: "BB16", O: "BC16" },
-        { R: "BN16", O: "BO16" },
-        { R: "BQ16", O: "BR16" },
-        { R: "AV16", O: "AW16" },
-        { R: "AY16", O: "AZ16" },
-        { R: "AP16", O: "AQ16" },
-        { R: "AS16", O: "AT16" }
-      ],
-      taux: {
-        assu: "DC16",
-        go5: "CO16",
-        reprise: "CW16"
-      }
-    }
-  ];
+const rows = [
+{
+label:"Antoine",
+cells:[{R:"AJ10",O:"AK10"},{R:"BB10",O:"BC10"},{R:"BN10",O:"BO10"},{R:"BQ10",O:"BR10"},{R:"AV10",O:"AW10"},{R:"AY10",O:"AZ10"},{R:"AP10",O:"AQ10"},{R:"AS10",O:"AT10"}],
+taux:{assu:"DC10",go5:"CO10",reprise:"CW10"}
+},
+{
+label:"Nicolas",
+cells:[{R:"AJ11",O:"AK11"},{R:"BB11",O:"BC11"},{R:"BN11",O:"BO11"},{R:"BQ11",O:"BR11"},{R:"AV11",O:"AW11"},{R:"AY11",O:"AZ11"},{R:"AP11",O:"AQ11"},{R:"AS11",O:"AT11"}],
+taux:{assu:"DC11",go5:"CO11",reprise:"CW11"}
+},
+{
+label:"Rémy",
+cells:[{R:"AJ12",O:"AK12"},{R:"BB12",O:"BC12"},{R:"BN12",O:"BO12"},{R:"BQ12",O:"BR12"},{R:"AV12",O:"AW12"},{R:"AY12",O:"AZ12"},{R:"AP12",O:"AQ12"},{R:"AS12",O:"AT12"}],
+taux:{assu:"DC12",go5:"CO12",reprise:"CW12"}
+},
+{
+label:"Magasin",
+rowClass:"row-magasin",
+cells:[{R:"AJ15",O:"AK15"},{R:"BB15",O:"BC15"},{R:"BN15",O:"BO15"},{R:"BQ15",O:"BR15"},{R:"AV15",O:"AW15"},{R:"AY15",O:"AZ15"},{R:"AP15",O:"AQ15"},{R:"AS15",O:"AT15"}],
+taux:{assu:"DC15",go5:"CO15",reprise:"CW15"}
+},
+{
+label:"OU1",
+rowClass:"row-secteur",
+cells:[{R:"AJ16",O:"AK16"},{R:"BB16",O:"BC16"},{R:"BN16",O:"BO16"},{R:"BQ16",O:"BR16"},{R:"AV16",O:"AW16"},{R:"AY16",O:"AZ16"},{R:"AP16",O:"AQ16"},{R:"AS16",O:"AT16"}],
+taux:{assu:"DC16",go5:"CO16",reprise:"CW16"}
+}
+];
 
-  fileInput.addEventListener("change", (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
+fileInput.addEventListener("change",(e)=>{
+const file=e.target.files[0];
+if(!file)return;
 
-    const reader = new FileReader();
+fileInput.style.display="none";
 
-    reader.onload = (evt) => {
-      const data = new Uint8Array(evt.target.result);
-      const workbook = XLSX.read(data, { type: "array" });
-      const sheet = workbook.Sheets[workbook.SheetNames[0]];
+const today=new Date();
+const formatted=("0"+today.getDate()).slice(-2)+"/"+("0"+(today.getMonth()+1)).slice(-2);
+document.getElementById("dateCell").textContent=formatted;
 
-      tbody.innerHTML = "";
+const reader=new FileReader();
 
-      rows.forEach(row => {
-        const tr = document.createElement("tr");
-        if (row.rowClass) tr.classList.add(row.rowClass);
+reader.onload=(evt)=>{
+const data=new Uint8Array(evt.target.result);
+const workbook=XLSX.read(data,{type:"array"});
+const sheet=workbook.Sheets[workbook.SheetNames[0]];
 
-        tr.innerHTML = `<td>${row.label}</td>`;
+tbody.innerHTML="";
 
-        let score = 0;
+rows.forEach(row=>{
+const tr=document.createElement("tr");
+if(row.rowClass)tr.classList.add(row.rowClass);
 
-        row.cells.forEach((cell, index) => {
-          let r = sheet[cell.R]?.v ?? "";
-          let o = sheet[cell.O]?.v ?? "";
+tr.innerHTML=`<td>${row.label}</td>`;
+let score=0;
 
-          if (index === 3 && typeof r === "number") r = Math.ceil(r);
-          if (typeof o === "number") o = Math.ceil(o);
+row.cells.forEach((cell,index)=>{
+let r=sheet[cell.R]?.v??"";
+let o=sheet[cell.O]?.v??"";
 
-          let rClass = "";
+if(index===3&&typeof r==="number")r=Math.ceil(r);
+if(typeof o==="number")o=Math.ceil(o);
 
-          if (typeof r === "number" && typeof o === "number") {
-            const isSuccess = r >= o; // ✅ R supérieur ou égal
+let rClass="";
+if(typeof r==="number"&&typeof o==="number"){
+const ok=r>=o;
+rClass=ok?"r-ok":"r-bad";
+if(ok)score+=index<=5?1:2;
+}
 
-            rClass = isSuccess ? "r-ok" : "r-bad";
+tr.innerHTML+=`<td><span class="${rClass}">${r}</span> / ${o}</td>`;
+});
 
-            if (isSuccess) {
-              if (index <= 5) {
-                score += 1; // P1 à P6
-              } else {
-                score += 2; // C7 et C8
-              }
-            }
-          }
+tr.innerHTML+=`<td>${score} / 10</td>`;
 
-          tr.innerHTML += `<td><span class="${rClass}">${r}</span> / ${o}</td>`;
-        });
+const formatPercent=v=>typeof v==="number"?(v*100).toFixed(1)+"%":v;
 
-        tr.innerHTML += `<td>${score} / 10</td>`;
+tr.innerHTML+=`<td>${formatPercent(sheet[row.taux.assu]?.v??"")}</td>`;
+tr.innerHTML+=`<td>${formatPercent(sheet[row.taux.go5]?.v??"")}</td>`;
+tr.innerHTML+=`<td>${formatPercent(sheet[row.taux.reprise]?.v??"")}</td>`;
 
-        const tauxAssu = sheet[row.taux.assu]?.v ?? "";
-        const tauxGo5 = sheet[row.taux.go5]?.v ?? "";
-        const tauxReprise = sheet[row.taux.reprise]?.v ?? "";
+tbody.appendChild(tr);
+});
 
-        const formatPercent = (v) => {
-          if (typeof v === "number") return (v * 100).toFixed(1) + "%";
-          return v;
-        };
+table.style.display="table";
+shareBtn.style.display="inline-block";
+};
 
-        tr.innerHTML += `<td>${formatPercent(tauxAssu)}</td>`;
-        tr.innerHTML += `<td>${formatPercent(tauxGo5)}</td>`;
-        tr.innerHTML += `<td>${formatPercent(tauxReprise)}</td>`;
+reader.readAsArrayBuffer(file);
+});
 
-        tbody.appendChild(tr);
-      });
-
-      table.style.display = "table";
-    };
-
-    reader.readAsArrayBuffer(file);
-  });
+/* ===== COPIE IMAGE DANS PRESSE PAPIER ===== */
+shareBtn.addEventListener("click",async()=>{
+const canvas=await html2canvas(table,{scale:2});
+canvas.toBlob(async(blob)=>{
+const item=new ClipboardItem({"image/png":blob});
+await navigator.clipboard.write([item]);
+alert("Image copiée ✅\nCollez-la directement dans WhatsApp.");
+});
+});
 </script>
 
 </body>

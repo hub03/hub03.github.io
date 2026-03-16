@@ -36,27 +36,30 @@
 
   <!-- ZONE À MODIFIER POUR AJOUTER DES QUESTIONS SUPPLÉMENTAIRES -->
   <div class="question" data-index="0">
-    <input type="text" name="name" placeholder="Nom du client" required>
+    <input type="text" name="client" placeholder="Nom du client" required>
     <button type="button" class="nextBtn">Suivant</button>
   </div>
   <div class="question" data-index="1">
-    <input type="tel" name="phone" placeholder="Téléphone">
+    <input type="tel" name="numero" placeholder="Téléphone">
     <button type="button" class="nextBtn">Suivant</button>
   </div>
   <div class="question" data-index="2">
-    <input type="number" name="age" placeholder="Âge">
+    <input type="checkbox" name="pro"> Client pro &nbsp; &nbsp; &nbsp;
+    <input type="checkbox" name="teletravail"> Télétravail
     <button type="button" class="nextBtn">Suivant</button>
   </div>
   <div class="question" data-index="3">
-    <select name="service">
-      <option value="">Sélectionnez un service</option>
-      <option value="A">Service A</option>
-      <option value="B">Service B</option>
+    <select name="motif_visite">
+      <option value="" selected disabled hidden>Motif de visite</option>
+      <option value="Fixe">Fixe</option>
+      <option value="Mobile">Mobile</option>
+      <option value="Parc">Parc</option>
     </select>
     <button type="button" class="nextBtn">Suivant</button>
   </div>
   <div class="question" data-index="4">
-    <input type="text" name="notes" placeholder="Notes">
+    Foyer : <input type="tel" name="adultes" placeholder="Adultes"> &nbsp; &nbsp; 
+    <input type="tel" name="enfants" placeholder="Enfants">
     <button type="button" class="nextBtn">Suivant</button>
   </div>
   <!-- FIN DE LA ZONE À MODIFIER -->

@@ -37,12 +37,15 @@
   <!-- ZONE À MODIFIER POUR AJOUTER DES QUESTIONS SUPPLÉMENTAIRES -->
   <div class="question" data-index="0">
     <input type="text" name="name" placeholder="Nom du client" required>
+    <button type="button" class="nextBtn">Suivant</button>
   </div>
   <div class="question" data-index="1">
     <input type="tel" name="phone" placeholder="Téléphone">
+    <button type="button" class="nextBtn">Suivant</button>
   </div>
   <div class="question" data-index="2">
     <input type="number" name="age" placeholder="Âge">
+    <button type="button" class="nextBtn">Suivant</button>
   </div>
   <div class="question" data-index="3">
     <select name="service">
@@ -50,14 +53,17 @@
       <option value="A">Service A</option>
       <option value="B">Service B</option>
     </select>
+    <button type="button" class="nextBtn">Suivant</button>
   </div>
   <div class="question" data-index="4">
     <input type="text" name="notes" placeholder="Notes">
+    <button type="button" class="nextBtn">Suivant</button>
   </div>
   <!-- FIN DE LA ZONE À MODIFIER -->
 
   <div class="question" data-index="5">
-    <button type="button" id="nextBtn">Suivant</button>
+    <button type='button' id='sendBtn'>Envoyer un devis</button>
+    <button type='button' id='finishBtn'>Terminer</button>
   </div>
 
 </form>
@@ -90,39 +96,24 @@
 <script>
 const form = document.getElementById('miniForm');
 const questions = document.querySelectorAll('.question');
-const nextBtn = document.getElementById('nextBtn');
 let currentIndex = 0;
 
-const historyBtn = document.getElementById('historyBtn');
-const historyModal = document.getElementById('historyModal');
-const closeHistory = document.getElementById('closeHistory');
-const historyTableBody = document.querySelector('#historyTable tbody');
-
-const viewModal = document.getElementById('viewModal');
-const closeView = document.getElementById('closeView');
-const viewTableBody = document.querySelector('#viewTable tbody');
-
-// Affiche la première question
 function showQuestion(index) {
   questions.forEach((q, i) => q.style.display = i === index ? 'flex' : 'none');
 }
 showQuestion(currentIndex);
 
-nextBtn.addEventListener('click', () => {
-  if(currentIndex < questions.length - 1) {
+// Gestion des boutons "Suivant"
+document.querySelectorAll('.nextBtn').forEach(btn => {
+  btn.addEventListener('click', () => {
     currentIndex++;
-    if(currentIndex === questions.length - 1) {
-      // Ajouter boutons finaux
-      questions[currentIndex].innerHTML = `
-        <button type='button' id='sendBtn'>Envoyer un devis</button>
-        <button type='button' id='finishBtn'>Terminer</button>
-      `;
-      document.getElementById('sendBtn').addEventListener('click', () => submitForm(true));
-      document.getElementById('finishBtn').addEventListener('click', () => submitForm(false));
-    }
     showQuestion(currentIndex);
-  }
+  });
 });
+
+// Boutons finaux
+document.getElementById('sendBtn').addEventListener('click', () => submitForm(true));
+document.getElementById('finishBtn').addEventListener('click', () => submitForm(false));
 
 function submitForm(redirect) {
   const data = {};
@@ -141,6 +132,14 @@ function submitForm(redirect) {
 }
 
 // Historique
+const historyBtn = document.getElementById('historyBtn');
+const historyModal = document.getElementById('historyModal');
+const closeHistory = document.getElementById('closeHistory');
+const historyTableBody = document.querySelector('#historyTable tbody');
+const viewModal = document.getElementById('viewModal');
+const closeView = document.getElementById('closeView');
+const viewTableBody = document.querySelector('#viewTable tbody');
+
 historyBtn.addEventListener('click', () => {
   renderHistory();
   historyModal.style.display = 'flex';

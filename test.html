@@ -2,57 +2,85 @@
 <html>
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+
 <title>Questionnaire</title>
 
 <style>
 
 body{
-font-family:Arial;
-background:#f5f5f5;
+font-family:system-ui;
+background:#f2f2f2;
+margin:0;
 display:flex;
 justify-content:center;
 align-items:center;
-height:100vh;
-margin:0;
+min-height:100vh;
 }
 
 #app{
-width:420px;
+width:100%;
+max-width:420px;
 background:white;
-padding:40px;
-border-radius:10px;
-box-shadow:0 10px 25px rgba(0,0,0,0.1);
+padding:30px;
+box-sizing:border-box;
+min-height:100vh;
 }
 
 h2{
-margin-top:0;
+font-size:22px;
+margin-bottom:20px;
 }
 
 input,select{
 width:100%;
-padding:10px;
+padding:14px;
+font-size:16px;
 margin-top:10px;
+box-sizing:border-box;
 }
 
 button{
+width:100%;
+padding:16px;
+font-size:16px;
 margin-top:20px;
-padding:10px 20px;
-cursor:pointer;
+background:black;
+color:white;
+border:none;
+border-radius:6px;
 }
 
-#admin{
-display:none;
+button.secondary{
+background:#ddd;
+color:black;
+}
+
+.progress{
+height:6px;
+background:#eee;
+margin-bottom:20px;
+border-radius:3px;
+overflow:hidden;
+}
+
+.progressBar{
+height:100%;
+background:black;
+width:0%;
 }
 
 .questionRow{
 border:1px solid #ddd;
 padding:10px;
 margin:10px 0;
+border-radius:6px;
 }
 
 .small{
-font-size:12px;
-color:#777;
+font-size:13px;
+color:#666;
+margin-top:10px;
 }
 
 </style>
@@ -64,19 +92,22 @@ color:#777;
 
 <script>
 
-// ⚠️ METTRE TON URL APPS SCRIPT ICI
-const API = "https://script.google.com/macros/s/AKfycbxWJxwkBqnMK5skhD3o2MD1xfMluucJGpsydotQb0j37njauTC3lsooYlwq7umQXLPXXA/exec"
-
-const ADMIN_PASSWORD = "admin123"
+const API="https://script.google.com/macros/s/AKfycbxWJxwkBqnMK5skhD3o2MD1xfMluucJGpsydotQb0j37njauTC3lsooYlwq7umQXLPXXA/exec"
+const ADMIN_PASSWORD="admin123"
 
 let questions=[]
 let answers={}
 let index=0
 
+const app=document.getElementById("app")
+
 async function loadQuestions(){
 
-const r = await fetch(API)
-questions = await r.json()
+app.innerHTML="Chargement..."
+
+const r=await fetch(API)
+
+questions=await r.json()
 
 questions.sort((a,b)=>Number(a.order)-Number(b.order))
 
@@ -105,7 +136,7 @@ const q=questions[index]
 let input=""
 
 if(q.type==="text"){
-input=`<input id="answer">`
+input=`<input id="answer" autocomplete="off">`
 }
 
 if(q.type==="number"){
@@ -114,15 +145,21 @@ input=`<input type="number" id="answer">`
 
 if(q.type==="select"){
 
-let opts=q.options.split(",")
+let opts=(q.options||"").split(",")
 
 input=`<select id="answer">
-${opts.map(o=>`<option>${o}</option>`).join("")}
+${opts.map(o=>`<option value="${o.trim()}">${o.trim()}</option>`).join("")}
 </select>`
 
 }
 
+let progress=((index)/questions.length)*100
+
 app.innerHTML=`
+
+<div class="progress">
+<div class="progressBar" style="width:${progress}%"></div>
+</div>
 
 <h2>${q.label}</h2>
 
@@ -130,9 +167,7 @@ ${input}
 
 <button onclick="next()">Suivant</button>
 
-<div class="small">
-${index+1} / ${questions.length}
-</div>
+<div class="small">${index+1} / ${questions.length}</div>
 
 `
 
@@ -140,7 +175,16 @@ ${index+1} / ${questions.length}
 
 function next(){
 
-let val=document.getElementById("answer").value
+let el=document.getElementById("answer")
+
+if(!el) return
+
+let val=el.value.trim()
+
+if(val===""){
+alert("Veuillez répondre")
+return
+}
 
 answers[questions[index].id]=val
 
@@ -151,6 +195,8 @@ renderQuestion()
 }
 
 async function finishQuiz(){
+
+app.innerHTML="Envoi..."
 
 let client=answers["q1"]||""
 
@@ -168,27 +214,22 @@ app.innerHTML=`
 
 <button onclick="startQuiz()">Nouveau questionnaire</button>
 
-<button onclick="adminLogin()">Admin</button>
+<button class="secondary" onclick="adminLogin()">Administration</button>
 
 `
 
 }
 
-// ADMIN
-
 function adminLogin(){
 
 let p=prompt("Mot de passe admin")
 
-if(p===ADMIN_PASSWORD){
+if(p!==ADMIN_PASSWORD){
+alert("Accès refusé")
+return
+}
 
 renderAdmin()
-
-}else{
-
-alert("Accès refusé")
-
-}
 
 }
 
@@ -207,18 +248,22 @@ app.innerHTML=`
 <input id="newLabel" placeholder="Question">
 
 <select id="newType">
-<option value="text">Text</option>
-<option value="number">Number</option>
-<option value="select">Select</option>
+<option value="text">Texte</option>
+<option value="number">Nombre</option>
+<option value="select">Liste</option>
 </select>
 
 <input id="newOptions" placeholder="Options (a,b,c)">
 
 <button onclick="addQuestion()">Ajouter</button>
 
-<button onclick="saveQuestions()">💾 Sauvegarder</button>
+<button onclick="saveQuestions()">Sauvegarder</button>
 
-<button onclick="loadQuestions()">Retour</button>
+<button class="secondary" onclick="loadQuestions()">Retour</button>
+
+<hr>
+
+<button onclick="exportCSV()">Exporter réponses CSV</button>
 
 `
 
@@ -238,8 +283,6 @@ html+=`
 
 <input value="${q.label}" onchange="questions[${i}].label=this.value">
 
-<br>
-
 <select onchange="questions[${i}].type=this.value">
 
 <option ${q.type=="text"?"selected":""}>text</option>
@@ -248,9 +291,7 @@ html+=`
 
 </select>
 
-<br>
-
-<input value="${q.options||""}" onchange="questions[${i}].options=this.value">
+<input value="${q.options||""}" placeholder="options" onchange="questions[${i}].options=this.value">
 
 <br>
 
@@ -320,11 +361,7 @@ renderQuestionList()
 
 async function saveQuestions(){
 
-for(let i=0;i<questions.length;i++){
-
-questions[i].order=i+1
-
-}
+questions.forEach((q,i)=>q.order=i+1)
 
 await fetch(API+"?updateQuestions=true",{
 method:"POST",
@@ -337,7 +374,11 @@ loadQuestions()
 
 }
 
-// START
+function exportCSV(){
+
+window.open("https://docs.google.com/spreadsheets")
+
+}
 
 loadQuestions()
 

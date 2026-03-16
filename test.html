@@ -47,28 +47,33 @@
 
 <!-- QUESTIONS -->
 <div class="question" data-index="0">
-  <input type="text" name="client" placeholder="Nom du client" required>
+  🙋 Quel est votre nom ?
+  <br><input type="text" name="client" placeholder="Nom du client" required>
 </div>
 <div class="question" data-index="1">
-  <input type="tel" name="numero" placeholder="Téléphone">
+  📱 Quel est votre numéro de téléphone ?
+  <br><input type="tel" name="numero" placeholder="Téléphone">
 </div>
 <div class="question" data-index="2">
-  <input type="checkbox" id="pro" name="pro" hidden>
+  🧑‍🔧 L'une de vos ligne est-elle utilisée à titre professionnel ?
+  <br><input type="checkbox" id="pro" name="pro" hidden>
   <label for="pro" class="btn-checkbox">Client pro</label>
-  <input type="checkbox" id="teletravail" name="teletravail" hidden>
+  <br>🧑‍💻 Faites-vous du télétravail ?<input type="checkbox" id="teletravail" name="teletravail" hidden>
   <label for="teletravail" class="btn-checkbox">Télétravail</label>
 </div>
-<div class="question" data-index="3">
-  <select name="motif_visite">
+<!-- <div class="question" data-index="X">
+  🤝
+  <br><select name="motif_visite">
     <option value="" selected disabled hidden>Motif de visite</option>
     <option value="Fixe">Fixe</option>
     <option value="Mobile">Mobile</option>
     <option value="Parc">Parc</option>
   </select>
-</div>
-<div class="question" data-index="4">
-  Foyer : <input type="tel" name="adultes" placeholder="Adultes"> &nbsp; &nbsp; 
-  <input type="tel" name="enfants" placeholder="Enfants">
+</div> -->
+<div class="question" data-index="3">
+  🧑‍🤝‍🧑 Combien de personnes vivent dans votre foyer ?
+  <br><input type="tel" name="adultes" placeholder="Adultes">
+  <br><input type="tel" name="enfants" placeholder="Enfants">
 </div>
 <div class="question" data-index="5">
   <button type='button' id='sendBtn'>Envoyer un devis</button>

@@ -2,396 +2,295 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
-<title>Questionnaire</title>
+<title>Questionnaire Mobile</title>
 
 <style>
-
 body{
-font-family:system-ui;
-background:#f2f2f2;
-margin:0;
-display:flex;
-justify-content:center;
-align-items:center;
-min-height:100vh;
+  font-family: system-ui;
+  background:#f2f2f2;
+  margin:0;
+  display:flex;
+  justify-content:center;
+  align-items:flex-start;
+  min-height:100vh;
 }
 
 #app{
-width:100%;
-max-width:420px;
-background:white;
-padding:30px;
-box-sizing:border-box;
-min-height:100vh;
+  width:100%;
+  max-width:420px;
+  background:white;
+  padding:20px;
+  box-sizing:border-box;
+  min-height:100vh;
 }
 
 h2{
-font-size:22px;
-margin-bottom:20px;
+  font-size:22px;
+  margin-bottom:20px;
 }
 
-input,select{
-width:100%;
-padding:14px;
-font-size:16px;
-margin-top:10px;
-box-sizing:border-box;
+input{
+  width:100%;
+  padding:14px;
+  font-size:16px;
+  margin-top:10px;
+  box-sizing:border-box;
 }
 
 button{
-width:100%;
-padding:16px;
-font-size:16px;
-margin-top:20px;
-background:black;
-color:white;
-border:none;
-border-radius:6px;
+  width:100%;
+  padding:16px;
+  font-size:16px;
+  margin-top:20px;
+  background:black;
+  color:white;
+  border:none;
+  border-radius:6px;
 }
 
 button.secondary{
-background:#ddd;
-color:black;
+  background:#ddd;
+  color:black;
 }
 
 .progress{
-height:6px;
-background:#eee;
-margin-bottom:20px;
-border-radius:3px;
-overflow:hidden;
+  height:6px;
+  background:#eee;
+  margin-bottom:20px;
+  border-radius:3px;
+  overflow:hidden;
 }
 
 .progressBar{
-height:100%;
-background:black;
-width:0%;
+  height:100%;
+  background:black;
+  width:0%;
+  transition: width 0.3s;
 }
 
 .questionRow{
-border:1px solid #ddd;
-padding:10px;
-margin:10px 0;
-border-radius:6px;
+  border:1px solid #ddd;
+  padding:10px;
+  margin:10px 0;
+  border-radius:6px;
 }
 
 .small{
-font-size:13px;
-color:#666;
-margin-top:10px;
+  font-size:13px;
+  color:#666;
+  margin-top:10px;
 }
 
+.selectButton{
+  display:block;
+  width:100%;
+  margin:6px 0;
+  padding:14px;
+  font-size:16px;
+  border-radius:6px;
+  border:1px solid #333;
+  background:#fff;
+  cursor:pointer;
+}
+
+.selectButton.selected{
+  background:black;
+  color:white;
+}
+
+#loader{
+  text-align:center;
+  font-size:18px;
+  margin-top:20px;
+}
 </style>
 </head>
 
 <body>
-
 <div id="app"></div>
 
 <script>
+const API="https://script.google.com/macros/s/AKfycbxWJxwkBqnMK5skhD3o2MD1xfMluucJGpsydotQb0j37njauTC3lsooYlwq7umQXLPXXA/exec";
+const ADMIN_PASSWORD="admin123";
 
-const API="https://script.google.com/macros/s/AKfycbxWJxwkBqnMK5skhD3o2MD1xfMluucJGpsydotQb0j37njauTC3lsooYlwq7umQXLPXXA/exec"
-const ADMIN_PASSWORD="admin123"
+let questions=[], answers={}, index=0;
+const app=document.getElementById("app");
 
-let questions=[]
-let answers={}
-let index=0
-
-const app=document.getElementById("app")
-
+// --- CHARGEMENT DES QUESTIONS ---
 async function loadQuestions(){
-
-app.innerHTML="Chargement..."
-
-const r=await fetch(API)
-
-questions=await r.json()
-
-questions.sort((a,b)=>Number(a.order)-Number(b.order))
-
-startQuiz()
-
+  app.innerHTML="Chargement...";
+  try{
+    const r = await fetch(API);
+    questions = await r.json();
+    questions.sort((a,b)=>Number(a.order)-Number(b.order));
+    startQuiz();
+  }catch(e){
+    app.innerHTML="<p>Erreur de chargement. Vérifie l'API.</p>";
+    console.error(e);
+  }
 }
 
+// --- START ---
 function startQuiz(){
-
-index=0
-answers={}
-renderQuestion()
-
+  index=0;
+  answers={};
+  renderQuestion();
 }
 
+// --- RENDER QUESTION ---
 function renderQuestion(){
+  if(index>=questions.length){ finishQuiz(); return; }
 
-if(index>=questions.length){
+  const q=questions[index];
+  const progress=((index)/questions.length)*100;
 
-finishQuiz()
-return
+  let html=`<div class="progress"><div class="progressBar" style="width:${progress}%"></div></div><h2>${q.label}</h2>`;
+
+  if(q.type==="text" || q.type==="number"){
+    html+=`<input type="${q.type}" id="answer" autocomplete="off">`;
+    html+=`<button onclick="next()">Suivant</button>`;
+  }
+  else if(q.type==="select"){
+    const opts=(q.options||"").split(",").map(o=>o.trim()).filter(o=>o!=="");
+    html+='<div id="selectButtons">';
+    opts.forEach(opt=>{
+      html+=`<button class="selectButton" onclick="selectOption('${opt}')">${opt}</button>`;
+    });
+    html+='</div>';
+  }
+
+  html+=`<div class="small">${index+1} / ${questions.length}</div>`;
+  app.innerHTML=html;
 }
 
-const q=questions[index]
-
-let input=""
-
-if(q.type==="text"){
-input=`<input id="answer" autocomplete="off">`
+// --- SELECT BUTTONS ---
+function selectOption(val){
+  answers[questions[index].id]=val;
+  // Marquer visuellement
+  document.querySelectorAll('.selectButton').forEach(b=>{
+    b.classList.remove('selected');
+    if(b.textContent===val) b.classList.add('selected');
+  });
+  // attendre un peu et passer à la question suivante
+  setTimeout(()=>{ index++; renderQuestion(); }, 300);
 }
 
-if(q.type==="number"){
-input=`<input type="number" id="answer">`
-}
-
-if(q.type==="select"){
-
-let opts=(q.options||"").split(",")
-
-input=`<select id="answer">
-${opts.map(o=>`<option value="${o.trim()}">${o.trim()}</option>`).join("")}
-</select>`
-
-}
-
-let progress=((index)/questions.length)*100
-
-app.innerHTML=`
-
-<div class="progress">
-<div class="progressBar" style="width:${progress}%"></div>
-</div>
-
-<h2>${q.label}</h2>
-
-${input}
-
-<button onclick="next()">Suivant</button>
-
-<div class="small">${index+1} / ${questions.length}</div>
-
-`
-
-}
-
+// --- NEXT pour input ---
 function next(){
-
-let el=document.getElementById("answer")
-
-if(!el) return
-
-let val=el.value.trim()
-
-if(val===""){
-alert("Veuillez répondre")
-return
+  const el=document.getElementById("answer");
+  if(!el) return;
+  const val=el.value.trim();
+  if(val===""){ alert("Veuillez répondre"); return; }
+  answers[questions[index].id]=val;
+  index++;
+  renderQuestion();
 }
 
-answers[questions[index].id]=val
-
-index++
-
-renderQuestion()
-
-}
-
+// --- FIN DU QUIZZ ---
 async function finishQuiz(){
-
-app.innerHTML="<h2>Envoi...</h2>"
-
-let client=answers["q1"]||""
-
-try{
-  const res = await fetch(API,{
-    method:"POST",
-    body:JSON.stringify({
-      client:client,
-      answers:answers
-    })
-  })
-  
-  if(!res.ok) throw new Error("Erreur réseau")
-
-  // Succès
-  app.innerHTML=`
-  <h2>Merci 👍</h2>
-  <button onclick="startQuiz()">Nouveau questionnaire</button>
-  <button class="secondary" onclick="adminLogin()">Administration</button>
-  `
-  
-}catch(e){
-  console.error(e)
-  app.innerHTML=`
-  <h2>Erreur lors de l'envoi 😢</h2>
-  <p>Vérifie ta connexion ou l'URL de l'API</p>
-  <button onclick="startQuiz()">Réessayer</button>
-  `
+  app.innerHTML='<div id="loader">⏳ Envoi en cours...</div>';
+  const client=answers["q1"]||"";
+  try{
+    const res = await fetch(API,{
+      method:"POST",
+      body:JSON.stringify({client,answers})
+    });
+    if(!res.ok) throw new Error("Erreur réseau");
+    app.innerHTML=`
+      <h2>Merci 👍</h2>
+      <button onclick="startQuiz()">Nouveau questionnaire</button>
+      <button class="secondary" onclick="adminLogin()">Administration</button>
+    `;
+  }catch(e){
+    console.error(e);
+    app.innerHTML=`
+      <h2>Erreur lors de l'envoi 😢</h2>
+      <p>Vérifie la connexion ou l'URL de l'API</p>
+      <button onclick="startQuiz()">Réessayer</button>
+    `;
+  }
 }
 
-}
-
+// --- ADMIN ---
 function adminLogin(){
-
-let p=prompt("Mot de passe admin")
-
-if(p!==ADMIN_PASSWORD){
-alert("Accès refusé")
-return
-}
-
-renderAdmin()
-
+  let p=prompt("Mot de passe admin");
+  if(p!==ADMIN_PASSWORD){ alert("Accès refusé"); return; }
+  renderAdmin();
 }
 
 function renderAdmin(){
-
-app.innerHTML=`
-
-<h2>Administration</h2>
-
-<div id="questionList"></div>
-
-<hr>
-
-<h3>Ajouter question</h3>
-
-<input id="newLabel" placeholder="Question">
-
-<select id="newType">
-<option value="text">Texte</option>
-<option value="number">Nombre</option>
-<option value="select">Liste</option>
-</select>
-
-<input id="newOptions" placeholder="Options (a,b,c)">
-
-<button onclick="addQuestion()">Ajouter</button>
-
-<button onclick="saveQuestions()">Sauvegarder</button>
-
-<button class="secondary" onclick="loadQuestions()">Retour</button>
-
-<hr>
-
-<button onclick="exportCSV()">Exporter réponses CSV</button>
-
-`
-
-renderQuestionList()
-
+  app.innerHTML=`
+    <h2>Administration</h2>
+    <div id="questionList"></div>
+    <hr>
+    <h3>Ajouter question</h3>
+    <input id="newLabel" placeholder="Question">
+    <select id="newType">
+      <option value="text">Texte</option>
+      <option value="number">Nombre</option>
+      <option value="select">Liste</option>
+    </select>
+    <input id="newOptions" placeholder="Options (a,b,c)">
+    <button onclick="addQuestion()">Ajouter</button>
+    <button onclick="saveQuestions()">💾 Sauvegarder</button>
+    <button class="secondary" onclick="loadQuestions()">Retour</button>
+    <hr>
+    <button onclick="exportCSV()">Exporter réponses CSV</button>
+  `;
+  renderQuestionList();
 }
 
 function renderQuestionList(){
-
-let html=""
-
-questions.forEach((q,i)=>{
-
-html+=`
-
-<div class="questionRow">
-
-<input value="${q.label}" onchange="questions[${i}].label=this.value">
-
-<select onchange="questions[${i}].type=this.value">
-
-<option ${q.type=="text"?"selected":""}>text</option>
-<option ${q.type=="number"?"selected":""}>number</option>
-<option ${q.type=="select"?"selected":""}>select</option>
-
-</select>
-
-<input value="${q.options||""}" placeholder="options" onchange="questions[${i}].options=this.value">
-
-<br>
-
-<button onclick="moveUp(${i})">↑</button>
-<button onclick="moveDown(${i})">↓</button>
-<button onclick="removeQ(${i})">Supprimer</button>
-
-</div>
-
-`
-
-})
-
-document.getElementById("questionList").innerHTML=html
-
+  let html="";
+  questions.forEach((q,i)=>{
+    html+=`
+      <div class="questionRow">
+        <input value="${q.label}" onchange="questions[${i}].label=this.value">
+        <select onchange="questions[${i}].type=this.value">
+          <option ${q.type=="text"?"selected":""}>text</option>
+          <option ${q.type=="number"?"selected":""}>number</option>
+          <option ${q.type=="select"?"selected":""}>select</option>
+        </select>
+        <input value="${q.options||""}" placeholder="options" onchange="questions[${i}].options=this.value">
+        <br>
+        <button onclick="moveUp(${i})">↑</button>
+        <button onclick="moveDown(${i})">↓</button>
+        <button onclick="removeQ(${i})">Supprimer</button>
+      </div>
+    `;
+  });
+  document.getElementById("questionList").innerHTML=html;
 }
 
 function addQuestion(){
-
-let label=document.getElementById("newLabel").value
-let type=document.getElementById("newType").value
-let options=document.getElementById("newOptions").value
-
-questions.push({
-id:"q"+Date.now(),
-label:label,
-type:type,
-options:options,
-order:questions.length+1
-})
-
-renderQuestionList()
-
+  const label=document.getElementById("newLabel").value;
+  const type=document.getElementById("newType").value;
+  const options=document.getElementById("newOptions").value;
+  questions.push({id:"q"+Date.now(), label, type, options, order:questions.length+1});
+  renderQuestionList();
 }
 
-function removeQ(i){
-
-questions.splice(i,1)
-
-renderQuestionList()
-
-}
-
-function moveUp(i){
-
-if(i===0)return
-
-let t=questions[i]
-questions[i]=questions[i-1]
-questions[i-1]=t
-
-renderQuestionList()
-
-}
-
-function moveDown(i){
-
-if(i===questions.length-1)return
-
-let t=questions[i]
-questions[i]=questions[i+1]
-questions[i+1]=t
-
-renderQuestionList()
-
-}
+function removeQ(i){ questions.splice(i,1); renderQuestionList(); }
+function moveUp(i){ if(i===0) return; [questions[i],questions[i-1]]=[questions[i-1],questions[i]]; renderQuestionList(); }
+function moveDown(i){ if(i===questions.length-1) return; [questions[i],questions[i+1]]=[questions[i+1],questions[i]]; renderQuestionList(); }
 
 async function saveQuestions(){
-
-questions.forEach((q,i)=>q.order=i+1)
-
-await fetch(API+"?updateQuestions=true",{
-method:"POST",
-body:JSON.stringify(questions)
-})
-
-alert("Questions sauvegardées")
-
-loadQuestions()
-
+  questions.forEach((q,i)=>q.order=i+1);
+  await fetch(API+"?updateQuestions=true",{
+    method:"POST",
+    body:JSON.stringify(questions)
+  });
+  alert("Questions sauvegardées");
+  loadQuestions();
 }
 
-function exportCSV(){
+// --- Export CSV ---
+function exportCSV(){ window.open("https://docs.google.com/spreadsheets"); }
 
-window.open("https://docs.google.com/spreadsheets")
-
-}
-
-loadQuestions()
-
+// --- INIT ---
+loadQuestions();
 </script>
-
 </body>
 </html>

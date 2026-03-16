@@ -15,9 +15,20 @@
   form { display: flex; flex-direction: column; gap: 0.8rem; background: #fff; padding: 1rem; border-radius: 1rem; }
   .question { display: none; flex-direction: column; gap: 0.5rem; }
   input, select, button { padding: 0.5rem; font-size: 1rem; border-radius: 0.5rem; border: 1px solid #ccc; }
-  button { background: #4CAF50; color: #fff; border: none; cursor: pointer; }
-  button:hover { background: #45a049; }
-  #historyBtn { position: fixed; top: 1rem; right: 1rem; font-size: 1.5rem; cursor: pointer; background: none; border: none; }
+  button { cursor: pointer; }
+  #historyBtn { position: fixed; top: 1rem; right: 1rem; font-size: 1.5rem; background: none; border: none; }
+
+  /* Boutons de navigation */
+  .nav-buttons { display: flex; justify-content: space-between; margin-top: 1rem; }
+  .nextBtn { background-color: #4CAF50; color: #fff; border: none; padding: 0.5rem 1rem; border-radius: 0.5rem; }
+  .nextBtn:hover { background-color: #45a049; }
+  .prevBtn { background-color: #bbb; color: #fff; border: none; padding: 0.5rem 1rem; border-radius: 0.5rem; }
+  .prevBtn:hover { background-color: #999; }
+
+  /* Boutons checkbox stylisés */
+  .btn-checkbox { display: inline-block; padding: 0.6rem 1.2rem; margin-right: 0.5rem; border: 1px solid #ccc; border-radius: 0.6rem; cursor: pointer; background-color: #f0f0f0; user-select: none; transition: all 0.2s ease; }
+  input[type="checkbox"]:checked + .btn-checkbox { background-color: #4CAF50; color: white; border-color: #4CAF50; }
+
   #historyModal, #viewModal { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; }
   .modal-content { background: #fff; padding: 1rem; border-radius: 1rem; width: 90%; max-height: 90%; overflow-y: auto; }
   table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
@@ -25,24 +36,6 @@
   .action-btn { cursor: pointer; font-size: 1.2rem; }
   .delete { color: red; }
   .close { cursor: pointer; float: right; font-size: 1.2rem; margin-left: 1rem; }
-  .btn-checkbox {
-  display: inline-block;
-  padding: 0.6rem 1.2rem;
-  margin-right: 0.5rem;
-  border: 1px solid #ccc;
-  border-radius: 0.6rem;
-  cursor: pointer;
-  background-color: #f0f0f0;
-  user-select: none;
-  transition: all 0.2s ease;
-}
-
-/* Couleur quand la checkbox est cochée */
-input[type="checkbox"]:checked + .btn-checkbox {
-  background-color: #4CAF50;
-  color: white;
-  border-color: #4CAF50;
-}
 </style>
 </head>
 <body>
@@ -53,42 +46,60 @@ input[type="checkbox"]:checked + .btn-checkbox {
 <form id="miniForm">
 
 <!-- ZONE À MODIFIER POUR AJOUTER DES QUESTIONS SUPPLÉMENTAIRES -->
-  <div class="question" data-index="0">
-    <input type="text" name="client" placeholder="Nom du client" required>
+<div class="question" data-index="0">
+  <input type="text" name="client" placeholder="Nom du client" required>
+  <div class="nav-buttons">
+    <span></span> <!-- Espace vide pour l'alignement gauche -->
     <button type="button" class="nextBtn">Suivant</button>
   </div>
-  <div class="question" data-index="1">
-    <input type="tel" name="numero" placeholder="Téléphone">
+</div>
+<div class="question" data-index="1">
+  <input type="tel" name="numero" placeholder="Téléphone">
+  <div class="nav-buttons">
+    <button type="button" class="prevBtn">&lt;-</button>
     <button type="button" class="nextBtn">Suivant</button>
   </div>
-  <div class="question" data-index="2">
-    <input type="checkbox" id="pro" name="pro" hidden>
-    <label for="pro" class="btn-checkbox">Client pro</label>
+</div>
+<div class="question" data-index="2">
+  <input type="checkbox" id="pro" name="pro" hidden>
+  <label for="pro" class="btn-checkbox">Client pro</label>
+  <input type="checkbox" id="teletravail" name="teletravail" hidden>
+  <label for="teletravail" class="btn-checkbox">Télétravail</label>
+  <div class="nav-buttons">
+    <button type="button" class="prevBtn">&lt;-</button>
+    <button type="button" class="nextBtn">Suivant</button>
+  </div>
+</div>
+<div class="question" data-index="3">
+  <select name="motif_visite">
+    <option value="" selected disabled hidden>Motif de visite</option>
+    <option value="Fixe">Fixe</option>
+    <option value="Mobile">Mobile</option>
+    <option value="Parc">Parc</option>
+  </select>
+  <div class="nav-buttons">
+    <button type="button" class="prevBtn">&lt;-</button>
+    <button type="button" class="nextBtn">Suivant</button>
+  </div>
+</div>
+<div class="question" data-index="4">
+  Foyer : <input type="tel" name="adultes" placeholder="Adultes"> &nbsp; &nbsp; 
+  <input type="tel" name="enfants" placeholder="Enfants">
+  <div class="nav-buttons">
+    <button type="button" class="prevBtn">&lt;-</button>
+    <button type="button" class="nextBtn">Suivant</button>
+  </div>
+</div>
+<!-- FIN DE LA ZONE À MODIFIER -->
 
-    <input type="checkbox" id="teletravail" name="teletravail" hidden>
-    <label for="teletravail" class="btn-checkbox">Télétravail</label>
-    <button type="button" class="nextBtn">Suivant</button>
-  </div>
-  <div class="question" data-index="3">
-    <select name="motif_visite">
-      <option value="" selected disabled hidden>Motif de visite</option>
-      <option value="Fixe">Fixe</option>
-      <option value="Mobile">Mobile</option>
-      <option value="Parc">Parc</option>
-    </select>
-    <button type="button" class="nextBtn">Suivant</button>
-  </div>
-  <div class="question" data-index="4">
-    Foyer : <input type="tel" name="adultes" placeholder="Adultes"> &nbsp; &nbsp; 
-    <input type="tel" name="enfants" placeholder="Enfants">
-    <button type="button" class="nextBtn">Suivant</button>
-  </div>
-  <!-- FIN DE LA ZONE À MODIFIER -->
-
-  <div class="question" data-index="5">
+<div class="question" data-index="5">
+  <div class="nav-buttons">
+    <button type='button' class="prevBtn">&lt;-</button>
+    <span></span> <!-- pour l'alignement -->
     <button type='button' id='sendBtn'>Envoyer un devis</button>
     <button type='button' id='finishBtn'>Terminer</button>
   </div>
+</div>
 
 </form>
 
@@ -127,11 +138,23 @@ function showQuestion(index) {
 }
 showQuestion(currentIndex);
 
-// Gestion des boutons "Suivant"
+// Bouton Suivant
 document.querySelectorAll('.nextBtn').forEach(btn => {
   btn.addEventListener('click', () => {
-    currentIndex++;
-    showQuestion(currentIndex);
+    if (currentIndex < questions.length - 1) {
+      currentIndex++;
+      showQuestion(currentIndex);
+    }
+  });
+});
+
+// Bouton Précédent
+document.querySelectorAll('.prevBtn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    if (currentIndex > 0) {
+      currentIndex--;
+      showQuestion(currentIndex);
+    }
   });
 });
 
@@ -142,7 +165,7 @@ document.getElementById('finishBtn').addEventListener('click', () => submitForm(
 function submitForm(redirect) {
   const data = {};
   new FormData(form).forEach((value, key) => data[key] = value);
-  // Gestion des checkbox
+  // Checkbox Oui/Non
   form.querySelectorAll('input[type=checkbox]').forEach(cb => {
     data[cb.name] = cb.checked ? 'Oui' : 'Non';
   });
@@ -150,7 +173,7 @@ function submitForm(redirect) {
   let history = JSON.parse(localStorage.getItem('miniFormHistory') || '[]');
   history.push(data);
   localStorage.setItem('miniFormHistory', JSON.stringify(history));
-  if(redirect) window.location.href = 'https://hub03.github.io/devis.html';
+  if (redirect) window.location.href = 'https://hub03.github.io/devis.html';
   else {
     alert('Réponses sauvegardées !');
     form.reset();
@@ -181,8 +204,7 @@ function renderHistory() {
   history.forEach((entry, index) => {
     const tr = document.createElement('tr');
     const date = new Date(entry.date).toLocaleString();
-    tr.innerHTML = `<td>${date}</td>
-                    <td>${entry.client || ''}</td>
+    tr.innerHTML = `<td>${date}</td><td>${entry.client || ''}</td>
                     <td>
                       <span class="action-btn" onclick="viewEntry(${index})">👁️</span>
                       <span class="action-btn delete" onclick="deleteEntry(${index})">❌</span>
@@ -198,8 +220,6 @@ function viewEntry(index) {
   for (let key in entry) {
     if (key !== 'date') {
       let value = entry[key];
-      // Si c'est une checkbox stockée, afficher Oui/Non
-      if(value === 'Oui' || value === 'Non') value = value;
       const tr = document.createElement('tr');
       tr.innerHTML = `<td>${key}</td><td>${value}</td>`;
       viewTableBody.appendChild(tr);

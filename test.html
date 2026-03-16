@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mini Formulaire</title>
+<title>Discover</title>
 <style>
   body {
     font-family: Arial, sans-serif;
@@ -13,6 +13,7 @@
   }
   h1 { text-align: center; font-size: 1.5rem; }
   form { display: flex; flex-direction: column; gap: 0.8rem; background: #fff; padding: 1rem; border-radius: 1rem; }
+  .question { display: none; flex-direction: column; gap: 0.5rem; }
   input, select, button { padding: 0.5rem; font-size: 1rem; border-radius: 0.5rem; border: 1px solid #ccc; }
   button { background: #4CAF50; color: #fff; border: none; cursor: pointer; }
   button:hover { background: #45a049; }
@@ -28,20 +29,37 @@
 </head>
 <body>
 
-<h1>Mini Formulaire</h1>
+<h1>Discover</h1>
 <button id="historyBtn">📜</button>
 
 <form id="miniForm">
-  <input type="text" name="name" placeholder="Nom du client" required>
-  <input type="tel" name="phone" placeholder="Téléphone">
-  <input type="number" name="age" placeholder="Âge">
-  <select name="service">
-    <option value="">Sélectionnez un service</option>
-    <option value="A">Service A</option>
-    <option value="B">Service B</option>
-  </select>
-  <input type="text" name="notes" placeholder="Notes">
-  <button type="submit">Envoyer</button>
+
+  <!-- ZONE À MODIFIER POUR AJOUTER DES QUESTIONS SUPPLÉMENTAIRES -->
+  <div class="question" data-index="0">
+    <input type="text" name="name" placeholder="Nom du client" required>
+  </div>
+  <div class="question" data-index="1">
+    <input type="tel" name="phone" placeholder="Téléphone">
+  </div>
+  <div class="question" data-index="2">
+    <input type="number" name="age" placeholder="Âge">
+  </div>
+  <div class="question" data-index="3">
+    <select name="service">
+      <option value="">Sélectionnez un service</option>
+      <option value="A">Service A</option>
+      <option value="B">Service B</option>
+    </select>
+  </div>
+  <div class="question" data-index="4">
+    <input type="text" name="notes" placeholder="Notes">
+  </div>
+  <!-- FIN DE LA ZONE À MODIFIER -->
+
+  <div class="question" data-index="5">
+    <button type="button" id="nextBtn">Suivant</button>
+  </div>
+
 </form>
 
 <!-- Historique -->
@@ -71,6 +89,10 @@
 
 <script>
 const form = document.getElementById('miniForm');
+const questions = document.querySelectorAll('.question');
+const nextBtn = document.getElementById('nextBtn');
+let currentIndex = 0;
+
 const historyBtn = document.getElementById('historyBtn');
 const historyModal = document.getElementById('historyModal');
 const closeHistory = document.getElementById('closeHistory');
@@ -80,29 +102,50 @@ const viewModal = document.getElementById('viewModal');
 const closeView = document.getElementById('closeView');
 const viewTableBody = document.querySelector('#viewTable tbody');
 
-// Sauvegarder formulaire
-form.addEventListener('submit', e => {
-  e.preventDefault();
+// Affiche la première question
+function showQuestion(index) {
+  questions.forEach((q, i) => q.style.display = i === index ? 'flex' : 'none');
+}
+showQuestion(currentIndex);
+
+nextBtn.addEventListener('click', () => {
+  if(currentIndex < questions.length - 1) {
+    currentIndex++;
+    if(currentIndex === questions.length - 1) {
+      // Ajouter boutons finaux
+      questions[currentIndex].innerHTML = `
+        <button type='button' id='sendBtn'>Envoyer un devis</button>
+        <button type='button' id='finishBtn'>Terminer</button>
+      `;
+      document.getElementById('sendBtn').addEventListener('click', () => submitForm(true));
+      document.getElementById('finishBtn').addEventListener('click', () => submitForm(false));
+    }
+    showQuestion(currentIndex);
+  }
+});
+
+function submitForm(redirect) {
   const data = {};
   new FormData(form).forEach((value, key) => data[key] = value);
   data.date = new Date().toISOString();
-
   let history = JSON.parse(localStorage.getItem('miniFormHistory') || '[]');
   history.push(data);
   localStorage.setItem('miniFormHistory', JSON.stringify(history));
+  if(redirect) window.location.href = 'https://hub03.github.io/devis.html';
+  else {
+    alert('Réponses sauvegardées !');
+    form.reset();
+    currentIndex = 0;
+    showQuestion(currentIndex);
+  }
+}
 
-  form.reset();
-  alert('Réponses sauvegardées !');
-});
-
-// Afficher historique
+// Historique
 historyBtn.addEventListener('click', () => {
   renderHistory();
   historyModal.style.display = 'flex';
 });
 closeHistory.addEventListener('click', () => historyModal.style.display = 'none');
-
-// Afficher vue
 closeView.addEventListener('click', () => viewModal.style.display = 'none');
 
 function renderHistory() {

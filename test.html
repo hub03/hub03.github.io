@@ -1,225 +1,346 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Priorités - Vue simplifiée</title>
+<meta charset="UTF-8">
+<title>Questionnaire</title>
 
-  <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<style>
 
-  <style>
-    body {
-      font-family: system-ui, sans-serif;
-      padding: 1rem;
-      background: #f9f9f9;
-    }
+body{
+font-family:Arial;
+background:#f5f5f5;
+display:flex;
+justify-content:center;
+align-items:center;
+height:100vh;
+margin:0;
+}
 
-    h1 {
-      font-size: 1.1rem;
-      margin-bottom: 1rem;
-    }
+#app{
+width:420px;
+background:white;
+padding:40px;
+border-radius:10px;
+box-shadow:0 10px 25px rgba(0,0,0,0.1);
+}
 
-    input[type="file"] {
-      width: 100%;
-      margin-bottom: 1rem;
-    }
+h2{
+margin-top:0;
+}
 
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      background: white;
-      font-size: 0.85rem;
-      border: 2px solid black;
-    }
+input,select{
+width:100%;
+padding:10px;
+margin-top:10px;
+}
 
-    th, td {
-      padding: 0.45rem;
-      border: 1px solid #ddd;
-      text-align: center;
-      white-space: nowrap;
-    }
+button{
+margin-top:20px;
+padding:10px 20px;
+cursor:pointer;
+}
 
-    /* Bordures spécifiques */
-    th:nth-child(1), td:nth-child(1),
-    th:nth-child(9), td:nth-child(9),
-    th:nth-child(10), td:nth-child(10) {
-      border-right: 2px solid black;
-    }
+#admin{
+display:none;
+}
 
-    th {
-      background: #efefef;
-      font-weight: 600;
-    }
+.questionRow{
+border:1px solid #ddd;
+padding:10px;
+margin:10px 0;
+}
 
-    th:first-child,
-    td:first-child {
-      text-align: left;
-      font-weight: 600;
-      background: #fafafa;
-    }
+.small{
+font-size:12px;
+color:#777;
+}
 
-    #dateCell {
-      color: #1565c0;
-      font-weight: 700;
-    }
-
-    .row-magasin { background: #f2f2f2; }
-    .row-secteur { background: #e0e0e0; }
-
-    .r-ok { color: #00c853; font-weight: 700; }
-    .r-bad { color: #ff1744; font-weight: 700; }
-
-    #shareBtn {
-      margin-top: 1rem;
-      padding: 0.5rem 1rem;
-      font-size: 1.2rem;
-      background: none;
-      border: 1px solid #ccc;
-      cursor: pointer;
-      display: none;
-    }
-
-    #shareBtn:hover {
-      background: #f0f0f0;
-    }
-  </style>
+</style>
 </head>
+
 <body>
 
-<h1>Tableau des priorités</h1>
-
-<input type="file" id="fileInput" accept=".xlsx">
-
-<table id="resultTable" style="display:none;">
-  <thead>
-    <tr>
-      <th id="dateCell"></th>
-      <th>P1 Box VR</th>
-      <th>P2 Abo</th>
-      <th>P3 Assu</th>
-      <th>P4 Access</th>
-      <th>P5 Pro</th>
-      <th>P6 MS</th>
-      <th>C7 Mig</th>
-      <th>C8 Canal+</th>
-      <th>Score</th>
-      <th>Tx d'assu</th>
-      <th>Tx 5Go et +</th>
-      <th>Tx reprise</th>
-    </tr>
-  </thead>
-  <tbody></tbody>
-</table>
-
-<button id="shareBtn">📤</button>
+<div id="app"></div>
 
 <script>
-const fileInput = document.getElementById("fileInput");
-const table = document.getElementById("resultTable");
-const tbody = table.querySelector("tbody");
-const shareBtn = document.getElementById("shareBtn");
 
-const rows = [
-{
-label:"Antoine",
-cells:[{R:"AJ10",O:"AK10"},{R:"BB10",O:"BC10"},{R:"BN10",O:"BO10"},{R:"BQ10",O:"BR10"},{R:"AV10",O:"AW10"},{R:"AY10",O:"AZ10"},{R:"AP10",O:"AQ10"},{R:"AS10",O:"AT10"}],
-taux:{assu:"DC10",go5:"CO10",reprise:"CW10"}
-},
-{
-label:"Nicolas",
-cells:[{R:"AJ11",O:"AK11"},{R:"BB11",O:"BC11"},{R:"BN11",O:"BO11"},{R:"BQ11",O:"BR11"},{R:"AV11",O:"AW11"},{R:"AY11",O:"AZ11"},{R:"AP11",O:"AQ11"},{R:"AS11",O:"AT11"}],
-taux:{assu:"DC11",go5:"CO11",reprise:"CW11"}
-},
-{
-label:"Rémy",
-cells:[{R:"AJ12",O:"AK12"},{R:"BB12",O:"BC12"},{R:"BN12",O:"BO12"},{R:"BQ12",O:"BR12"},{R:"AV12",O:"AW12"},{R:"AY12",O:"AZ12"},{R:"AP12",O:"AQ12"},{R:"AS12",O:"AT12"}],
-taux:{assu:"DC12",go5:"CO12",reprise:"CW12"}
-},
-{
-label:"Magasin",
-rowClass:"row-magasin",
-cells:[{R:"AJ15",O:"AK15"},{R:"BB15",O:"BC15"},{R:"BN15",O:"BO15"},{R:"BQ15",O:"BR15"},{R:"AV15",O:"AW15"},{R:"AY15",O:"AZ15"},{R:"AP15",O:"AQ15"},{R:"AS15",O:"AT15"}],
-taux:{assu:"DC15",go5:"CO15",reprise:"CW15"}
-},
-{
-label:"OU1",
-rowClass:"row-secteur",
-cells:[{R:"AJ16",O:"AK16"},{R:"BB16",O:"BC16"},{R:"BN16",O:"BO16"},{R:"BQ16",O:"BR16"},{R:"AV16",O:"AW16"},{R:"AY16",O:"AZ16"},{R:"AP16",O:"AQ16"},{R:"AS16",O:"AT16"}],
-taux:{assu:"DC16",go5:"CO16",reprise:"CW16"}
-}
-];
+// ⚠️ METTRE TON URL APPS SCRIPT ICI
+const API = "PASTE_YOUR_SCRIPT_URL_HERE"
 
-fileInput.addEventListener("change",(e)=>{
-const file=e.target.files[0];
-if(!file)return;
+const ADMIN_PASSWORD = "admin123"
 
-fileInput.style.display="none";
+let questions=[]
+let answers={}
+let index=0
 
-const today=new Date();
-const formatted=("0"+today.getDate()).slice(-2)+"/"+("0"+(today.getMonth()+1)).slice(-2);
-document.getElementById("dateCell").textContent=formatted;
+async function loadQuestions(){
 
-const reader=new FileReader();
+const r = await fetch(API)
+questions = await r.json()
 
-reader.onload=(evt)=>{
-const data=new Uint8Array(evt.target.result);
-const workbook=XLSX.read(data,{type:"array"});
-const sheet=workbook.Sheets[workbook.SheetNames[0]];
+questions.sort((a,b)=>Number(a.order)-Number(b.order))
 
-tbody.innerHTML="";
+startQuiz()
 
-rows.forEach(row=>{
-const tr=document.createElement("tr");
-if(row.rowClass)tr.classList.add(row.rowClass);
-
-tr.innerHTML=`<td>${row.label}</td>`;
-let score=0;
-
-row.cells.forEach((cell,index)=>{
-let r=sheet[cell.R]?.v??"";
-let o=sheet[cell.O]?.v??"";
-
-if(index===3&&typeof r==="number")r=Math.ceil(r);
-if(typeof o==="number")o=Math.ceil(o);
-
-let rClass="";
-if(typeof r==="number"&&typeof o==="number"){
-const ok=r>=o;
-rClass=ok?"r-ok":"r-bad";
-if(ok)score+=index<=5?1:2;
 }
 
-tr.innerHTML+=`<td><span class="${rClass}">${r}</span> / ${o}</td>`;
-});
+function startQuiz(){
 
-tr.innerHTML+=`<td>${score} / 10</td>`;
+index=0
+answers={}
+renderQuestion()
 
-const formatPercent=v=>typeof v==="number"?(v*100).toFixed(1)+"%":v;
+}
 
-tr.innerHTML+=`<td>${formatPercent(sheet[row.taux.assu]?.v??"")}</td>`;
-tr.innerHTML+=`<td>${formatPercent(sheet[row.taux.go5]?.v??"")}</td>`;
-tr.innerHTML+=`<td>${formatPercent(sheet[row.taux.reprise]?.v??"")}</td>`;
+function renderQuestion(){
 
-tbody.appendChild(tr);
-});
+if(index>=questions.length){
 
-table.style.display="table";
-shareBtn.style.display="inline-block";
-};
+finishQuiz()
+return
+}
 
-reader.readAsArrayBuffer(file);
-});
+const q=questions[index]
 
-/* ===== COPIE IMAGE DANS PRESSE PAPIER ===== */
-shareBtn.addEventListener("click",async()=>{
-const canvas=await html2canvas(table,{scale:2});
-canvas.toBlob(async(blob)=>{
-const item=new ClipboardItem({"image/png":blob});
-await navigator.clipboard.write([item]);
-alert("Image copiée ✅\nCollez-la directement dans WhatsApp.");
-});
-});
+let input=""
+
+if(q.type==="text"){
+input=`<input id="answer">`
+}
+
+if(q.type==="number"){
+input=`<input type="number" id="answer">`
+}
+
+if(q.type==="select"){
+
+let opts=q.options.split(",")
+
+input=`<select id="answer">
+${opts.map(o=>`<option>${o}</option>`).join("")}
+</select>`
+
+}
+
+app.innerHTML=`
+
+<h2>${q.label}</h2>
+
+${input}
+
+<button onclick="next()">Suivant</button>
+
+<div class="small">
+${index+1} / ${questions.length}
+</div>
+
+`
+
+}
+
+function next(){
+
+let val=document.getElementById("answer").value
+
+answers[questions[index].id]=val
+
+index++
+
+renderQuestion()
+
+}
+
+async function finishQuiz(){
+
+let client=answers["q1"]||""
+
+await fetch(API,{
+method:"POST",
+body:JSON.stringify({
+client:client,
+answers:answers
+})
+})
+
+app.innerHTML=`
+
+<h2>Merci 👍</h2>
+
+<button onclick="startQuiz()">Nouveau questionnaire</button>
+
+<button onclick="adminLogin()">Admin</button>
+
+`
+
+}
+
+// ADMIN
+
+function adminLogin(){
+
+let p=prompt("Mot de passe admin")
+
+if(p===ADMIN_PASSWORD){
+
+renderAdmin()
+
+}else{
+
+alert("Accès refusé")
+
+}
+
+}
+
+function renderAdmin(){
+
+app.innerHTML=`
+
+<h2>Administration</h2>
+
+<div id="questionList"></div>
+
+<hr>
+
+<h3>Ajouter question</h3>
+
+<input id="newLabel" placeholder="Question">
+
+<select id="newType">
+<option value="text">Text</option>
+<option value="number">Number</option>
+<option value="select">Select</option>
+</select>
+
+<input id="newOptions" placeholder="Options (a,b,c)">
+
+<button onclick="addQuestion()">Ajouter</button>
+
+<button onclick="saveQuestions()">💾 Sauvegarder</button>
+
+<button onclick="loadQuestions()">Retour</button>
+
+`
+
+renderQuestionList()
+
+}
+
+function renderQuestionList(){
+
+let html=""
+
+questions.forEach((q,i)=>{
+
+html+=`
+
+<div class="questionRow">
+
+<input value="${q.label}" onchange="questions[${i}].label=this.value">
+
+<br>
+
+<select onchange="questions[${i}].type=this.value">
+
+<option ${q.type=="text"?"selected":""}>text</option>
+<option ${q.type=="number"?"selected":""}>number</option>
+<option ${q.type=="select"?"selected":""}>select</option>
+
+</select>
+
+<br>
+
+<input value="${q.options||""}" onchange="questions[${i}].options=this.value">
+
+<br>
+
+<button onclick="moveUp(${i})">↑</button>
+<button onclick="moveDown(${i})">↓</button>
+<button onclick="removeQ(${i})">Supprimer</button>
+
+</div>
+
+`
+
+})
+
+document.getElementById("questionList").innerHTML=html
+
+}
+
+function addQuestion(){
+
+let label=document.getElementById("newLabel").value
+let type=document.getElementById("newType").value
+let options=document.getElementById("newOptions").value
+
+questions.push({
+id:"q"+Date.now(),
+label:label,
+type:type,
+options:options,
+order:questions.length+1
+})
+
+renderQuestionList()
+
+}
+
+function removeQ(i){
+
+questions.splice(i,1)
+
+renderQuestionList()
+
+}
+
+function moveUp(i){
+
+if(i===0)return
+
+let t=questions[i]
+questions[i]=questions[i-1]
+questions[i-1]=t
+
+renderQuestionList()
+
+}
+
+function moveDown(i){
+
+if(i===questions.length-1)return
+
+let t=questions[i]
+questions[i]=questions[i+1]
+questions[i+1]=t
+
+renderQuestionList()
+
+}
+
+async function saveQuestions(){
+
+for(let i=0;i<questions.length;i++){
+
+questions[i].order=i+1
+
+}
+
+await fetch(API+"?updateQuestions=true",{
+method:"POST",
+body:JSON.stringify(questions)
+})
+
+alert("Questions sauvegardées")
+
+loadQuestions()
+
+}
+
+// START
+
+loadQuestions()
+
 </script>
 
 </body>

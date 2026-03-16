@@ -12,18 +12,18 @@
     background: #f5f5f5;
   }
   h1 { text-align: center; font-size: 1.5rem; }
-  form { display: flex; flex-direction: column; gap: 0.8rem; background: #fff; padding: 1rem; border-radius: 1rem; }
+  form { display: flex; flex-direction: column; gap: 0.8rem; background: #fff; padding: 1rem; border-radius: 1rem; position: relative; }
   .question { display: none; flex-direction: column; gap: 0.5rem; }
   input, select, button { padding: 0.5rem; font-size: 1rem; border-radius: 0.5rem; border: 1px solid #ccc; }
   button { cursor: pointer; }
   #historyBtn { position: fixed; top: 1rem; right: 1rem; font-size: 1.5rem; background: none; border: none; }
 
-  /* Boutons de navigation */
-  .nav-buttons { display: flex; justify-content: space-between; margin-top: 1rem; }
-  .nextBtn { background-color: #4CAF50; color: #fff; border: none; padding: 0.5rem 1rem; border-radius: 0.5rem; }
-  .nextBtn:hover { background-color: #45a049; }
-  .prevBtn { background-color: #bbb; color: #fff; border: none; padding: 0.5rem 1rem; border-radius: 0.5rem; }
-  .prevBtn:hover { background-color: #999; }
+  /* Navigation unique */
+  #navigation { display: flex; justify-content: space-between; margin-top: 1rem; }
+  #prevBtn { background-color: #bbb; color: #fff; border: none; padding: 0.5rem 1rem; border-radius: 0.5rem; }
+  #prevBtn:hover { background-color: #999; }
+  #nextBtn { background-color: #4CAF50; color: #fff; border: none; padding: 0.5rem 1rem; border-radius: 0.5rem; }
+  #nextBtn:hover { background-color: #45a049; }
 
   /* Boutons checkbox stylisés */
   .btn-checkbox { display: inline-block; padding: 0.6rem 1.2rem; margin-right: 0.5rem; border: 1px solid #ccc; border-radius: 0.6rem; cursor: pointer; background-color: #f0f0f0; user-select: none; transition: all 0.2s ease; }
@@ -45,30 +45,18 @@
 
 <form id="miniForm">
 
-<!-- ZONE À MODIFIER POUR AJOUTER DES QUESTIONS SUPPLÉMENTAIRES -->
+<!-- QUESTIONS -->
 <div class="question" data-index="0">
   <input type="text" name="client" placeholder="Nom du client" required>
-  <div class="nav-buttons">
-    <span></span> <!-- Espace vide pour l'alignement gauche -->
-    <button type="button" class="nextBtn">Suivant</button>
-  </div>
 </div>
 <div class="question" data-index="1">
   <input type="tel" name="numero" placeholder="Téléphone">
-  <div class="nav-buttons">
-    <button type="button" class="prevBtn">&lt;-</button>
-    <button type="button" class="nextBtn">Suivant</button>
-  </div>
 </div>
 <div class="question" data-index="2">
   <input type="checkbox" id="pro" name="pro" hidden>
   <label for="pro" class="btn-checkbox">Client pro</label>
   <input type="checkbox" id="teletravail" name="teletravail" hidden>
   <label for="teletravail" class="btn-checkbox">Télétravail</label>
-  <div class="nav-buttons">
-    <button type="button" class="prevBtn">&lt;-</button>
-    <button type="button" class="nextBtn">Suivant</button>
-  </div>
 </div>
 <div class="question" data-index="3">
   <select name="motif_visite">
@@ -77,28 +65,20 @@
     <option value="Mobile">Mobile</option>
     <option value="Parc">Parc</option>
   </select>
-  <div class="nav-buttons">
-    <button type="button" class="prevBtn">&lt;-</button>
-    <button type="button" class="nextBtn">Suivant</button>
-  </div>
 </div>
 <div class="question" data-index="4">
   Foyer : <input type="tel" name="adultes" placeholder="Adultes"> &nbsp; &nbsp; 
   <input type="tel" name="enfants" placeholder="Enfants">
-  <div class="nav-buttons">
-    <button type="button" class="prevBtn">&lt;-</button>
-    <button type="button" class="nextBtn">Suivant</button>
-  </div>
 </div>
-<!-- FIN DE LA ZONE À MODIFIER -->
-
 <div class="question" data-index="5">
-  <div class="nav-buttons">
-    <button type='button' class="prevBtn">&lt;-</button>
-    <span></span> <!-- pour l'alignement -->
-    <button type='button' id='sendBtn'>Envoyer un devis</button>
-    <button type='button' id='finishBtn'>Terminer</button>
-  </div>
+  <button type='button' id='sendBtn'>Envoyer un devis</button>
+  <button type='button' id='finishBtn'>Terminer</button>
+</div>
+
+<!-- Navigation unique -->
+<div id="navigation">
+  <button type="button" id="prevBtn">&lt;-</button>
+  <button type="button" id="nextBtn">Suivant</button>
 </div>
 
 </form>
@@ -131,31 +111,37 @@
 <script>
 const form = document.getElementById('miniForm');
 const questions = document.querySelectorAll('.question');
+const prevBtn = document.getElementById('prevBtn');
+const nextBtn = document.getElementById('nextBtn');
 let currentIndex = 0;
 
 function showQuestion(index) {
   questions.forEach((q, i) => q.style.display = i === index ? 'flex' : 'none');
+
+  // Focus automatique sur input texte/tel/number
+  const currentQuestion = questions[index];
+  const inputToFocus = currentQuestion.querySelector('input[type="text"], input[type="tel"], input[type="number"]');
+  if (inputToFocus) inputToFocus.focus();
+
+  // Masquer/afficher boutons navigation selon l'index
+  prevBtn.style.display = index === 0 ? 'none' : 'inline-block';
+  nextBtn.style.display = index >= questions.length - 1 ? 'none' : 'inline-block';
 }
+
 showQuestion(currentIndex);
 
-// Bouton Suivant
-document.querySelectorAll('.nextBtn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    if (currentIndex < questions.length - 1) {
-      currentIndex++;
-      showQuestion(currentIndex);
-    }
-  });
+prevBtn.addEventListener('click', () => {
+  if (currentIndex > 0) {
+    currentIndex--;
+    showQuestion(currentIndex);
+  }
 });
 
-// Bouton Précédent
-document.querySelectorAll('.prevBtn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    if (currentIndex > 0) {
-      currentIndex--;
-      showQuestion(currentIndex);
-    }
-  });
+nextBtn.addEventListener('click', () => {
+  if (currentIndex < questions.length - 1) {
+    currentIndex++;
+    showQuestion(currentIndex);
+  }
 });
 
 // Boutons finaux
@@ -165,7 +151,6 @@ document.getElementById('finishBtn').addEventListener('click', () => submitForm(
 function submitForm(redirect) {
   const data = {};
   new FormData(form).forEach((value, key) => data[key] = value);
-  // Checkbox Oui/Non
   form.querySelectorAll('input[type=checkbox]').forEach(cb => {
     data[cb.name] = cb.checked ? 'Oui' : 'Non';
   });
@@ -191,10 +176,7 @@ const viewModal = document.getElementById('viewModal');
 const closeView = document.getElementById('closeView');
 const viewTableBody = document.querySelector('#viewTable tbody');
 
-historyBtn.addEventListener('click', () => {
-  renderHistory();
-  historyModal.style.display = 'flex';
-});
+historyBtn.addEventListener('click', () => { renderHistory(); historyModal.style.display = 'flex'; });
 closeHistory.addEventListener('click', () => historyModal.style.display = 'none');
 closeView.addEventListener('click', () => viewModal.style.display = 'none');
 

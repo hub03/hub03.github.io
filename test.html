@@ -34,7 +34,7 @@
 
 <form id="miniForm">
 
-  <!-- ZONE À MODIFIER POUR AJOUTER DES QUESTIONS SUPPLÉMENTAIRES -->
+<!-- ZONE À MODIFIER POUR AJOUTER DES QUESTIONS SUPPLÉMENTAIRES -->
   <div class="question" data-index="0">
     <input type="text" name="client" placeholder="Nom du client" required>
     <button type="button" class="nextBtn">Suivant</button>
@@ -121,6 +121,10 @@ document.getElementById('finishBtn').addEventListener('click', () => submitForm(
 function submitForm(redirect) {
   const data = {};
   new FormData(form).forEach((value, key) => data[key] = value);
+  // Gestion des checkbox
+  form.querySelectorAll('input[type=checkbox]').forEach(cb => {
+    data[cb.name] = cb.checked ? 'Oui' : 'Non';
+  });
   data.date = new Date().toISOString();
   let history = JSON.parse(localStorage.getItem('miniFormHistory') || '[]');
   history.push(data);
@@ -157,7 +161,7 @@ function renderHistory() {
     const tr = document.createElement('tr');
     const date = new Date(entry.date).toLocaleString();
     tr.innerHTML = `<td>${date}</td>
-                    <td>${entry.name || ''}</td>
+                    <td>${entry.client || ''}</td>
                     <td>
                       <span class="action-btn" onclick="viewEntry(${index})">👁️</span>
                       <span class="action-btn delete" onclick="deleteEntry(${index})">❌</span>
@@ -172,8 +176,11 @@ function viewEntry(index) {
   viewTableBody.innerHTML = '';
   for (let key in entry) {
     if (key !== 'date') {
+      let value = entry[key];
+      // Si c'est une checkbox stockée, afficher Oui/Non
+      if(value === 'Oui' || value === 'Non') value = value;
       const tr = document.createElement('tr');
-      tr.innerHTML = `<td>${key}</td><td>${entry[key]}</td>`;
+      tr.innerHTML = `<td>${key}</td><td>${value}</td>`;
       viewTableBody.appendChild(tr);
     }
   }

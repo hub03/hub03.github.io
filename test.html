@@ -196,27 +196,36 @@ renderQuestion()
 
 async function finishQuiz(){
 
-app.innerHTML="Envoi..."
+app.innerHTML="<h2>Envoi...</h2>"
 
 let client=answers["q1"]||""
 
-await fetch(API,{
-method:"POST",
-body:JSON.stringify({
-client:client,
-answers:answers
-})
-})
+try{
+  const res = await fetch(API,{
+    method:"POST",
+    body:JSON.stringify({
+      client:client,
+      answers:answers
+    })
+  })
+  
+  if(!res.ok) throw new Error("Erreur réseau")
 
-app.innerHTML=`
-
-<h2>Merci 👍</h2>
-
-<button onclick="startQuiz()">Nouveau questionnaire</button>
-
-<button class="secondary" onclick="adminLogin()">Administration</button>
-
-`
+  // Succès
+  app.innerHTML=`
+  <h2>Merci 👍</h2>
+  <button onclick="startQuiz()">Nouveau questionnaire</button>
+  <button class="secondary" onclick="adminLogin()">Administration</button>
+  `
+  
+}catch(e){
+  console.error(e)
+  app.innerHTML=`
+  <h2>Erreur lors de l'envoi 😢</h2>
+  <p>Vérifie ta connexion ou l'URL de l'API</p>
+  <button onclick="startQuiz()">Réessayer</button>
+  `
+}
 
 }
 

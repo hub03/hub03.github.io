@@ -1,616 +1,240 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <title>Fiche Découverte</title>
-    <meta name="viewport" content="width=device-width,initial-scale=1">
-    <style>
-        body {
-            font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-            margin: 16px;
-            color: #111;
-            text-align: center;
-            background: #f7f7f8;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Discover</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 1rem;
+    background: #f5f5f5;
+  }
+  h1 { text-align: center; font-size: 1.5rem; }
+  form { display: flex; flex-direction: column; gap: 0.8rem; background: #fff; padding: 1rem; border-radius: 1rem; position: relative; }
+  .question { display: none; flex-direction: column; gap: 0.5rem; }
+  input, select, button { padding: 0.5rem; font-size: 1rem; border-radius: 0.5rem; border: 1px solid #ccc; }
+  button { cursor: pointer; }
+  #historyBtn { position: fixed; top: 1rem; right: 1rem; font-size: 1.5rem; background: none; border: none; }
 
-        h1 {
-            text-align: center;
-            margin: 8px 0 16px;
-            font-size: 1.4rem;
-        }
+  /* Navigation unique */
+  #navigation { display: flex; justify-content: space-between; margin-top: 1rem; }
+  #prevBtn { background-color: #bbb; color: #fff; border: none; padding: 0.5rem 1rem; border-radius: 0.5rem; }
+  #prevBtn:hover { background-color: #999; }
+  #nextBtn { background-color: #4CAF50; color: #fff; border: none; padding: 0.5rem 1rem; border-radius: 0.5rem; }
+  #nextBtn:hover { background-color: #45a049; }
 
-        h2 {
-            margin: 16px 0 8px;
-            padding: 6px 8px;
-            border-radius: 6px;
-            font-size: 1.05rem;
-            text-align: center;
-        }
+  /* Boutons checkbox stylisés */
+  .btn-checkbox { display: inline-block; padding: 0.6rem 1.2rem; margin-right: 0.5rem; border: 1px solid #ccc; border-radius: 0.6rem; cursor: pointer; background-color: #f0f0f0; user-select: none; transition: all 0.2s ease; }
+  input[type="checkbox"]:checked + .btn-checkbox { background-color: #4CAF50; color: white; border-color: #4CAF50; }
 
-        select, input[type="text"], input[type="tel"], input[type="number"], textarea {
-            font-size: 1rem;
-            padding: 6px;
-            margin: 6px;
-            border: 1px solid #ccc;
-            border-radius: 6px;
-            width: auto; 
-        }
-
-        textarea {
-            width: 100%;
-            box-sizing: border-box;
-            resize: none;
-        }
-
-        /* Styles spécifiques pour les champs de saisie */
-        input[id="adultes"], input[id="enfants"], input[id="superficie"], input[id="fixeCout"], 
-        input[id^="coutLigne"], input[id="maisonCout"], input[id="eqAutres"] {
-            width: 70px;
-            box-sizing: border-box; 
-        }
-        
-        input[id^="tLigne"] {
-            width: 140px; /* Ajusté pour une meilleure lisibilité */
-            box-sizing: border-box; 
-        }
-        
-        input[id^="gLigne"] {
-            width: 45px;
-            box-sizing: border-box; 
-        }
-
-        #selectChainesServices {
-            width: 300px;
-            box-sizing: border-box;
-            margin: 10px 0;
-        }
-        
-        input[type="checkbox"], input[type="radio"] {
-            transform: scale(1.2);
-            vertical-align: middle;
-        }
-
-        ::placeholder {
-            font-size: 0.8em;
-        }
-
-        .section {
-            display: none;
-            border-radius: 10px;
-            padding: 10px;
-            margin-bottom: 12px;
-        }
-
-        .visible {
-            display: block !important;
-        }
-
-        #infos {
-            background: #ffffff;
-        }
-
-        #fixe {
-            background: #ffe5e5;
-        }
-
-        #maison {
-            background: #fff8d6;
-        }
-
-        #mobile {
-            background: #e5f0ff;
-        }
-
-        #synthese {
-            background: #e6ffe6;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 8px;
-        }
-
-        th, td {
-            border: 1px solid #ddd;
-            padding: 6px;
-            text-align: center;
-        }
-        
-        .cost-cell {
-            white-space: nowrap;
-        }
-        
-        button {
-            margin: 4px;
-            padding: 8px 14px;
-            border: 1px solid #bbb;
-            border-radius: 6px;
-            background: #fff;
-            cursor: pointer;
-        }
-
-        button:hover {
-            background: #eee;
-        }
-
-        #menuBurger {
-            position: fixed;
-            top: 10px;
-            right: 10px;
-            background: #fff;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-            width: 40px;
-            height: 40px;
-            font-size: 22px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-        }
-
-        #menuOptions {
-            position: fixed;
-            top: 60px;
-            right: 10px;
-            background: white;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-            display: none;
-            z-index: 999;
-        }
-
-        #menuOptions button {
-            width: 160px;
-            border: none;
-            background: none;
-            padding: 8px;
-            text-align: left;
-            display: block;
-        }
-
-        #menuOptions button:hover {
-            background: #eee;
-        }
-
-        #historyPanel {
-            display: none;
-            margin-top: 20px;
-            background: #f2f2f2;
-            border-radius: 8px;
-            padding: 10px;
-        }
-
-        #historyTable {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        #historyTable th, #historyTable td {
-            border: 1px solid #ccc;
-            padding: 6px;
-        }
-
-        #historyTable th {
-            background: #e0e0e0;
-        }
-    </style>
-
+  #historyModal, #viewModal { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; }
+  .modal-content { background: #fff; padding: 1rem; border-radius: 1rem; width: 90%; max-height: 90%; overflow-y: auto; }
+  table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+  th, td { border: 1px solid #ddd; padding: 0.5rem; text-align: left; }
+  .action-btn { cursor: pointer; font-size: 1.2rem; }
+  .delete { color: red; }
+  .close { cursor: pointer; float: right; font-size: 1.2rem; margin-left: 1rem; }
+</style>
 </head>
 <body>
-<div id="menuBurger">☰</div>
-<div id="menuOptions">
-    <button id="exportBtn">📤 Exporter l'historique</button>
-    <button id="importBtn">📥 Importer l'historique</button>
+
+<h1>Discover</h1>
+<button id="historyBtn">📜</button>
+
+<form id="miniForm">
+
+<!-- QUESTIONS -->
+<div class="question" data-index="0">
+  <i>Quel est votre nom ?</i>
+  <br><input type="text" name="client" required>
+</div>
+<div class="question" data-index="1">
+  <i>Quel est votre numéro de téléphone ?</i>
+  <br><input type="tel" name="numero" maxlength=10>
+</div>
+<div class="question" data-index="2">
+  <i>🧑‍🔧 L'une de vos lignes est-elle utilisée à titre professionnel ?</i>
+  <br><input type="checkbox" id="pro" name="pro" hidden>
+  <label for="pro" class="btn-checkbox">Oui ✅</label>
+  <br><i>🧑‍💻 Faites-vous du télétravail ?</i>
+  <br><input type="checkbox" id="teletravail" name="teletravail" hidden>
+  <label for="teletravail" class="btn-checkbox">Oui ✅</label>
+</div>
+<div class="question" data-index="3">
+  <i>🧑‍🤝‍🧑 Combien de personnes vivent dans votre foyer ?</i>
+  <br><input type="tel" name="adultes" placeholder="Adultes">
+  <br><input type="tel" name="enfants" placeholder="Enfants">
 </div>
 
-<h1>FICHE DÉCOUVERTE</h1>
-<input type="hidden" id="date"/>
-
-<div id="infos" class="section visible">
-    <h2>INFORMATIONS</h2>
-    <p>
-        <input type="text" id="nomClient" placeholder="Nom du client">
-        <input type="tel" id="numeroClient" maxlength="10" placeholder="Numéro du client">
-    </p>
-    <p>
-        <input type="text" id="activitePro" placeholder="Métier">
-        <label for="teletravail">Télétravail</label><input type="checkbox" id="teletravail">
-    </p>
-    <p>
-        Foyer : <input type="tel" maxlength="2" id="adultes" placeholder="adulte(s)">
-        <input type="tel" maxlength="2" id="enfants" placeholder="enfant(s)">
-    </p>
-    <p>
-        <select id="motif">
-            <option hidden disabled selected>🤝 motif de visite</option>
-            <option>Box</option>
-            <option>Abo</option>
-            <option>RM</option>
-            <option>Autre</option>
-        </select>
-    </p>
+<div class="question" data-index="5">
+  <i>🛜 Quel est votre fournisseur d'accès actuel ?</i>
+  <br><select name="fai">
+    <option value="" selected disabled hidden>F.A.I.</option>
+    <option value="Orange">Orange</option>
+    <option value="SFR">SFR</option>
+    <option value="Bouygues">Bouygues</option>
+    <option value="Free">Free</option>
+    <option value="autre">autre</option>
+  </select>
 </div>
 
-<div id="containerSections">
-    <div id="fixe" class="section">
-        <h2>UNIVERS FIXE</h2>
-        <p>
-            <select id="fixeOperateur">
-                <option hidden disabled selected>🛜 opérateur</option>
-                <option>SFR</option>
-                <option>Orange</option>
-                <option>Bouygues</option>
-                <option>Free</option>
-                <option>Autre</option>
-            </select>
-            <input type="number" id="fixeCout" placeholder="coût">€/mois
-        </p>
-        <p>
-            <select id="fixeUsages">
-                <option hidden disabled selected>📞 usages tel fixe</option>
-                <option>Fixes</option>
-                <option>Fixes et mobiles</option>
-            </select>
-        </p>
-        <p>
-            Nombre d'équipement du foyer (mobiles, tablettes, PC, TV, consoles...)
-            <br><input type="tel" maxlength="2" id="eqAutres">
-        </p>
-        <select multiple id="selectChainesServices" size=1>
-				<option hidden disabled selected>Centres d'intêret et abonnements SVOD</option>
-            <optgroup label="Centres d'Intérêt">
-                <option>Sport</option>
-                <option>Ciné</option>
-                <option>Séries</option>
-                <option>Découverte</option>
-                <option>Jeunesse</option>
-                <option>Musique</option>
-                <option>Info</option>
-            </optgroup>
-            <optgroup label="Abonnements SVOD / Ciné">
-                <option>Canal+</option>
-                <option>Netflix</option>
-                <option>Prime Video</option>
-                <option>Disney+</option>
-                <option>HBO Max</option>
-                <option>Autre...</option>
-            </optgroup>
-        </select>
-        
-        <textarea rows="3" id="commentFixe" placeholder="Commentaires"></textarea>
-    </div>
-
-    <div id="maison" class="section">
-        <h2>UNIVERS MAISON</h2>
-        <p>
-            <select id="logementType">
-                <option hidden disabled selected>🏠 logement</option>
-                <option>Maison</option>
-                <option>Appartement</option>
-            </select>
-            <input type="tel" maxlength="3" id="superficie">m²
-            <br><label for="absencesProlongees">absences prolongées</label><input type="checkbox" id="absencesProlongees"> &nbsp; <label for="cambriolages">cambriolages passés</label><input type="checkbox" id="cambriolages">
-        </p>
-        <p>
-            <select id="surveillanceType">
-                <option hidden disabled selected>🎦 surveillance</option>
-                <option>Aucun</option>
-                <option>Orange</option>
-                <option>Verisure</option>
-                <option>Sector alarm</option>
-                <option>Somfy</option>
-                <option>Autre</option>
-            </select>
-            <input type="number" id="maisonCout" step="1.00" min="0" max="999.99">€/mois
-        </p>
-        <textarea rows="3" id="commentMaison" placeholder="Commentaires"></textarea>
-    </div>
-
-    <div id="mobile" class="section">
-        <h2>UNIVERS MOBILE</h2>
-        <table>
-            <tr>
-                <th>&nbsp;</th>
-                <th>Gigas</th>
-                <th>Terminal</th>
-                <th>Repris</th>
-                <th>Assu</th>
-                <th>Coût</th> 
-            </tr>
-            <tr>
-                <td>1</td>
-                <td><input type="tel" id="gLigne1" maxlength=3></td>
-                <td><input type="text" id="tLigne1"></td>
-                <td><input type="checkbox" id="repriseLigne1"></td>
-                <td><input type="checkbox" id="assLigne1"></td>
-                <td class="cost-cell"><input type="number" id="coutLigne1">€/m</td>
-            </tr>
-            <tr>
-                <td>2</td>
-                <td><input type="tel" id="gLigne2" maxlength=3></td>
-                <td><input type="text" id="tLigne2"></td>
-                <td><input type="checkbox" id="repriseLigne2"></td>
-                <td><input type="checkbox" id="assLigne2"></td>
-                <td class="cost-cell"><input type="number" id="coutLigne2">€/m</td>
-            </tr>
-            <tr>
-                <td>3</td>
-                <td><input type="tel" id="gLigne3" maxlength=3></td>
-                <td><input type="text" id="tLigne3"></td>
-                <td><input type="checkbox" id="repriseLigne3"></td>
-                <td><input type="checkbox" id="assLigne3"></td>
-                <td class="cost-cell"><input type="number" id="coutLigne3">€/m</td>
-            </tr>
-            <tr>
-                <td>4</td>
-                <td><input type="tel" id="gLigne4" maxlength=3></td>
-                <td><input type="text" id="tLigne4"></td>
-                <td><input type="checkbox" id="repriseLigne4"></td>
-                <td><input type="checkbox" id="assLigne4"></td>
-                <td class="cost-cell"><input type="number" id="coutLigne4">€/m</td>
-            </tr>
-        </table>
-        <textarea rows="3" id="commentMobile" placeholder="Commentaires"></textarea>
-    </div>
+<div class="question" data-index="6">
+  <i>👛 Combien payez-vous votre fournisseur actuel ?</i>
+  <br><input type="number" name="prix-fai">€/mois
 </div>
 
-<div id="synthese" class="section">
-    <h2>SYNTHÈSE</h2>
-    <p>
-        Vente réalisée :
-        <input type="radio" name="vente" id="venteOui"><label for="venteOui">✔️ Oui</label>
-        <input type="radio" name="vente" id="venteNon"><label for="venteNon">❌ Non</label>
-    </p>
-    <textarea rows="3" id="commentSynthese" placeholder="Conclusion, relances..."></textarea>
+<!-- Boutons de fin -->
+  
+<div class="question" data-index="99">
+  <button type='button' id='sendBtn'>Envoyer un devis</button>
+  <button type='button' id='finishBtn'>Terminer</button>
 </div>
 
-<p>
-    <button id="saveBtn">💾 Sauvegarder et terminer</button>
-    <button id="showHistoryBtn">📜 Historique</button>
-</p>
+<!-- Navigation unique -->
+<div id="navigation">
+  <button type="button" id="prevBtn">&lt;-</button>
+  <button type="button" id="nextBtn">Suivant</button>
+</div>
 
-<div id="historyPanel">
-    <h2>Historique des fiches</h2>
+</form>
+
+<!-- Historique -->
+<div id="historyModal">
+  <div class="modal-content">
+    <span class="close" id="closeHistory">❌</span>
+    <h2>Historique</h2>
     <table id="historyTable">
-        <thead>
-        <tr>
-            <th>Date</th>
-            <th>Nom client</th>
-            <th>Motif</th>
-            <th>Action</th>
-        </tr>
-        </thead>
-        <tbody id="historyBody">
-        <tr>
-            <td colspan="4">Aucune fiche enregistrée</td>
-        </tr>
-        </tbody>
+      <thead>
+        <tr><th>Date</th><th>Nom</th><th>Actions</th></tr>
+      </thead>
+      <tbody></tbody>
     </table>
+  </div>
 </div>
 
-<footer>Lambert M. 18/10/2025</footer>
+<!-- Voir réponse -->
+<div id="viewModal">
+  <div class="modal-content">
+    <span class="close" id="closeView">❌</span>
+    <h2>Réponses</h2>
+    <table id="viewTable">
+      <tbody></tbody>
+    </table>
+  </div>
+</div>
 
 <script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const date = document.getElementById('date');
-        date.value = new Date().toISOString().split('T')[0];
+const form = document.getElementById('miniForm');
+const questions = document.querySelectorAll('.question');
+const prevBtn = document.getElementById('prevBtn');
+const nextBtn = document.getElementById('nextBtn');
+let currentIndex = 0;
 
-        const motif = document.getElementById('motif');
-        const sections = ['fixe', 'maison', 'mobile', 'synthese'].map(id => document.getElementById(id));
-        const container = document.getElementById('containerSections');
+function showQuestion(index) {
+  questions.forEach((q, i) => q.style.display = i === index ? 'flex' : 'none');
 
-        function hideAll() {
-            sections.forEach(s => s.classList.remove('visible'));
-        }
+  // Focus automatique sur input texte/tel/number
+  const currentQuestion = questions[index];
+  const inputToFocus = currentQuestion.querySelector('input[type="text"], input[type="tel"], input[type="number"]');
+  if (inputToFocus) inputToFocus.focus();
 
-        function setOrder(order) {
-            order.forEach(id => {
-                const el = document.getElementById(id);
-                if (el) container.appendChild(el);
-            });
-        }
+  // Masquer/afficher boutons navigation selon l'index
+  prevBtn.style.display = index === 0 ? 'none' : 'inline-block';
+  nextBtn.style.display = index >= questions.length - 1 ? 'none' : 'inline-block';
+}
 
-        function updateVisibilityAndOrder() {
-            const m = motif.value;
+showQuestion(currentIndex);
 
-            hideAll();
-            document.getElementById('infos').classList.add('visible');
+prevBtn.addEventListener('click', () => {
+  if (currentIndex > 0) {
+    currentIndex--;
+    showQuestion(currentIndex);
+  }
+});
 
-            if (m !== '🤝 motif de visite') {
-                if (m === 'Box' || m === 'Autre') {
-                    setOrder(['fixe', 'maison', 'mobile']);
-                } else if (m === 'Abo' || m === 'RM') {
-                    setOrder(['mobile', 'fixe', 'maison']);
-                }
+nextBtn.addEventListener('click', () => {
+  if (currentIndex < questions.length - 1) {
+    currentIndex++;
+    showQuestion(currentIndex);
+  }
+});
 
-                sections.forEach(s => s.classList.add('visible'));
-            }
-        }
+// Boutons finaux
+document.getElementById('sendBtn').addEventListener('click', () => submitForm(true));
+document.getElementById('finishBtn').addEventListener('click', () => submitForm(false));
 
-        motif.addEventListener('change', updateVisibilityAndOrder);
-        updateVisibilityAndOrder();
+function submitForm(redirect) {
+  const data = {};
+  new FormData(form).forEach((value, key) => data[key] = value);
+  form.querySelectorAll('input[type=checkbox]').forEach(cb => {
+    data[cb.name] = cb.checked ? 'Oui' : 'Non';
+  });
+  data.date = new Date().toISOString();
+  let history = JSON.parse(localStorage.getItem('miniFormHistory') || '[]');
+  history.push(data);
+  localStorage.setItem('miniFormHistory', JSON.stringify(history));
+  if (redirect) window.location.href = 'https://hub03.github.io/devis.html';
+  else {
+    alert('Réponses sauvegardées !');
+    form.reset();
+    currentIndex = 0;
+    showQuestion(currentIndex);
+  }
+}
 
-        const allInputs = document.querySelectorAll('input,select,textarea');
-        const historyKey = 'ficheHistoriqueComplet_v2';
-        const historyDataKey = 'ficheHistoriqueData_v2';
+// Historique
+const historyBtn = document.getElementById('historyBtn');
+const historyModal = document.getElementById('historyModal');
+const closeHistory = document.getElementById('closeHistory');
+const historyTableBody = document.querySelector('#historyTable tbody');
+const viewModal = document.getElementById('viewModal');
+const closeView = document.getElementById('closeView');
+const viewTableBody = document.querySelector('#viewTable tbody');
 
-        function collectData() {
-            const d = {};
-            allInputs.forEach(el => {
-                if (!el.id) return;
-                
-                // Gestion spécifique des sélecteurs multiples
-                if (el.tagName === 'SELECT' && el.multiple) {
-                    d[el.id] = Array.from(el.selectedOptions).map(option => option.value);
-                }
-                // Gestion normale des autres champs
-                else {
-                    d[el.id] = (el.type === 'checkbox' || el.type === 'radio') ? el.checked : el.value;
-                }
-            });
-            d.dateSauvegarde = new Date().toLocaleString('fr-FR', {
-                day: '2-digit',
-                month: '2-digit',
-                year: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit'
-            });
-            return d;
-        }
+historyBtn.addEventListener('click', () => { renderHistory(); historyModal.style.display = 'flex'; });
+closeHistory.addEventListener('click', () => historyModal.style.display = 'none');
+closeView.addEventListener('click', () => viewModal.style.display = 'none');
 
-        function applyData(data) {
-            allInputs.forEach(el => {
-                if (data.hasOwnProperty(el.id)) {
-                    // Gestion spécifique des sélecteurs multiples
-                    if (el.tagName === 'SELECT' && el.multiple) {
-                        const selectedValues = Array.isArray(data[el.id]) ? data[el.id] : [];
-                        Array.from(el.options).forEach(option => {
-                            option.selected = selectedValues.includes(option.value);
-                        });
-                    }
-                    // Gestion normale des autres champs
-                    else if (el.type === 'checkbox' || el.type === 'radio') {
-                        el.checked = data[el.id];
-                    }
-                    else {
-                        el.value = data[el.id];
-                    }
-                }
-            });
-            updateVisibilityAndOrder();
-        }
+function renderHistory() {
+  const history = JSON.parse(localStorage.getItem('miniFormHistory') || '[]');
+  historyTableBody.innerHTML = '';
+  history.forEach((entry, index) => {
+    const tr = document.createElement('tr');
+    const date = new Date(entry.date).toLocaleString();
+    tr.innerHTML = `<td>${date}</td><td>${entry.client || ''}</td>
+                    <td>
+                      <span class="action-btn" onclick="viewEntry(${index})">👁️</span>
+                      <span class="action-btn delete" onclick="deleteEntry(${index})">❌</span>
+                    </td>`;
+    historyTableBody.appendChild(tr);
+  });
+}
 
-        function clearForm() {
-            allInputs.forEach(el => {
-                if (el.type === 'checkbox' || el.type === 'radio') {
-                    el.checked = false;
-                } else if (el.tagName === 'SELECT' && el.multiple) {
-                    Array.from(el.options).forEach(option => option.selected = false);
-                } else {
-                    el.value = '';
-                }
-            });
-            motif.value = motif.querySelector('option[hidden]').value;
-            updateVisibilityAndOrder();
-        }
-        
-        function saveToLocalStorage() {
-            const data = collectData();
-            const id = 'fiche_' + Date.now();
-            
-            let histIndex = JSON.parse(localStorage.getItem(historyKey) || '[]');
-            histIndex.unshift({id, date: data.dateSauvegarde, nom: data.nomClient || '(inconnu)', motif: data.motif || ''});
-            localStorage.setItem(historyKey, JSON.stringify(histIndex));
+function viewEntry(index) {
+  const history = JSON.parse(localStorage.getItem('miniFormHistory') || '[]');
+  const entry = history[index];
+  viewTableBody.innerHTML = '';
+  for (let key in entry) {
+    if (key !== 'date') {
+      let value = entry[key];
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td>${key}</td><td>${value}</td>`;
+      viewTableBody.appendChild(tr);
+    }
+  }
+  viewModal.style.display = 'flex';
+}
 
-            let histData = JSON.parse(localStorage.getItem(historyDataKey) || '{}');
-            histData[id] = data;
-            localStorage.setItem(historyDataKey, JSON.stringify(histData));
-
-            updateHistory();
-            alert('✅ Fiche sauvegardée');
-            clearForm();
-        }
-
-        function updateHistory() {
-            const hist = JSON.parse(localStorage.getItem(historyKey) || '[]');
-            const body = document.getElementById('historyBody');
-            body.innerHTML = '';
-            if (!hist.length) {
-                body.innerHTML = '<tr><td colspan="4">Aucune fiche enregistrée</td></tr>';
-                return;
-            }
-            hist.forEach(h => {
-                const tr = document.createElement('tr');
-                tr.innerHTML = `<td>${h.date}</td><td>${h.nom}</td><td>${h.motif}</td> <td><button data-id="${h.id}" class="loadHist">👁️ Voir</button></td>`;
-                body.appendChild(tr);
-            });
-            document.querySelectorAll('.loadHist').forEach(btn => {
-                btn.onclick = () => {
-                    const id = btn.dataset.id;
-                    const histData = JSON.parse(localStorage.getItem(historyDataKey) || '{}');
-                    const data = histData[id];
-                    
-                    if (!data) {
-                        alert('Fiche introuvable');
-                        return;
-                    }
-                    applyData(data);
-                    alert('Fiche rechargée.');
-                };
-            });
-        }
-
-        document.getElementById('saveBtn').onclick = saveToLocalStorage;
-
-        const histPanel = document.getElementById('historyPanel');
-        document.getElementById('showHistoryBtn').onclick = () => {
-            histPanel.style.display = histPanel.style.display === 'block' ? 'none' : 'block';
-            if (histPanel.style.display === 'block') updateHistory();
-        };
-
-        const burger = document.getElementById('menuBurger');
-        const menu = document.getElementById('menuOptions');
-        burger.onclick = () => {
-            menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
-        };
-
-        document.getElementById('exportBtn').onclick = () => {
-            const histData = localStorage.getItem(historyDataKey) || '{}';
-            const blob = new Blob([histData], {type: 'application/json'});
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            const today = new Date().toLocaleDateString('fr-FR').replace(/\//g, '-');
-            a.download = `Sauvegarde fiches 4P - ${today}.json`;
-            a.click();
-            URL.revokeObjectURL(url);
-            menu.style.display = 'none';
-        };
-
-        document.getElementById('importBtn').onclick = () => {
-            const input = document.createElement('input');
-            input.type = 'file';
-            input.accept = 'application/json';
-            input.onchange = e => {
-                const file = e.target.files[0];
-                const reader = new FileReader();
-                reader.onload = evt => {
-                    try {
-                        const importedData = JSON.parse(evt.target.result);
-                        
-                        let currentData = JSON.parse(localStorage.getItem(historyDataKey) || '{}');
-                        const mergedData = {...currentData, ...importedData};
-                        localStorage.setItem(historyDataKey, JSON.stringify(mergedData));
-
-                        const newHistIndex = Object.keys(mergedData).map(id => {
-                            const data = mergedData[id];
-                            return {
-                                id: id,
-                                date: data.dateSauvegarde,
-                                nom: data.nomClient || '(inconnu)',
-                                motif: data.motif || ''
-                            };
-                        }).sort((a, b) => b.id.localeCompare(a.id));
-                        
-                        localStorage.setItem(historyKey, JSON.stringify(newHistIndex));
-                        
-                        updateHistory();
-                        alert('Import réussi ! Les fiches ont été fusionnées.');
-                    } catch {
-                        alert('Erreur lors de l’import. Assurez-vous que le fichier est au bon format.');
-                    }
-                };
-                reader.readAsText(file);
-            };
-            input.click();
-            menu.style.display = 'none';
-        };
-
-        updateHistory();
-    });
+function deleteEntry(index) {
+  if (!confirm('Supprimer cet enregistrement ?')) return;
+  let history = JSON.parse(localStorage.getItem('miniFormHistory') || '[]');
+  history.splice(index, 1);
+  localStorage.setItem('miniFormHistory', JSON.stringify(history));
+  renderHistory();
+}
 </script>
+
 </body>
 </html>

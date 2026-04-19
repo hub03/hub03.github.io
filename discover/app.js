@@ -1,45 +1,36 @@
-document.addEventListener("DOMContentLoaded", () => {
+let currentStep = 0;
+const steps = document.querySelectorAll(".step");
 
-  const form = document.getElementById("discoverForm");
+function showStep(index) {
+  steps.forEach(step => step.classList.remove("active"));
+  steps[index].classList.add("active");
+}
 
-  if (form) {
-    form.addEventListener("submit", (e) => {
-      e.preventDefault();
+function nextStep() {
+  currentStep++;
+  showStep(currentStep);
+}
 
-      const data = {
-        nbPersonnes: nbPersonnes.value,
-        logement: logement.value,
-        superficie: superficie.value,
-        teletravail: teletravail.value,
-        devices: devices.value,
-        tv: tv.value,
-        aboTv: aboTv.value,
-        alarme: alarme.value,
-        fai: fai.value,
-        prixBox: prixBox.value,
-        engagementBox: engagementBox.value,
-        tech: tech.value,
-        operateur: operateur.value,
-        prixMobile: prixMobile.value,
-        engagementMobile: engagementMobile.value,
-        data: data.value,
-        lignes: lignes.value
-      };
+function prevStep() {
+  currentStep--;
+  showStep(currentStep);
+}
 
-      let fiches = JSON.parse(localStorage.getItem("discover")) || [];
-      fiches.push(data);
+function save() {
+  const data = {
+    nbPersonnes: nbPersonnes.value,
+    logement: logement.value,
+    superficie: superficie.value,
+    fai: fai.value,
+    prixBox: prixBox.value,
+    operateur: operateur.value,
+    prixMobile: prixMobile.value
+  };
 
-      localStorage.setItem("discover", JSON.stringify(fiches));
+  let fiches = JSON.parse(localStorage.getItem("discover")) || [];
+  fiches.push(data);
+  localStorage.setItem("discover", JSON.stringify(fiches));
 
-      alert("Fiche enregistrée !");
-      window.location.href = "index.html";
-    });
-  }
-
-});
-
-if ("serviceWorker" in navigator) {
-  navigator.serviceWorker.register("/discover/service-worker.js")
-    .then(() => console.log("PWA prête 🚀"))
-    .catch(err => console.log(err));
+  alert("Fiche enregistrée !");
+  window.location.href = "index.html";
 }

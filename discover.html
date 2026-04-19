@@ -55,13 +55,7 @@ button { cursor: pointer; }
   border: none;
 }
 
-#nextBtn {
-  background-color: #4CAF50;
-  color: #fff;
-  border: none;
-}
-
-#finishBtn {
+#nextBtn, #finishBtn {
   background-color: #4CAF50;
   color: #fff;
   border: none;
@@ -77,16 +71,18 @@ button { cursor: pointer; }
   margin-right: 0.5rem;
 }
 
+/* Vert pour les Oui par défaut ou autres radios */
 input[type="radio"]:checked + label {
   background-color: #4CAF50;
   color: white;
   border-color: #4CAF50;
 }
 
-.btn-no:checked + label {
-  background-color: red;
+/* Rouge pour les Non spécifiquement */
+input[type="radio"].btn-no:checked + label {
+  background-color: #f44336;
   color: white;
-  border-color: red;
+  border-color: #f44336;
 }
 
 i {
@@ -113,6 +109,7 @@ i {
   background:rgba(0,0,0,0.5);
   justify-content:center;
   align-items:center;
+  z-index: 10;
 }
 
 .modal-content {
@@ -133,6 +130,12 @@ table {
 th, td {
   border:1px solid #ddd;
   padding:0.5rem;
+  text-align: left;
+}
+
+.actions-cell {
+    display: flex;
+    gap: 5px;
 }
 </style>
 </head>
@@ -150,20 +153,20 @@ th, td {
 <div class="question">
 🧑‍🔧 Vous utilisez une de vos lignes à titre professionnel ?
 <br>
-<input type="radio" id="pro_yes" name="Pro" hidden>
+<input type="radio" id="pro_yes" name="Pro" value="Oui" hidden>
 <label for="pro_yes" class="btn-checkbox">Oui ✅</label>
 
-<input type="radio" id="pro_no" name="Pro" class="btn-no" hidden>
+<input type="radio" id="pro_no" name="Pro" value="Non" class="btn-no" hidden>
 <label for="pro_no" class="btn-checkbox">Non ❌</label>
 </div>
 
 <div class="question">
 🧑‍💻 Vous faites du télétravail ?
 <br>
-<input type="radio" id="tt_yes" name="Teletravail" hidden>
+<input type="radio" id="tt_yes" name="Teletravail" value="Oui" hidden>
 <label for="tt_yes" class="btn-checkbox">Oui ✅</label>
 
-<input type="radio" id="tt_no" name="Teletravail" class="btn-no" hidden>
+<input type="radio" id="tt_no" name="Teletravail" value="Non" class="btn-no" hidden>
 <label for="tt_no" class="btn-checkbox">Non ❌</label>
 </div>
 
@@ -176,10 +179,10 @@ th, td {
 <div class="question">
 🏚️ Vous êtes en maison ou appartement ?
 <br>
-<input type="radio" id="maison" name="Logement" hidden>
+<input type="radio" id="maison" name="Logement" value="Maison" hidden>
 <label for="maison" class="btn-checkbox">Maison 🏠</label>
 
-<input type="radio" id="appartement" name="Logement" hidden>
+<input type="radio" id="appartement" name="Logement" value="Appartement" hidden>
 <label for="appartement" class="btn-checkbox">Appartement 🏢</label>
 </div>
 
@@ -191,10 +194,10 @@ th, td {
 <div class="question">
 🚨 Vous avez une alarme pour protéger votre logement ?
 <br>
-<input type="radio" id="al_yes" name="Alarme" hidden>
+<input type="radio" id="al_yes" name="Alarme" value="Oui" hidden>
 <label for="al_yes" class="btn-checkbox">Oui ✅</label>
 
-<input type="radio" id="al_no" name="Alarme" class="btn-no" hidden>
+<input type="radio" id="al_no" name="Alarme" value="Non" class="btn-no" hidden>
 <label for="al_no" class="btn-checkbox">Non ❌</label>
 
 <br>Si oui chez quel fournisseur ?
@@ -270,21 +273,27 @@ th, td {
 <br><input type="tel" name="Numero">
 </div>
 
-<div class="question">
-<button type="button" id="finishBtn" style="display:none;">Terminer</button>
-</div>
-
 <div id="navigation">
 <button type="button" id="prevBtn">←</button>
 <button type="button" id="nextBtn">Suivant</button>
+<button type="button" id="finishBtn" style="display:none;">Terminer</button>
 </div>
 </form>
 
 <div id="historyModal">
   <div class="modal-content">
-    <span id="closeHistory">❌</span>
+    <span id="closeHistory" style="cursor:pointer; float:right;">❌</span>
     <h2>Historique</h2>
-    <table id="historyTable"><tbody></tbody></table>
+    <table id="historyTable">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Client</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
   </div>
 </div>
 
@@ -301,9 +310,11 @@ function showQuestion(i){
  prevBtn.style.display=i===0?'none':'inline-block';
 
  const current=questions[i];
- const input=current.querySelector('input:not([data-no-focus]), select');
+ // Focus uniquement sur les input (pas de select) et respect du data-no-focus
+ const input=current.querySelector('input:not([data-no-focus])');
  if(input) input.focus();
 
+ // Si c'est la dernière question (Nom du client)
  if(i===questions.length-1){
   nextBtn.style.display='none';
   finishBtn.style.display='inline-block';
@@ -325,17 +336,41 @@ finishBtn.onclick=()=>{
  localStorage.setItem('miniFormHistory',JSON.stringify(h));
  alert('Sauvegardé');
  form.reset();
+ document.getElementById('homeScreen').style.display='flex';
+ form.style.display='none';
  currentIndex=0;
- showQuestion(0);
 };
+
+function deleteEntry(index) {
+    let h=JSON.parse(localStorage.getItem('miniFormHistory')||'[]');
+    h.splice(index, 1);
+    localStorage.setItem('miniFormHistory',JSON.stringify(h));
+    renderHistory();
+}
+
+function viewEntry(index) {
+    const h=JSON.parse(localStorage.getItem('miniFormHistory')||'[]');
+    const item = h[index];
+    let details = "";
+    for (let key in item) {
+        if(key !== 'date') details += `${key} : ${item[key]}\n`;
+    }
+    alert(details);
+}
 
 function renderHistory(){
  const h=JSON.parse(localStorage.getItem('miniFormHistory')||'[]');
  const tbody=document.querySelector('#historyTable tbody');
  tbody.innerHTML='';
- h.forEach(e=>{
+ h.forEach((e, index)=>{
   const tr=document.createElement('tr');
-  tr.innerHTML=`<td>${new Date(e.date).toLocaleString()}</td><td>${e.client||''}</td>`;
+  tr.innerHTML=`
+    <td>${new Date(e.date).toLocaleString()}</td>
+    <td>${e.client||''}</td>
+    <td class="actions-cell">
+        <button onclick="viewEntry(${index})">👁️</button>
+        <button onclick="deleteEntry(${index})" style="background:#ff4d4d; color:white; border:none;">❌</button>
+    </td>`;
   tbody.appendChild(tr);
  });
 }
@@ -346,6 +381,7 @@ document.getElementById('closeHistory').onclick=()=>{document.getElementById('hi
 document.getElementById('newBtn').onclick=()=>{
  document.getElementById('homeScreen').style.display='none';
  form.style.display='flex';
+ currentIndex=0;
  showQuestion(0);
 };
 

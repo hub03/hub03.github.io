@@ -17,8 +17,9 @@ button { cursor: pointer; }
 #nextBtn { background-color: #4CAF50; color: #fff; border: none; }
 
 .btn-checkbox { display: inline-block; padding: 0.6rem 1.2rem; border: 1px solid #ccc; border-radius: 0.6rem; cursor: pointer; background-color: #f0f0f0; }
-input[type="checkbox"]:checked + .btn-checkbox,
 input[type="radio"]:checked + .btn-checkbox { background-color: #4CAF50; color: white; border-color: #4CAF50; }
+
+.btn-no:checked + label { background-color: black; color: white; border-color: black; }
 
 #homeScreen { display:flex; flex-direction:column; gap:1rem; justify-content:center; align-items:center; height:100vh; }
 #historyModal, #viewModal { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; }
@@ -36,41 +37,86 @@ th, td { border: 1px solid #ddd; padding: 0.5rem; }
 </div>
 
 <form id="miniForm" style="display:none;">
+<h1>Discover</h1>
 
 <div class="question">
 🧑‍🔧 Vous utilisez une ligne à titre professionnel ?
-<br><input type="checkbox" id="pro" name="Pro" hidden>
-<label for="pro" class="btn-checkbox">Oui ✅</label>
+<br><input type="radio" name="Pro" id="pro_yes" hidden>
+<label for="pro_yes" class="btn-checkbox">Oui ✅</label>
+<input type="radio" name="Pro" id="pro_no" class="btn-no" hidden>
+<label for="pro_no" class="btn-checkbox">Non ❌</label>
 </div>
 
 <div class="question">
 🧑‍💻 Vous faites du télétravail ?
-<br><input type="checkbox" id="teletravail" name="Télétravail" hidden>
-<label for="teletravail" class="btn-checkbox">Oui ✅</label>
+<br><input type="radio" name="Teletravail" id="tt_yes" hidden>
+<label for="tt_yes" class="btn-checkbox">Oui ✅</label>
+<input type="radio" name="Teletravail" id="tt_no" class="btn-no" hidden>
+<label for="tt_no" class="btn-checkbox">Non ❌</label>
 </div>
 
 <div class="question">
-🧑‍🤝‍🧑 Combien de personnes ?
+🧑‍🤝‍🧑 Vous êtes combien de personnes ?
 <br><input type="tel" name="Adultes" placeholder="Adultes">
 <br><input type="tel" name="Enfants" placeholder="Enfants">
 </div>
 
 <div class="question">
 🧱 Maison ou appartement ?
-<br><input type="radio" id="maison" name="Logement" hidden>
+<br><input type="radio" name="Logement" id="maison" hidden>
 <label for="maison" class="btn-checkbox">Maison 🏠</label>
-<br><input type="radio" id="appartement" name="Logement" hidden>
+<input type="radio" name="Logement" id="appartement" hidden>
 <label for="appartement" class="btn-checkbox">Appartement 🏢</label>
 </div>
 
 <div class="question">
-🍿 Vous aimez regarder quoi à la TV ?
-<br><input type="text" name="Interets TV">
+🚨 Vous avez une alarme ?
+<br><input type="radio" name="Alarme" id="al_yes" hidden>
+<label for="al_yes" class="btn-checkbox">Oui ✅</label>
+<input type="radio" name="Alarme" id="al_no" class="btn-no" hidden>
+<label for="al_no" class="btn-checkbox">Non ❌</label>
+<br>Fournisseur :
+<input type="text" name="Fournisseur alarme" data-no-focus="true">
+<br>Prix :
+<input type="tel" name="Prix alarme">€/m
 </div>
 
 <div class="question">
-🧟‍♀️ Nom du client ?
-<br><input type="text" name="client">
+🛜 Opérateur internet
+<select name="FAI box">
+<option value="">Choisir</option>
+<option>Orange</option>
+<option>SFR</option>
+<option>Bouygues</option>
+<option>Free</option>
+</select>
+</div>
+
+<div class="question">
+👛 Prix box
+<input type="tel" name="Prix box">€/mois
+</div>
+
+<div class="question">
+🍿 Vous aimez regarder quoi à la TV ?
+<input type="text" name="Interets TV">
+</div>
+
+<div class="question">
+📳 Nombre de portables
+<input type="tel" name="Nb lignes">
+</div>
+
+<div class="question">
+🌐 Consommation Go
+<input type="tel" name="Go conso">
+</div>
+
+<div class="question">
+🧟‍♀️ Nom du client
+<input type="text" name="client">
+<br>📱 Numéro
+<input type="tel" name="Numero">
 </div>
 
 <div class="question">
@@ -94,75 +140,69 @@ const nextBtn = document.getElementById('nextBtn');
 const finishBtn = document.getElementById('finishBtn');
 let currentIndex = 0;
 
-// AUTO SAVE
-function saveProgress() {
-  const data = {};
-  new FormData(form).forEach((v,k)=>data[k]=v);
-  form.querySelectorAll('input[type=checkbox],input[type=radio]').forEach(el=>{
-    data[el.name] = el.checked;
-  });
-  localStorage.setItem('formProgress', JSON.stringify(data));
+function saveProgress(){
+ const data={};
+ new FormData(form).forEach((v,k)=>data[k]=v);
+ localStorage.setItem('formProgress',JSON.stringify(data));
 }
 
-function loadProgress() {
-  const saved = JSON.parse(localStorage.getItem('formProgress') || '{}');
-  Object.keys(saved).forEach(key => {
-    const el = form.elements[key];
-    if (!el) return;
-    if (el.type === 'checkbox' || el.type === 'radio') {
-      el.checked = saved[key];
-    } else {
-      el.value = saved[key];
-    }
-  });
+function loadProgress(){
+ const saved=JSON.parse(localStorage.getItem('formProgress')||'{}');
+ Object.keys(saved).forEach(k=>{
+  if(form.elements[k]) form.elements[k].value=saved[k];
+ });
 }
 
-form.addEventListener('input', saveProgress);
+form.addEventListener('input',saveProgress);
 
-function showQuestion(index) {
-  questions.forEach((q,i)=>q.style.display = i===index?'flex':'none');
-  prevBtn.style.display = index===0?'none':'inline-block';
+function showQuestion(index){
+ questions.forEach((q,i)=>q.style.display=i===index?'flex':'none');
+ prevBtn.style.display=index===0?'none':'inline-block';
 
-  if(index===questions.length-2){
-    nextBtn.style.display='none';
-    finishBtn.style.display='inline-block';
-  } else {
-    nextBtn.style.display='inline-block';
-    finishBtn.style.display='none';
-  }
+ const current=questions[index];
+ const input=current.querySelector('input:not([data-no-focus]), select');
+ if(input) input.focus();
+
+ if(index===questions.length-2){
+  nextBtn.style.display='none';
+  finishBtn.style.display='inline-block';
+ } else {
+  nextBtn.style.display='inline-block';
+  finishBtn.style.display='none';
+ }
 }
 
 prevBtn.onclick=()=>{ if(currentIndex>0){currentIndex--;showQuestion(currentIndex);} };
 nextBtn.onclick=()=>{ if(currentIndex<questions.length-1){currentIndex++;showQuestion(currentIndex);} };
+
 finishBtn.onclick=()=>{
-  let history = JSON.parse(localStorage.getItem('miniFormHistory')||'[]');
-  const data={};
-  new FormData(form).forEach((v,k)=>data[k]=v);
-  data.date=new Date().toISOString();
-  history.push(data);
-  localStorage.setItem('miniFormHistory',JSON.stringify(history));
-  localStorage.removeItem('formProgress');
-  alert('Sauvegardé');
-  form.reset();
-  currentIndex=0;
-  showQuestion(0);
+ let history=JSON.parse(localStorage.getItem('miniFormHistory')||'[]');
+ const data={};
+ new FormData(form).forEach((v,k)=>data[k]=v);
+ data.date=new Date().toISOString();
+ history.push(data);
+ localStorage.setItem('miniFormHistory',JSON.stringify(history));
+ localStorage.removeItem('formProgress');
+ alert('Sauvegardé');
+ form.reset();
+ currentIndex=0;
+ showQuestion(0);
 };
 
-// HOME
-const homeScreen = document.getElementById('homeScreen');
+const homeScreen=document.getElementById('homeScreen');
 document.getElementById('newBtn').onclick=()=>{
-  homeScreen.style.display='none';
-  form.style.display='flex';
-  loadProgress();
-  showQuestion(0);
+ homeScreen.style.display='none';
+ form.style.display='flex';
+ loadProgress();
+ showQuestion(0);
 };
 
 document.getElementById('openHistoryBtn').onclick=()=>{
-  document.getElementById('historyModal').style.display='flex';
+ document.getElementById('historyModal').style.display='flex';
 };
 
 document.getElementById('closeHistory').onclick=()=>{
-  document.getElementById('historyModal').style.display='none';
+ document.getElementById('historyModal').style.display='none';
 };
 
 showQuestion(0);

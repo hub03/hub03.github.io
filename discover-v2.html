@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Profil Client</title>
+<style>
+    body {
+        font-family: Arial;
+        text-align: center;
+        background: #f5f5f5;
+    }
+
+    .container {
+        position: relative;
+        margin-top: 50px;
+    }
+
+    .client {
+        font-size: 80px;
+    }
+
+    .circle {
+        position: absolute;
+        width: 100px;
+        height: 100px;
+        background: #3498db;
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+    }
+
+    .foyer { top: -120px; left: 50%; transform: translateX(-50%); }
+    .box { left: -120px; top: 50%; transform: translateY(-50%); }
+    .mobile { right: -120px; top: 50%; transform: translateY(-50%); }
+
+    .panel {
+        display: none;
+        margin-top: 30px;
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        width: 300px;
+        margin-left: auto;
+        margin-right: auto;
+        box-shadow: 0 0 10px rgba(0,0,0,0.2);
+    }
+
+    input {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+</style>
+</head>
+
+<body>
+
+<div class="container">
+    <div class="client">👤?</div>
+
+    <div class="circle foyer" onclick="openPanel('foyer')">🏠</div>
+    <div class="circle box" onclick="openPanel('box')">📦</div>
+    <div class="circle mobile" onclick="openPanel('mobile')">📱</div>
+</div>
+
+<!-- FOYER -->
+<div id="foyer" class="panel">
+    <h3>Foyer</h3>
+    <input placeholder="Nb de personnes">
+    <input placeholder="Type de logement">
+    <input placeholder="Superficie">
+    <input placeholder="Equipements connectés">
+    <input placeholder="Intérêts TV">
+    <input placeholder="Abonnements TV">
+</div>
+
+<!-- BOX -->
+<div id="box" class="panel">
+    <h3>Box</h3>
+    <input placeholder="Fournisseur">
+    <input placeholder="Prix">
+    <input placeholder="Technologie">
+    <input placeholder="Ligne fixe">
+    <input placeholder="Engagement">
+</div>
+
+<!-- MOBILE -->
+<div id="mobile" class="panel">
+    <h3>Mobile</h3>
+    <input placeholder="Opérateur">
+    <input placeholder="Prix">
+    <input placeholder="Gigas">
+    <input placeholder="Engagement">
+</div>
+
+<script>
+function openPanel(id) {
+    document.querySelectorAll('.panel').forEach(p => p.style.display = 'none');
+    document.getElementById(id).style.display = 'block';
+}
+</script>
+
+</body>
+</html>

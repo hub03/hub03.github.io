@@ -3,122 +3,190 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Discover</title>
+<title>Discover - Dashboard</title>
 <style>
+/* Reset et Bases */
 body {
-  font-family: Arial, sans-serif;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   margin: 0;
-  padding: 1rem;
-  background: #f5f5f5;
+  padding: 0;
+  background: #f0f2f5;
+  color: #333;
 }
 
-h1 {
-  text-align: center;
-  font-size: 1.5rem;
-}
-
-form {
+/* Accueil Style Moderne */
+#homeScreen {
   display: flex;
   flex-direction: column;
-  gap: 0.8rem;
-  background: #fff;
+  gap: 2.5rem;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+}
+
+.welcome-header {
+  text-align: center;
+}
+
+.welcome-header h1 {
+  font-size: 3.5rem;
+  margin: 0;
+  color: #2d3436;
+  text-transform: uppercase;
+  letter-spacing: 4px;
+  font-weight: 800;
+}
+
+.welcome-header p {
+  color: #636e72;
+  margin-top: 0.5rem;
+  font-size: 1.1rem;
+}
+
+.card-container {
+  display: flex;
+  gap: 2rem;
+  width: 100%;
+  max-width: 700px;
   padding: 1rem;
-  border-radius: 1rem;
+}
+
+.card {
+  flex: 1;
+  background: white;
+  padding: 2.5rem;
+  border-radius: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  box-shadow: 0 15px 35px rgba(0,0,0,0.05);
+  border: 1px solid rgba(255,255,255,0.8);
+}
+
+.card:hover {
+  transform: translateY(-12px);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.12);
+}
+
+.card-icon {
+  font-size: 3.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.card-content h3 {
+  margin: 0.5rem 0;
+  color: #2d3436;
+  font-size: 1.4rem;
+}
+
+.card-content p {
+  font-size: 0.95rem;
+  color: #b2bec3;
+  line-height: 1.4;
+}
+
+.card.primary { border-bottom: 6px solid #4CAF50; }
+.card.secondary { border-bottom: 6px solid #0984e3; }
+
+/* Formulaire et Questions */
+form {
+  display: none;
+  flex-direction: column;
+  gap: 1rem;
+  background: #fff;
+  padding: 2rem;
+  max-width: 500px;
+  margin: 2rem auto;
+  border-radius: 1.5rem;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
 }
 
 .question {
   display: none;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.8rem;
+  font-weight: bold;
+  font-size: 1.1rem;
 }
 
 input, select, button {
-  padding: 0.5rem;
+  padding: 0.7rem;
   font-size: 1rem;
-  border-radius: 0.5rem;
-  border: 1px solid #ccc;
+  border-radius: 0.6rem;
+  border: 1px solid #ddd;
+  outline: none;
 }
 
-button { cursor: pointer; }
+input:focus { border-color: #0984e3; }
 
 #navigation {
   display: flex;
   justify-content: flex-end;
-  margin-top: 1rem;
-  gap: 0.5rem;
+  margin-top: 1.5rem;
+  gap: 0.8rem;
 }
 
-#prevBtn {
-  margin-right: auto;
-  background-color: #bbb;
-  color: #fff;
-  border: none;
-}
+#prevBtn { background: #dfe6e9; color: #636e72; border: none; }
+#nextBtn, #finishBtn { background: #4CAF50; color: #fff; border: none; }
 
-#nextBtn, #finishBtn {
-  background-color: #4CAF50;
-  color: #fff;
-  border: none;
-}
-
+/* Radio Buttons Stylés */
 .btn-checkbox {
   display: inline-block;
-  padding: 0.6rem 1.2rem;
-  border: 1px solid #ccc;
-  border-radius: 0.6rem;
+  padding: 0.8rem 1.5rem;
+  border: 2px solid #eee;
+  border-radius: 0.8rem;
   cursor: pointer;
-  background-color: #f0f0f0;
+  background-color: #f9f9f9;
   margin-right: 0.5rem;
+  font-weight: normal;
+  transition: 0.2s;
 }
 
-/* Vert pour les Oui par défaut ou autres radios */
 input[type="radio"]:checked + label {
   background-color: #4CAF50;
   color: white;
   border-color: #4CAF50;
 }
 
-/* Rouge pour les Non spécifiquement */
 input[type="radio"].btn-no:checked + label {
-  background-color: #f44336;
+  background-color: #ff7675;
   color: white;
-  border-color: #f44336;
+  border-color: #ff7675;
 }
 
-i {
-  font-size: 0.85rem;
-  color: #555;
-}
-
-#homeScreen {
-  display:flex;
-  flex-direction:column;
-  gap:1rem;
-  justify-content:center;
-  align-items:center;
-  height:100vh;
-}
-
+/* Modale Historique */
 #historyModal {
   display:none;
   position:fixed;
-  top:0;
-  left:0;
-  width:100%;
-  height:100%;
-  background:rgba(0,0,0,0.5);
+  top:0; left:0; width:100%; height:100%;
+  background:rgba(0,0,0,0.6);
+  backdrop-filter: blur(5px);
   justify-content:center;
   align-items:center;
-  z-index: 10;
+  z-index: 100;
 }
 
 .modal-content {
   background:#fff;
-  padding:1rem;
-  border-radius:1rem;
-  width:90%;
-  max-height:90%;
+  padding:2rem;
+  border-radius:1.5rem;
+  width:95%;
+  max-width: 800px;
+  max-height:85vh;
   overflow-y:auto;
+  position: relative;
+}
+
+#closeHistory {
+  position: absolute;
+  top: 1rem;
+  right: 1.5rem;
+  font-size: 1.5rem;
+  cursor: pointer;
 }
 
 table {
@@ -128,264 +196,258 @@ table {
 }
 
 th, td {
-  border:1px solid #ddd;
-  padding:0.5rem;
+  border-bottom: 1px solid #eee;
+  padding: 1rem;
   text-align: left;
 }
 
-.actions-cell {
-    display: flex;
-    gap: 5px;
+th { background: #f8f9fa; }
+
+.actions-cell { display: flex; gap: 0.5rem; }
+.actions-cell button { padding: 0.4rem 0.7rem; border: none; }
+
+@media (max-width: 480px) {
+  .card-container { flex-direction: column; }
+  .welcome-header h1 { font-size: 2.5rem; }
 }
 </style>
 </head>
 <body>
 
 <div id="homeScreen">
-  <h1>Discover</h1>
-  <button id="newBtn">Nouvelle fiche</button>
-  <button id="openHistoryBtn">Historique</button>
+  <div class="welcome-header">
+    <h1>Discover</h1>
+    <p>Gestionnaire de fiches client intelligent</p>
+  </div>
+  
+  <div class="card-container">
+    <div class="card primary" id="newBtn">
+      <div class="card-icon">📝</div>
+      <div class="card-content">
+        <h3>Nouvelle fiche</h3>
+        <p>Commencer une analyse client</p>
+      </div>
+    </div>
+
+    <div class="card secondary" id="openHistoryBtn">
+      <div class="card-icon">📂</div>
+      <div class="card-content">
+        <h3>Historique</h3>
+        <p>Voir et gérer les fiches</p>
+      </div>
+    </div>
+  </div>
 </div>
 
-<form id="miniForm" style="display:none;">
-<h1>Discover</h1>
+<form id="miniForm">
+  <h2 style="text-align:center; color:#2d3436;">Questionnaire</h2>
 
-<div class="question">
-🧑‍🔧 Vous utilisez une de vos lignes à titre professionnel ?
-<br>
-<input type="radio" id="pro_yes" name="Pro" value="Oui" hidden>
-<label for="pro_yes" class="btn-checkbox">Oui ✅</label>
+  <div class="question">
+    🧑‍🔧 Vous utilisez une de vos lignes à titre professionnel ?
+    <div>
+      <input type="radio" id="pro_yes" name="Pro" value="Oui" hidden>
+      <label for="pro_yes" class="btn-checkbox">Oui ✅</label>
+      <input type="radio" id="pro_no" name="Pro" value="Non" class="btn-no" hidden>
+      <label for="pro_no" class="btn-checkbox">Non ❌</label>
+    </div>
+  </div>
 
-<input type="radio" id="pro_no" name="Pro" value="Non" class="btn-no" hidden>
-<label for="pro_no" class="btn-checkbox">Non ❌</label>
-</div>
+  <div class="question">
+    🧑‍💻 Vous faites du télétravail ?
+    <div>
+      <input type="radio" id="tt_yes" name="Teletravail" value="Oui" hidden>
+      <label for="tt_yes" class="btn-checkbox">Oui ✅</label>
+      <input type="radio" id="tt_no" name="Teletravail" value="Non" class="btn-no" hidden>
+      <label for="tt_no" class="btn-checkbox">Non ❌</label>
+    </div>
+  </div>
 
-<div class="question">
-🧑‍💻 Vous faites du télétravail ?
-<br>
-<input type="radio" id="tt_yes" name="Teletravail" value="Oui" hidden>
-<label for="tt_yes" class="btn-checkbox">Oui ✅</label>
+  <div class="question">
+    🧑‍🤝‍🧑 Combien de personnes dans votre foyer ?
+    <input type="tel" name="Adultes" placeholder="Nombre d'adultes">
+    <input type="tel" name="Enfants" placeholder="Nombre d'enfants">
+  </div>
 
-<input type="radio" id="tt_no" name="Teletravail" value="Non" class="btn-no" hidden>
-<label for="tt_no" class="btn-checkbox">Non ❌</label>
-</div>
+  <div class="question">
+    🏚️ Vous êtes en maison ou appartement ?
+    <div>
+      <input type="radio" id="maison" name="Logement" value="Maison" hidden>
+      <label for="maison" class="btn-checkbox">Maison 🏠</label>
+      <input type="radio" id="appartement" name="Logement" value="Appartement" hidden>
+      <label for="appartement" class="btn-checkbox">Appartement 🏢</label>
+    </div>
+  </div>
 
-<div class="question">
-🧑‍🤝‍🧑 Vous êtes combien de personnes dans votre foyer ?
-<br><input type="tel" name="Adultes" placeholder="Adultes">
-<br><input type="tel" name="Enfants" placeholder="Enfants">
-</div>
+  <div class="question">
+    🧱 Quelle est votre superficie ?
+    <input type="tel" name="Superficie" placeholder="m²">
+  </div>
 
-<div class="question">
-🏚️ Vous êtes en maison ou appartement ?
-<br>
-<input type="radio" id="maison" name="Logement" value="Maison" hidden>
-<label for="maison" class="btn-checkbox">Maison 🏠</label>
+  <div class="question">
+    🚨 Avez-vous une alarme ?
+    <div>
+      <input type="radio" id="al_yes" name="Alarme" value="Oui" hidden>
+      <label for="al_yes" class="btn-checkbox">Oui ✅</label>
+      <input type="radio" id="al_no" name="Alarme" value="Non" class="btn-no" hidden>
+      <label for="al_no" class="btn-checkbox">Non ❌</label>
+    </div>
+    <br>Si oui, fournisseur :
+    <input type="text" name="Fournisseur alarme" data-no-focus="true" placeholder="Ex: Verisure">
+    Prix :
+    <input type="tel" name="Prix alarme" placeholder="0"> €/m
+  </div>
 
-<input type="radio" id="appartement" name="Logement" value="Appartement" hidden>
-<label for="appartement" class="btn-checkbox">Appartement 🏢</label>
-</div>
+  <div class="question">
+    🛜 Opérateur Internet actuel ?
+    <select name="FAI box">
+      <option value="" selected disabled hidden>Choisir...</option>
+      <option>Orange</option><option>SFR</option><option>Bouygues</option><option>Free</option><option>Autre</option>
+    </select>
+  </div>
 
-<div class="question">
-🧱 Vous avez quelle superficie ?
-<br><input type="tel" name="Superficie">
-</div>
+  <div class="question">
+    📳 Nombre de mobiles dans le foyer ?
+    <input type="tel" name="Nb lignes" placeholder="0">
+  </div>
 
-<div class="question">
-🚨 Vous avez une alarme pour protéger votre logement ?
-<br>
-<input type="radio" id="al_yes" name="Alarme" value="Oui" hidden>
-<label for="al_yes" class="btn-checkbox">Oui ✅</label>
+  <div class="question">
+    🧟‍♀️ Infos Client
+    <input type="text" name="client" placeholder="Nom complet">
+    <input type="tel" name="Numero" placeholder="Numéro de téléphone">
+  </div>
 
-<input type="radio" id="al_no" name="Alarme" value="Non" class="btn-no" hidden>
-<label for="al_no" class="btn-checkbox">Non ❌</label>
-
-<br>Si oui chez quel fournisseur ?
-<input type="text" name="Fournisseur alarme" data-no-focus="true">
-<br>Et à quel prix ?
-<input type="tel" name="Prix alarme">€/m
-</div>
-
-<div class="question">
-🛜 Vous êtes chez quel opérateur pour internet ?
-<br>
-<select name="FAI box">
-<option value="" selected disabled hidden>F.A.I.</option>
-<option>Orange</option>
-<option>SFR</option>
-<option>Bouygues</option>
-<option>Free</option>
-<option>autre</option>
-<option>aucun</option>
-</select>
-</div>
-
-<div class="question">
-👛 Vous payez combien pour internet ?
-<br><input type="tel" name="Prix box">€/mois
-</div>
-
-<div class="question">
-🛰️ Il y a combien d'équipements dans votre foyer ?
-<br><input type="tel" name="Equipements">
-<br><i>smartphone, tablette, PC, TV connectée, console, alarme</i>
-</div>
-
-<div class="question">
-🍿 Vous aimez regarder quoi à la TV ?
-<br><input type="text" name="Interets TV">
-<br><i>cinéma, sport, séries, jeunesse, infos, découverte, musique</i>
-</div>
-
-<div class="question">
-🎞️ Vous avez des abonnements à des services TV ?
-<br><input type="text" name="Abonnements TV">
-<br><i>Netflix, Canal+, Prime video, Disney+, HBO, Apple TV+</i>
-</div>
-
-<div class="question">
-📳 Vous avez combien de portable dans le foyer ?
-<br><input type="tel" name="Nb lignes">
-</div>
-
-<div class="question">
-📶 Vous êtes chez quel opérateur pour le mobile ?
-<br>
-<select name="Operateur mobile">
-<option>Orange</option>
-<option>SFR</option>
-<option>Bouygues</option>
-<option>Free</option>
-<option>autre</option>
-<option>aucun</option>
-</select>
-</div>
-
-<div class="question">
-🌐 Vous consommez combien de gigas ?
-<br><input type="tel" name="Go conso">
-</div>
-
-<div class="question">
-🧟‍♀️ Nom du client ?
-<br><input type="text" name="client">
-<br>📱 Numéro du client ?
-<br><input type="tel" name="Numero">
-</div>
-
-<div id="navigation">
-<button type="button" id="prevBtn">←</button>
-<button type="button" id="nextBtn">Suivant</button>
-<button type="button" id="finishBtn" style="display:none;">Terminer</button>
-</div>
+  <div id="navigation">
+    <button type="button" id="prevBtn">← Retour</button>
+    <button type="button" id="nextBtn">Suivant</button>
+    <button type="button" id="finishBtn" style="display:none;">Terminer & Sauvegarder</button>
+  </div>
 </form>
 
 <div id="historyModal">
   <div class="modal-content">
-    <span id="closeHistory" style="cursor:pointer; float:right;">❌</span>
-    <h2>Historique</h2>
+    <span id="closeHistory">❌</span>
+    <h2>Historique des fiches</h2>
     <table id="historyTable">
-        <thead>
-            <tr>
-                <th>Date</th>
-                <th>Client</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody></tbody>
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Client</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
     </table>
   </div>
 </div>
 
 <script>
-const form=document.getElementById('miniForm');
-const questions=document.querySelectorAll('.question');
-const prevBtn=document.getElementById('prevBtn');
-const nextBtn=document.getElementById('nextBtn');
-const finishBtn=document.getElementById('finishBtn');
-let currentIndex=0;
+const form = document.getElementById('miniForm');
+const questions = document.querySelectorAll('.question');
+const prevBtn = document.getElementById('prevBtn');
+const nextBtn = document.getElementById('nextBtn');
+const finishBtn = document.getElementById('finishBtn');
+const homeScreen = document.getElementById('homeScreen');
+let currentIndex = 0;
 
-function showQuestion(i){
- questions.forEach((q,idx)=>q.style.display=idx===i?'flex':'none');
- prevBtn.style.display=i===0?'none':'inline-block';
+function showQuestion(i) {
+  questions.forEach((q, idx) => q.style.display = idx === i ? 'flex' : 'none');
+  prevBtn.style.display = i === 0 ? 'none' : 'inline-block';
 
- const current=questions[i];
- // Focus uniquement sur les input (pas de select) et respect du data-no-focus
- const input=current.querySelector('input:not([data-no-focus])');
- if(input) input.focus();
+  // Gestion du focus : Input uniquement, pas de Select, pas de data-no-focus
+  const current = questions[i];
+  const inputToFocus = current.querySelector('input:not([data-no-focus]):not([type="radio"])');
+  if (inputToFocus) inputToFocus.focus();
 
- // Si c'est la dernière question (Nom du client)
- if(i===questions.length-1){
-  nextBtn.style.display='none';
-  finishBtn.style.display='inline-block';
- } else {
-  nextBtn.style.display='inline-block';
-  finishBtn.style.display='none';
- }
+  // Bouton Terminer sur la dernière question
+  if (i === questions.length - 1) {
+    nextBtn.style.display = 'none';
+    finishBtn.style.display = 'inline-block';
+  } else {
+    nextBtn.style.display = 'inline-block';
+    finishBtn.style.display = 'none';
+  }
 }
 
-prevBtn.onclick=()=>{if(currentIndex>0){currentIndex--;showQuestion(currentIndex);}};
-nextBtn.onclick=()=>{if(currentIndex<questions.length-1){currentIndex++;showQuestion(currentIndex);}};
+// Navigation
+prevBtn.onclick = () => { if(currentIndex > 0) { currentIndex--; showQuestion(currentIndex); } };
+nextBtn.onclick = () => { if(currentIndex < questions.length - 1) { currentIndex++; showQuestion(currentIndex); } };
 
-finishBtn.onclick=()=>{
- const data={};
- new FormData(form).forEach((v,k)=>data[k]=v);
- data.date=new Date().toISOString();
- let h=JSON.parse(localStorage.getItem('miniFormHistory')||'[]');
- h.push(data);
- localStorage.setItem('miniFormHistory',JSON.stringify(h));
- alert('Sauvegardé');
- form.reset();
- document.getElementById('homeScreen').style.display='flex';
- form.style.display='none';
- currentIndex=0;
+// Sauvegarde
+finishBtn.onclick = () => {
+  const data = {};
+  new FormData(form).forEach((v, k) => data[k] = v);
+  data.date = new Date().toISOString();
+  
+  let h = JSON.parse(localStorage.getItem('miniFormHistory') || '[]');
+  h.push(data);
+  localStorage.setItem('miniFormHistory', JSON.stringify(h));
+  
+  alert('Fiche client enregistrée avec succès !');
+  form.reset();
+  form.style.display = 'none';
+  homeScreen.style.display = 'flex';
+  currentIndex = 0;
 };
 
+// Fonctions Historique
 function deleteEntry(index) {
-    let h=JSON.parse(localStorage.getItem('miniFormHistory')||'[]');
+  if(confirm("Supprimer cette fiche ?")) {
+    let h = JSON.parse(localStorage.getItem('miniFormHistory') || '[]');
     h.splice(index, 1);
-    localStorage.setItem('miniFormHistory',JSON.stringify(h));
+    localStorage.setItem('miniFormHistory', JSON.stringify(h));
     renderHistory();
+  }
 }
 
 function viewEntry(index) {
-    const h=JSON.parse(localStorage.getItem('miniFormHistory')||'[]');
-    const item = h[index];
-    let details = "";
-    for (let key in item) {
-        if(key !== 'date') details += `${key} : ${item[key]}\n`;
-    }
-    alert(details);
+  const h = JSON.parse(localStorage.getItem('miniFormHistory') || '[]');
+  const item = h[index];
+  let details = "DÉTAILS DE LA FICHE :\n\n";
+  for (let key in item) {
+    if(key !== 'date' && item[key]) details += `${key} : ${item[key]}\n`;
+  }
+  alert(details);
 }
 
-function renderHistory(){
- const h=JSON.parse(localStorage.getItem('miniFormHistory')||'[]');
- const tbody=document.querySelector('#historyTable tbody');
- tbody.innerHTML='';
- h.forEach((e, index)=>{
-  const tr=document.createElement('tr');
-  tr.innerHTML=`
-    <td>${new Date(e.date).toLocaleString()}</td>
-    <td>${e.client||''}</td>
-    <td class="actions-cell">
-        <button onclick="viewEntry(${index})">👁️</button>
-        <button onclick="deleteEntry(${index})" style="background:#ff4d4d; color:white; border:none;">❌</button>
-    </td>`;
-  tbody.appendChild(tr);
- });
+function renderHistory() {
+  const h = JSON.parse(localStorage.getItem('miniFormHistory') || '[]');
+  const tbody = document.querySelector('#historyTable tbody');
+  tbody.innerHTML = '';
+  h.forEach((e, index) => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${new Date(e.date).toLocaleDateString()} ${new Date(e.date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</td>
+      <td>${e.client || 'Inconnu'}</td>
+      <td class="actions-cell">
+        <button onclick="viewEntry(${index})" title="Voir">👁️</button>
+        <button onclick="deleteEntry(${index})" style="background:#ff7675; color:white;" title="Supprimer">❌</button>
+      </td>`;
+    tbody.appendChild(tr);
+  });
 }
 
-document.getElementById('openHistoryBtn').onclick=()=>{renderHistory();document.getElementById('historyModal').style.display='flex';};
-document.getElementById('closeHistory').onclick=()=>{document.getElementById('historyModal').style.display='none';};
-
-document.getElementById('newBtn').onclick=()=>{
- document.getElementById('homeScreen').style.display='none';
- form.style.display='flex';
- currentIndex=0;
- showQuestion(0);
+// Events Accueil
+document.getElementById('newBtn').onclick = () => {
+  homeScreen.style.display = 'none';
+  form.style.display = 'flex';
+  currentIndex = 0;
+  showQuestion(0);
 };
 
-showQuestion(0);
+document.getElementById('openHistoryBtn').onclick = () => {
+  renderHistory();
+  document.getElementById('historyModal').style.display = 'flex';
+};
+
+document.getElementById('closeHistory').onclick = () => {
+  document.getElementById('historyModal').style.display = 'none';
+};
+
+window.onclick = (event) => {
+  if (event.target == document.getElementById('historyModal')) {
+    document.getElementById('historyModal').style.display = 'none';
+  }
+};
 </script>
 
 </body>

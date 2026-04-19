@@ -37,3 +37,9 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
 });
+
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("/discover/service-worker.js")
+    .then(() => console.log("PWA prête 🚀"))
+    .catch(err => console.log(err));
+}

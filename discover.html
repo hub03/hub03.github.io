@@ -48,38 +48,39 @@
 <!-- QUESTIONS -->
 <div class="question" data-index="0">
   <i>Quel est votre nom ?</i>
-  <br><input type="text" name="client" required>
+  <br><input type="text" name="Client" required>
 <br>&nbsp;<br>
   <i>Quel est votre numéro de téléphone ?</i>
-  <br><input type="tel" name="numero" maxlength=10>
+  <br><input type="tel" name="Numéro" maxlength=10>
 </div>
 <div class="question" data-index="1">
   <i>🧑‍🔧 L'une de vos lignes est-elle utilisée à titre professionnel ?</i>
-  <br><input type="checkbox" id="pro" name="pro" hidden>
+  <br><input type="checkbox" id="pro" name="Pro" hidden>
   <label for="pro" class="btn-checkbox">Oui ✅</label>
   <br><i>🧑‍💻 Faites-vous du télétravail ?</i>
-  <br><input type="checkbox" id="teletravail" name="teletravail" hidden>
+  <br><input type="checkbox" id="teletravail" name="Télétravail" hidden>
   <label for="teletravail" class="btn-checkbox">Oui ✅</label>
 </div>
 <div class="question" data-index="2">
   <i>🧑‍🤝‍🧑 Combien de personnes vivent dans votre foyer ?</i>
-  <br><input type="tel" name="adultes" placeholder="Adultes">
-  <br><input type="tel" name="enfants" placeholder="Enfants">
+  <br><input type="tel" name="Adultes" placeholder="Adultes">
+  <br><input type="tel" name="Enfants" placeholder="Enfants">
 </div>
 
 <div class="question" data-index="3">
   <i>🛜 Quel est votre fournisseur d'accès actuel ?</i>
-  <br><select name="fai">
+  <br><select name="FAI box">
     <option value="" selected disabled hidden>F.A.I.</option>
     <option value="Orange">Orange</option>
     <option value="SFR">SFR</option>
     <option value="Bouygues">Bouygues</option>
     <option value="Free">Free</option>
     <option value="autre">autre</option>
+    <option value="aucun">aucun</option>
   </select>
 <br>&nbsp;<br>
   <i>👛 Combien payez-vous votre fournisseur actuel ?</i>
-  <br><input type="number" name="prix-fai">€/mois
+  <br><input type="number" name="Prix box">€/mois
 </div>
 
 <div class="question" data-index="4">
@@ -94,7 +95,7 @@
 
 <div class="question" data-index="5">
   <i>X Qu'aimez-vous regarder à la TV ?</i>
-  <br><select name="interets" multiple>
+  <br><select name="Interets TV" multiple>
     <option value="" selected disabled hidden>Intérêts TV</option>
     <option value="sport">Sport</option>
     <option value="cine">Ciné</option>
@@ -108,8 +109,8 @@
 
 <div class="question" data-index="6">
   <i>X Avez-vous des abonnements SVOD ?</i>
-  <br><select name="svod" multiple>
-    <option value="" selected disabled hidden>SVOD</option>
+  <br><select name="Abonnements TV" multiple>
+    <option value="" selected disabled hidden>Abonnements</option>
     <option value="canal+">Canal+</option>
     <option value="netlif">Netflix</option>
     <option value="prime">Prime Video</option>

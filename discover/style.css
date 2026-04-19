@@ -1,0 +1,27 @@
+body {
+  font-family: Arial;
+  padding: 20px;
+}
+
+.menu a {
+  display: block;
+  margin: 10px 0;
+  padding: 15px;
+  background: black;
+  color: white;
+  text-decoration: none;
+  border-radius: 10px;
+}
+
+input {
+  display: block;
+  margin: 8px 0;
+  padding: 10px;
+  width: 100%;
+}
+
+button {
+  margin-top: 20px;
+  padding: 15px;
+  width: 100%;
+}

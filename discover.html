@@ -18,7 +18,6 @@ button { cursor: pointer; }
 
 .btn-checkbox { display: inline-block; padding: 0.6rem 1.2rem; border: 1px solid #ccc; border-radius: 0.6rem; cursor: pointer; background-color: #f0f0f0; }
 input[type="radio"]:checked + .btn-checkbox { background-color: #4CAF50; color: white; border-color: #4CAF50; }
-
 .btn-no:checked + label { background-color: black; color: white; border-color: black; }
 
 #homeScreen { display:flex; flex-direction:column; gap:1rem; justify-content:center; align-items:center; height:100vh; }
@@ -26,6 +25,7 @@ input[type="radio"]:checked + .btn-checkbox { background-color: #4CAF50; color: 
 .modal-content { background: #fff; padding: 1rem; border-radius: 1rem; width: 90%; max-height: 90%; overflow-y: auto; }
 table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
 th, td { border: 1px solid #ddd; padding: 0.5rem; }
+i { font-size: 0.85rem; color: #555; }
 </style>
 </head>
 <body>
@@ -40,7 +40,7 @@ th, td { border: 1px solid #ddd; padding: 0.5rem; }
 <h1>Discover</h1>
 
 <div class="question">
-🧑‍🔧 Vous utilisez une ligne à titre professionnel ?
+🧑‍🔧 Vous utilisez une de vos lignes à titre professionnel ?
 <br><input type="radio" name="Pro" id="pro_yes" hidden>
 <label for="pro_yes" class="btn-checkbox">Oui ✅</label>
 <input type="radio" name="Pro" id="pro_no" class="btn-no" hidden>
@@ -56,67 +56,100 @@ th, td { border: 1px solid #ddd; padding: 0.5rem; }
 </div>
 
 <div class="question">
-🧑‍🤝‍🧑 Vous êtes combien de personnes ?
+🧑‍🤝‍🧑 Vous êtes combien de personnes dans votre foyer ?
 <br><input type="tel" name="Adultes" placeholder="Adultes">
 <br><input type="tel" name="Enfants" placeholder="Enfants">
 </div>
 
 <div class="question">
-🧱 Maison ou appartement ?
-<br><input type="radio" name="Logement" id="maison" hidden>
+🧱 Vous êtes en maison ou appartement ?
+<br><input type="radio" id="maison" name="Logement" hidden>
 <label for="maison" class="btn-checkbox">Maison 🏠</label>
-<input type="radio" name="Logement" id="appartement" hidden>
+<input type="radio" id="appartement" name="Logement" hidden>
 <label for="appartement" class="btn-checkbox">Appartement 🏢</label>
 </div>
 
 <div class="question">
-🚨 Vous avez une alarme ?
+🧱 Vous avez quelle superficie ?
+<br><input type="tel" maxlength="3" name="Superficie">
+</div>
+
+<div class="question">
+🚨 Vous avez une alarme pour protéger votre logement ?
 <br><input type="radio" name="Alarme" id="al_yes" hidden>
 <label for="al_yes" class="btn-checkbox">Oui ✅</label>
 <input type="radio" name="Alarme" id="al_no" class="btn-no" hidden>
 <label for="al_no" class="btn-checkbox">Non ❌</label>
-<br>Fournisseur :
+<br>Si oui chez quel fournisseur ?
 <input type="text" name="Fournisseur alarme" data-no-focus="true">
-<br>Prix :
+<br>Et à quel prix ?
 <input type="tel" name="Prix alarme">€/m
 </div>
 
 <div class="question">
-🛜 Opérateur internet
-<select name="FAI box">
-<option value="">Choisir</option>
+🛜 Vous êtes chez quel opérateur pour internet ?
+<br><select name="FAI box">
+<option value="" selected disabled hidden>F.A.I.</option>
 <option>Orange</option>
 <option>SFR</option>
 <option>Bouygues</option>
 <option>Free</option>
+<option>autre</option>
+<option>aucun</option>
 </select>
 </div>
 
 <div class="question">
-👛 Prix box
-<input type="tel" name="Prix box">€/mois
+👛 Vous payez combien pour internet ?
+<br><input type="tel" name="Prix box">€/mois
+</div>
+
+<div class="question">
+🛰️ Il y a combien d'équipements dans votre foyer ?
+<br><input type="tel" maxlength="2" name="Equipements">
+<i>smartphone, tablette, PC, TV connectée, console, alarme</i>
 </div>
 
 <div class="question">
 🍿 Vous aimez regarder quoi à la TV ?
-<input type="text" name="Interets TV">
+<br><input type="text" name="Interets TV">
+<i>cinéma, sport, séries, jeunesse, infos, découverte, musique</i>
 </div>
 
 <div class="question">
-📳 Nombre de portables
-<input type="tel" name="Nb lignes">
+🎞️ Vous avez des abonnements à des services TV ?
+<br><input type="text" name="Abonnements TV">
+<i>Netflix, Canal+, Prime video, Disney+, HBO, Apple TV+, beIN sports</i>
 </div>
 
 <div class="question">
-🌐 Consommation Go
-<input type="tel" name="Go conso">
+📳 Vous avez combien de portable dans le foyer ?
+<br><input type="tel" maxlength="2" name="Nb lignes">
 </div>
 
 <div class="question">
-🧟‍♀️ Nom du client
-<input type="text" name="client">
-<br>📱 Numéro
-<input type="tel" name="Numero">
+📶 Vous êtes chez quel opérateur pour le mobile ?
+<br><select name="Operateur mobile">
+<option value="" selected disabled hidden>Opérateur</option>
+<option>Orange</option>
+<option>SFR</option>
+<option>Bouygues</option>
+<option>Free</option>
+<option>autre</option>
+<option>aucun</option>
+</select>
+</div>
+
+<div class="question">
+🌐 Vous consommez combien de gigas ?
+<br><input type="tel" maxlength="3" name="Go conso">
+</div>
+
+<div class="question">
+🧟‍♀️ Nom du client ?
+<br><input type="text" name="client">
+<br>📱 Numéro du client ?
+<br><input type="tel" maxlength="10" name="Numero">
 </div>
 
 <div class="question">
@@ -160,7 +193,7 @@ function showQuestion(index){
  prevBtn.style.display=index===0?'none':'inline-block';
 
  const current=questions[index];
- const input=current.querySelector('input:not([data-no-focus]), select');
+ const input=current.querySelector('input:not([data-no-focus])');
  if(input) input.focus();
 
  if(index===questions.length-2){

@@ -3,30 +3,55 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Client 360</title>
+<title>Client App</title>
 
 <style>
 body {
     margin: 0;
-    font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+    font-family: -apple-system, sans-serif;
     background: #f2f4f8;
 }
 
-/* CENTRE */
+/* SCREENS */
+.screen {
+    display: none;
+    padding: 20px;
+}
+
+.active {
+    display: block;
+}
+
+/* HOME */
+.home button {
+    width: 100%;
+    padding: 20px;
+    margin: 10px 0;
+    font-size: 18px;
+    border: none;
+    border-radius: 12px;
+    background: #3498db;
+    color: white;
+}
+
+/* CLIENT VIEW */
 .container {
-    position: relative;
-    height: 60vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    text-align: center;
 }
 
 .client {
     font-size: 70px;
-    z-index: 2;
 }
 
-/* BOUTONS AUTOUR */
+input {
+    width: 90%;
+    padding: 12px;
+    margin: 8px 0;
+    border-radius: 10px;
+    border: 1px solid #ddd;
+}
+
+/* CIRCLES */
 .circle {
     position: absolute;
     width: 70px;
@@ -38,19 +63,13 @@ body {
     justify-content: center;
     font-size: 28px;
     box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-    cursor: pointer;
-    transition: transform 0.2s;
 }
 
-.circle:active {
-    transform: scale(0.9);
-}
-
-.foyer { top: 10%; left: 50%; transform: translateX(-50%); }
+.foyer { top: 15%; left: 50%; transform: translateX(-50%); }
 .box { left: 10%; top: 50%; transform: translateY(-50%); }
 .mobile { right: 10%; top: 50%; transform: translateY(-50%); }
 
-/* PANEL MOBILE (BOTTOM SHEET) */
+/* PANEL */
 .panel {
     position: fixed;
     bottom: -100%;
@@ -59,85 +78,91 @@ body {
     background: white;
     border-radius: 20px 20px 0 0;
     padding: 20px;
-    transition: bottom 0.3s ease;
-    box-shadow: 0 -5px 20px rgba(0,0,0,0.2);
+    transition: 0.3s;
 }
 
 .panel.active {
     bottom: 0;
 }
 
-.panel h3 {
-    margin-top: 0;
+/* HISTORIQUE */
+.card {
+    background: white;
+    padding: 15px;
+    margin-bottom: 10px;
+    border-radius: 10px;
 }
 
-/* INPUT STYLE */
-input {
-    width: 100%;
-    padding: 12px;
-    margin-bottom: 12px;
-    border-radius: 10px;
-    border: 1px solid #ddd;
-    font-size: 16px;
-}
-
-/* BOUTON */
-.close-btn {
-    background: #3498db;
-    color: white;
-    border: none;
-    padding: 12px;
-    width: 100%;
-    border-radius: 10px;
-    font-size: 16px;
+/* BACK */
+.back {
+    margin-bottom: 10px;
 }
 </style>
 </head>
 
 <body>
 
-<div class="container">
-    <div class="client">👤</div>
-
-    <div class="circle foyer" onclick="openPanel('foyer')">🏠</div>
-    <div class="circle box" onclick="openPanel('box')">📦</div>
-    <div class="circle mobile" onclick="openPanel('mobile')">📱</div>
+<!-- HOME -->
+<div id="home" class="screen active home">
+    <h2>Client App</h2>
+    <button onclick="goTo('client')">➕ Nouveau client</button>
+    <button onclick="loadHistory()">📜 Historique</button>
 </div>
 
-<!-- FOYER -->
+<!-- CLIENT -->
+<div id="client" class="screen">
+    <button class="back" onclick="goTo('home')">⬅ Retour</button>
+
+    <div class="container">
+        <div class="client">👤</div>
+
+        <input id="nom" placeholder="Nom">
+        <input id="numero" placeholder="Numéro">
+
+        <div class="circle foyer" onclick="openPanel('foyer')">🏠</div>
+        <div class="circle box" onclick="openPanel('box')">📦</div>
+        <div class="circle mobile" onclick="openPanel('mobile')">📱</div>
+    </div>
+
+    <button onclick="saveClient()">💾 Enregistrer</button>
+</div>
+
+<!-- HISTORIQUE -->
+<div id="history" class="screen">
+    <button class="back" onclick="goTo('home')">⬅ Retour</button>
+    <h3>Historique</h3>
+    <div id="historyList"></div>
+</div>
+
+<!-- PANELS -->
 <div id="foyer" class="panel">
-    <h3>🏠 Foyer</h3>
-    <input placeholder="Nb de personnes">
-    <input placeholder="Type de logement">
-    <input placeholder="Superficie">
-    <input placeholder="Equipements connectés">
-    <input placeholder="Intérêts TV">
-    <input placeholder="Abonnements TV">
-    <button class="close-btn" onclick="closePanel()">Fermer</button>
+    <h3>Foyer</h3>
+    <input id="f1" placeholder="Nb personnes">
+    <input id="f2" placeholder="Logement">
+    <button onclick="closePanel()">Fermer</button>
 </div>
 
-<!-- BOX -->
 <div id="box" class="panel">
-    <h3>📦 Box</h3>
-    <input placeholder="Fournisseur">
-    <input placeholder="Prix">
-    <input placeholder="Technologie">
-    <input placeholder="Ligne fixe">
-    <input placeholder="Engagement">
-    <button class="close-btn" onclick="closePanel()">Fermer</button>
+    <h3>Box</h3>
+    <input id="b1" placeholder="Fournisseur">
+    <input id="b2" placeholder="Prix">
+    <button onclick="closePanel()">Fermer</button>
 </div>
 
-<!-- MOBILE -->
 <div id="mobile" class="panel">
-    <h3>📱 Mobile</h3>
-    <input placeholder="Opérateur">
-    <input placeholder="Prix">
-    <input placeholder="Gigas">
-    <input placeholder="Engagement">
-    <button class="close-btn" onclick="closePanel()">Fermer</button>
+    <h3>Mobile</h3>
+    <input id="m1" placeholder="Opérateur">
+    <input id="m2" placeholder="Prix">
+    <button onclick="closePanel()">Fermer</button>
 </div>
 
 <script>
+function goTo(screen) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(screen).classList.add('active');
+}
+
+/* PANELS */
 function openPanel(id) {
     document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
     document.getElementById(id).classList.add('active');
@@ -145,6 +170,45 @@ function openPanel(id) {
 
 function closePanel() {
     document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+}
+
+/* SAVE CLIENT */
+function saveClient() {
+    let client = {
+        nom: document.getElementById("nom").value,
+        numero: document.getElementById("numero").value,
+        foyer: document.getElementById("f1").value,
+        box: document.getElementById("b1").value,
+        mobile: document.getElementById("m1").value
+    };
+
+    let data = JSON.parse(localStorage.getItem("clients") || "[]");
+    data.push(client);
+    localStorage.setItem("clients", JSON.stringify(data));
+
+    alert("Client enregistré !");
+    goTo('home');
+}
+
+/* LOAD HISTORY */
+function loadHistory() {
+    goTo('history');
+
+    let data = JSON.parse(localStorage.getItem("clients") || "[]");
+    let container = document.getElementById("historyList");
+    container.innerHTML = "";
+
+    data.forEach(c => {
+        container.innerHTML += `
+            <div class="card">
+                <strong>${c.nom}</strong><br>
+                📞 ${c.numero}<br>
+                🏠 ${c.foyer}<br>
+                📦 ${c.box}<br>
+                📱 ${c.mobile}
+            </div>
+        `;
+    });
 }
 </script>
 

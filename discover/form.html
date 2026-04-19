@@ -1,32 +1,42 @@
-<h2>Nouvelle fiche</h2>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nouvelle fiche</title>
+  <link rel="stylesheet" href="style.css">
+</head>
 
-<form id="discoverForm">
+<body>
 
-<h3>🏠 Foyer</h3>
-<input type="number" placeholder="Nb de personnes" id="nbPersonnes">
-<input type="text" placeholder="Type de logement" id="logement">
-<input type="number" placeholder="Superficie (m²)" id="superficie">
-<input type="text" placeholder="Télétravail" id="teletravail">
-<input type="number" placeholder="Nb appareils connectés" id="devices">
-<input type="text" placeholder="Intérêts TV" id="tv">
-<input type="text" placeholder="Abonnements TV" id="aboTv">
-<input type="text" placeholder="Alarme" id="alarme">
+<div class="container">
 
-<h3>📡 Box</h3>
-<input type="text" placeholder="FAI actuel" id="fai">
-<input type="number" placeholder="Prix (€)" id="prixBox">
-<input type="text" placeholder="Engagement" id="engagementBox">
-<input type="text" placeholder="Technologie" id="tech">
+  <div class="step active" id="step1">
+    <h2>🏠 Foyer</h2>
+    <input type="number" placeholder="Nb de personnes" id="nbPersonnes">
+    <input type="text" placeholder="Type logement" id="logement">
+    <input type="number" placeholder="Superficie" id="superficie">
+    <button onclick="nextStep()">Suivant →</button>
+  </div>
 
-<h3>📱 Mobile</h3>
-<input type="text" placeholder="Opérateur" id="operateur">
-<input type="number" placeholder="Prix (€)" id="prixMobile">
-<input type="text" placeholder="Engagement" id="engagementMobile">
-<input type="number" placeholder="Go" id="data">
-<input type="number" placeholder="Nb autres lignes" id="lignes">
+  <div class="step" id="step2">
+    <h2>📡 Box</h2>
+    <input type="text" placeholder="FAI" id="fai">
+    <input type="number" placeholder="Prix" id="prixBox">
+    <button onclick="prevStep()">← Retour</button>
+    <button onclick="nextStep()">Suivant →</button>
+  </div>
 
-<button type="submit">💾 Enregistrer</button>
+  <div class="step" id="step3">
+    <h2>📱 Mobile</h2>
+    <input type="text" placeholder="Opérateur" id="operateur">
+    <input type="number" placeholder="Prix" id="prixMobile">
+    <button onclick="prevStep()">← Retour</button>
+    <button onclick="save()">💾 Enregistrer</button>
+  </div>
 
-</form>
+</div>
 
 <script src="app.js"></script>
+</body>
+</html>

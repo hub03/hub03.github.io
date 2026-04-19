@@ -189,22 +189,23 @@ function loadProgress(){
 form.addEventListener('input',saveProgress);
 
 function showQuestion(index){
- questions.forEach((q,i)=>q.style.display=i===index?'flex':'none');
- prevBtn.style.display=index===0?'none':'inline-block';
+  questions.forEach((q,i)=>q.style.display=i===index?'flex':'none');
+  prevBtn.style.display=index===0?'none':'inline-block';
 
- const current=questions[index];
- const input=current.querySelector('input:not([data-no-focus])');
- if(input) input.focus();
+  const current=questions[index];
+  const input=current.querySelector('input:not([data-no-focus])');
+  if(input) input.focus();
 
- if(index===questions.length-2){
-  nextBtn.style.display='none';
-  finishBtn.style.display='inline-block';
- } else {
-  nextBtn.style.display='inline-block';
-  finishBtn.style.display='none';
- }
+  // ✅ LOGIQUE CORRIGÉE
+  if(index === questions.length - 1){
+    nextBtn.style.display = 'none';
+  } else {
+    nextBtn.style.display = 'inline-block';
+  }
+
+  // bouton terminer visible uniquement sur la dernière question
+  finishBtn.style.display = index === questions.length - 1 ? 'inline-block' : 'none';
 }
-
 prevBtn.onclick=()=>{ if(currentIndex>0){currentIndex--;showQuestion(currentIndex);} };
 nextBtn.onclick=()=>{ if(currentIndex<questions.length-1){currentIndex++;showQuestion(currentIndex);} };
 

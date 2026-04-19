@@ -1,0 +1,19 @@
+<h2>Historique</h2>
+<div id="list"></div>
+
+<script>
+let fiches = JSON.parse(localStorage.getItem("discover")) || [];
+let list = document.getElementById("list");
+
+fiches.forEach((f, index) => {
+  let div = document.createElement("div");
+  div.innerHTML = `
+    <p><strong>Fiche ${index + 1}</strong></p>
+    <p>Foyer: ${f.nbPersonnes} pers</p>
+    <p>FAI: ${f.fai}</p>
+    <p>Mobile: ${f.operateur}</p>
+    <hr>
+  `;
+  list.appendChild(div);
+});
+</script>

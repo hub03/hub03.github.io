@@ -137,14 +137,21 @@ th, td {
     display: flex;
     gap: 5px;
 }
+bouton-base {
+    height: 30px;
+    width: 90%;
+    border-radius: 10px;
+    background-color: blue;
+    border: 1px solid blue;
+}
 </style>
 </head>
 <body>
 
 <div id="homeScreen">
   <h1>Discover</h1>
-  <button id="newBtn">Nouvelle fiche</button>
-  <button id="openHistoryBtn">Historique</button>
+  <button id="newBtn" class="bouton-base">🕵️ Nouvelle fiche</button>
+  <button id="openHistoryBtn" class="bouton-base">📒 Historique</button>
 </div>
 
 <form id="miniForm" style="display:none;">

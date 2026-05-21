@@ -181,8 +181,10 @@ row.cells.forEach((cell,index)=>{
 let r=sheet[cell.R]?.v??"";
 let o=sheet[cell.O]?.v??"";
 
-if(index===3&&typeof r==="number")r=Math.ceil(r);
-if(typeof o==="number")o=Math.ceil(o);
+if(index===4){
+  if(typeof r==="number") r=Math.ceil(r);
+  if(typeof o==="number") o=Math.ceil(o);
+}
 
 let rClass="";
 if(typeof r==="number"&&typeof o==="number"){

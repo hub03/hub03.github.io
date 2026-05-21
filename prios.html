@@ -95,12 +95,13 @@
   <thead>
     <tr>
       <th id="dateCell"></th>
+      <th>Box VV</th>
       <th>P1 Box VR</th>
       <th>P2 Abo</th>
       <th>P3 Assu</th>
       <th>P4 Access</th>
       <th>P5 Pro</th>
-      <th>P6 MS</th>
+      <th>P6 Optima</th>
       <th>C7 Mig</th>
       <th>C8 Canal+</th>
       <th>Score</th>
@@ -123,29 +124,29 @@ const shareBtn = document.getElementById("shareBtn");
 const rows = [
 {
 label:"Antoine",
-cells:[{R:"AJ10",O:"AK10"},{R:"BB10",O:"BC10"},{R:"BN10",O:"BO10"},{R:"BQ10",O:"BR10"},{R:"AV10",O:"AW10"},{R:"AY10",O:"AZ10"},{R:"AP10",O:"AQ10"},{R:"AS10",O:"AT10"}],
+cells:[{R:"E10",O:"F10"},{R:"AJ10",O:"AK10"},{R:"BE10",O:"BF10"},{R:"BQ10",O:"BR10"},{R:"BT10",O:"BU10"},{R:"AY10",O:"AZ10"},{R:"AS10",O:"AT10"},{R:"AP10",O:"AQ10"},{R:"AV10",O:"AW10"}],
 taux:{assu:"DC10",go5:"CO10",reprise:"CW10"}
 },
 {
 label:"Nicolas",
-cells:[{R:"AJ11",O:"AK11"},{R:"BB11",O:"BC11"},{R:"BN11",O:"BO11"},{R:"BQ11",O:"BR11"},{R:"AV11",O:"AW11"},{R:"AY11",O:"AZ11"},{R:"AP11",O:"AQ11"},{R:"AS11",O:"AT11"}],
+cells:[{R:"E11",O:"F11"},{R:"AJ11",O:"AK11"},{R:"BE11",O:"BF11"},{R:"BQ11",O:"BR11"},{R:"BT11",O:"BU11"},{R:"AY11",O:"AZ11"},{R:"AS11",O:"AT11"},{R:"AP11",O:"AQ11"},{R:"AV11",O:"AW11"}],
 taux:{assu:"DC11",go5:"CO11",reprise:"CW11"}
 },
 {
 label:"Rémy",
-cells:[{R:"AJ12",O:"AK12"},{R:"BB12",O:"BC12"},{R:"BN12",O:"BO12"},{R:"BQ12",O:"BR12"},{R:"AV12",O:"AW12"},{R:"AY12",O:"AZ12"},{R:"AP12",O:"AQ12"},{R:"AS12",O:"AT12"}],
+cells:[{R:"E12",O:"F12"},{R:"AJ12",O:"AK12"},{R:"BE12",O:"BF12"},{R:"BQ12",O:"BR12"},{R:"BT12",O:"BU12"},{R:"AY12",O:"AZ12"},{R:"AS12",O:"AT12"},{R:"AP12",O:"AQ12"},{R:"AV12",O:"AW12"}],
 taux:{assu:"DC12",go5:"CO12",reprise:"CW12"}
 },
 {
 label:"Magasin",
 rowClass:"row-magasin",
-cells:[{R:"AJ15",O:"AK15"},{R:"BB15",O:"BC15"},{R:"BN15",O:"BO15"},{R:"BQ15",O:"BR15"},{R:"AV15",O:"AW15"},{R:"AY15",O:"AZ15"},{R:"AP15",O:"AQ15"},{R:"AS15",O:"AT15"}],
+cells:[{R:"E15",O:"F15"},{R:"AJ15",O:"AK15"},{R:"BE15",O:"BF15"},{R:"BQ15",O:"BR15"},{R:"BT15",O:"BU15"},{R:"AY15",O:"AZ15"},{R:"AS15",O:"AT15"},{R:"AP15",O:"AQ15"},{R:"AV15",O:"AW15"}],
 taux:{assu:"DC15",go5:"CO15",reprise:"CW15"}
 },
 {
 label:"OU1",
 rowClass:"row-secteur",
-cells:[{R:"AJ16",O:"AK16"},{R:"BB16",O:"BC16"},{R:"BN16",O:"BO16"},{R:"BQ16",O:"BR16"},{R:"AV16",O:"AW16"},{R:"AY16",O:"AZ16"},{R:"AP16",O:"AQ16"},{R:"AS16",O:"AT16"}],
+cells:[{R:"E16",O:"F16"},{R:"AJ16",O:"AK16"},{R:"BE16",O:"BF16"},{R:"BQ16",O:"BR16"},{R:"BQ16",O:"BR16"},{R:"AY16",O:"AZ16"},{R:"AS16",O:"AT16"},{R:"AP16",O:"AQ16"},{R:"AV16",O:"AW16"}],
 taux:{assu:"DC16",go5:"CO16",reprise:"CW16"}
 }
 ];
@@ -187,7 +188,10 @@ let rClass="";
 if(typeof r==="number"&&typeof o==="number"){
 const ok=r>=o;
 rClass=ok?"r-ok":"r-bad";
-if (ok) score += (index === 0 || index === 4) ? 2 : 1;
+
+if (ok && index > 0) {
+  score += (index === 5 || index === 8) ? 2 : 1;
+}
 }
 
 tr.innerHTML+=`<td><span class="${rClass}">${r}</span> / ${o}</td>`;

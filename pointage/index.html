@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pointage Travail</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card-bg: #1e293b;
+      --accent: #38bdf8;
+      --text: #f8fafc;
+      --text-dim: #94a3b8;
+      --success: #22c55e;
+      --warning: #eab308;
+      --danger: #ef4444;
+      --border: #334155;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body { background: var(--bg); color: var(--text); min-height: 100vh; padding: 1rem; display: flex; flex-direction: column; align-items: center; }
+    
+    .container { width: 100%; max-width: 500px; }
+    header { text-align: center; margin-bottom: 1.5rem; }
+    h1 { font-size: 1.5rem; color: var(--accent); }
+
+    .card { background: var(--card-bg); border-radius: 12px; padding: 1.25rem; margin-bottom: 1rem; border: 1px solid var(--border); }
+    
+    /* Session status & Timer */
+    .status-box { text-align: center; margin-bottom: 1rem; }
+    .status-title { font-size: 0.85rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.05em; }
+    .timer { font-size: 2.5rem; font-weight: bold; margin: 0.5rem 0; font-mono: monospace; color: var(--accent); }
+    .status-text { font-weight: 600; }
+
+    /* Buttons */
+    .btn-group { display: flex; flex-direction: column; gap: 0.75rem; }
+    button { background: var(--accent); color: #000; border: none; padding: 0.85rem; border-radius: 8px; font-weight: bold; font-size: 1rem; cursor: pointer; transition: opacity 0.2s; width: 100%; }
+    button:hover { opacity: 0.9; }
+    button:disabled { opacity: 0.3; cursor: not-allowed; }
+    .btn-warning { background: var(--warning); }
+    .btn-danger { background: var(--danger); color: white; }
+    .btn-secondary { background: var(--border); color: var(--text); }
+    .btn-sm { padding: 0.4rem 0.6rem; font-size: 0.8rem; width: auto; }
+
+    /* Inputs inline */
+    .time-inputs { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-top: 1rem; font-size: 0.85rem; }
+    .input-field { display: flex; flex-direction: column; gap: 0.2rem; }
+    label { color: var(--text-dim); font-size: 0.75rem; }
+    input[type="time"], input[type="date"] { background: var(--bg); border: 1px solid var(--border); color: var(--text); padding: 0.4rem; border-radius: 6px; }
+
+    /* History section */
+    .history-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+    .history-controls { display: flex; gap: 0.5rem; }
+    .history-list { display: flex; flex-direction: column; gap: 0.75rem; margin-top: 1rem; }
+    .history-item { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 0.8rem; font-size: 0.85rem; }
+    .history-item-header { display: flex; justify-content: space-between; margin-bottom: 0.5rem; font-weight: bold; color: var(--accent); }
+    .history-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.4rem; color: var(--text-dim); }
+    .history-actions { display: flex; justify-content: flex-end; gap: 0.5rem; margin-top: 0.5rem; }
+
+    /* Collapsible */
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <header>
+      <h1>Pointage Hebdo</h1>
+    </header>
+
+    <!-- Session active -->
+    <div class="card">
+      <div class="status-box">
+        <div class="status-title">Session en cours</div>
+        <div id="timer" class="timer">00:00:00</div>
+        <div id="status-text" class="status-text">Non pointé</div>
+      </div>
+
+      <div class="btn-group">
+        <button id="btn-start" onclick="actionStart()">Arrivée</button>
+        <button id="btn-pause" class="btn-warning hidden" onclick="actionPause()">Pause Déjeuner</button>
+        <button id="btn-resume" class="btn-warning hidden" onclick="actionResume()">Reprise Travail</button>
+        <button id="btn-end" class="btn-danger hidden" onclick="actionEnd()">Fin de journée</button>
+      </div>
+
+      <!-- Ajustement direct journée en cours -->
+      <div id="today-adjustments" class="time-inputs hidden">
+        <div class="input-field">
+          <label>Arrivée</label>
+          <input type="time" id="input-start" onchange="updateCurrentTimes()">
+        </div>
+        <div class="input-field">
+          <label>Début Pause</label>
+          <input type="time" id="input-pause-start" onchange="updateCurrentTimes()">
+        </div>
+        <div class="input-field">
+          <label>Fin Pause</label>
+          <input type="time" id="input-pause-end" onchange="updateCurrentTimes()">
+        </div>
+      </div>
+    </div>
+
+    <!-- Toggle Historique -->
+    <button class="btn-secondary" onclick="toggleHistory()">Consulter l'historique / Modifier</button>
+
+    <!-- Section Historique -->
+    <div id="history-section" class="card hidden" style="margin-top: 1rem;">
+      <div class="history-header">
+        <h3>Historique</h3>
+        <input type="month" id="month-filter" onchange="renderHistory()">
+      </div>
+      
+      <div class="history-controls">
+        <button class="btn-sm btn-secondary" onclick="exportCSV()">Exporter (CSV)</button>
+        <button class="btn-sm" onclick="addNewDay()">+ Ajouter un jour</button>
+      </div>
+
+      <div id="history-list" class="history-list"></div>
+    </div>
+  </div>
+
+  <script>
+    // Structure des données
+    let state = JSON.parse(localStorage.getItem('timeTrackerState')) || {
+      activeSession: null, // { date, start, pauseStart, pauseEnd }
+      history: []          // [{ id, date, start, pauseStart, pauseEnd, end, totalMinutes }]
+    };
+
+    let timerInterval = null;
+
+    // Initialisation
+    document.addEventListener('DOMContentLoaded', () => {
+      // Définir le filtre du mois sur le mois en cours
+      const today = new Date();
+      document.getElementById('month-filter').value = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}`;
+      
+      updateUI();
+      renderHistory();
+      startTimer();
+    });
+
+    function saveState() {
+      localStorage.setItem('timeTrackerState', JSON.stringify(state));
+    }
+
+    function formatTime(dateStr) {
+      if (!dateStr) return '--:--';
+      const d = new Date(dateStr);
+      return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+    }
+
+    function getTimeInputVal(dateStr) {
+      if (!dateStr) return '';
+      const d = new Date(dateStr);
+      return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+    }
+
+    // --- ACTIONS BOUTONS MAIN ---
+
+    function actionStart() {
+      const now = new Date();
+      state.activeSession = {
+        date: now.toISOString().split('T')[0],
+        start: now.toISOString(),
+        pauseStart: null,
+        pauseEnd: null,
+        status: 'working'
+      };
+      saveState();
+      updateUI();
+    }
+
+    function actionPause() {
+      if (!state.activeSession) return;
+      state.activeSession.pauseStart = new Date().toISOString();
+      state.activeSession.status = 'paused';
+      saveState();
+      updateUI();
+    }
+
+    function actionResume() {
+      if (!state.activeSession) return;
+      state.activeSession.pauseEnd = new Date().toISOString();
+      state.activeSession.status = 'working';
+      saveState();
+      updateUI();
+    }
+
+    function actionEnd() {
+      if (!state.activeSession) return;
+      const end = new Date();
+      const session = state.activeSession;
+      
+      // Calcul du temps travaillé en minutes
+      const startMs = new Date(session.start).getTime();
+      const endMs = end.getTime();
+      
+      let pauseMs = 0;
+      if (session.pauseStart && session.pauseEnd) {
+        pauseMs = new Date(session.pauseEnd).getTime() - new Date(session.pauseStart).getTime();
+      }
+
+      const totalMinutes = Math.max(0, Math.round((endMs - startMs - pauseMs) / (1000 * 60)));
+
+      // Enregistrement dans l'historique
+      state.history.push({
+        id: Date.now(),
+        date: session.date,
+        start: session.start,
+        pauseStart: session.pauseStart,
+        pauseEnd: session.pauseEnd,
+        end: end.toISOString(),
+        totalMinutes: totalMinutes
+      });
+
+      state.activeSession = null;
+      saveState();
+      updateUI();
+      renderHistory();
+      
+      alert(`Journée terminée ! Temps travaillé : ${Math.floor(totalMinutes/60)}h ${totalMinutes%60}m`);
+    }
+
+    // Ajustement en temps réel des horaires du jour
+    function updateCurrentTimes() {
+      if (!state.activeSession) return;
+      
+      const dateBase = state.activeSession.date;
+      
+      const startVal = document.getElementById('input-start').value;
+      const pauseStartVal = document.getElementById('input-pause-start').value;
+      const pauseEndVal = document.getElementById('input-pause-end').value;
+
+      if (startVal) state.activeSession.start = new Date(`${dateBase}T${startVal}`).toISOString();
+      if (pauseStartVal) state.activeSession.pauseStart = new Date(`${dateBase}T${pauseStartVal}`).toISOString();
+      if (pauseEndVal) state.activeSession.pauseEnd = new Date(`${dateBase}T${pauseEndVal}`).toISOString();
+
+      saveState();
+    }
+
+    // --- MISE À JOUR UI & TIMER ---
+
+    function updateUI() {
+      const session = state.activeSession;
+      const btnStart = document.getElementById('btn-start');
+      const btnPause = document.getElementById('btn-pause');
+      const btnResume = document.getElementById('btn-resume');
+      const btnEnd = document.getElementById('btn-end');
+      const statusText = document.getElementById('status-text');
+      const todayAdjustments = document.getElementById('today-adjustments');
+
+      if (!session) {
+        btnStart.classList.remove('hidden');
+        btnPause.classList.add('hidden');
+        btnResume.classList.add('hidden');
+        btnEnd.classList.add('hidden');
+        todayAdjustments.classList.add('hidden');
+        statusText.innerText = "Non pointé";
+        statusText.style.color = "var(--text-dim)";
+        document.getElementById('timer').innerText = "00:00:00";
+        return;
+      }
+
+      btnStart.classList.add('hidden');
+      btnEnd.classList.remove('hidden');
+      todayAdjustments.classList.remove('hidden');
+
+      // MAJ des champs de saisie directes
+      document.getElementById('input-start').value = getTimeInputVal(session.start);
+      document.getElementById('input-pause-start').value = getTimeInputVal(session.pauseStart);
+      document.getElementById('input-pause-end').value = getTimeInputVal(session.pauseEnd);
+
+      if (session.status === 'working') {
+        btnPause.classList.remove('hidden');
+        btnResume.classList.add('hidden');
+        statusText.innerText = "Au travail";
+        statusText.style.color = "var(--success)";
+      } else if (session.status === 'paused') {
+        btnPause.classList.add('hidden');
+        btnResume.classList.remove('hidden');
+        statusText.innerText = "En pause";
+        statusText.style.color = "var(--warning)";
+      }
+    }
+
+    function startTimer() {
+      if (timerInterval) clearInterval(timerInterval);
+      timerInterval = setInterval(() => {
+        const session = state.activeSession;
+        if (!session || !session.start) return;
+
+        const now = new Date();
+        const start = new Date(session.start);
+        
+        let elapsedMs = 0;
+
+        if (session.status === 'working') {
+          let pauseMs = 0;
+          if (session.pauseStart && session.pauseEnd) {
+            pauseMs = new Date(session.pauseEnd) - new Date(session.pauseStart);
+          }
+          elapsedMs = now - start - pauseMs;
+        } else if (session.status === 'paused') {
+          // Si en pause, figer le temps au moment du début de la pause
+          let pauseStart = new Date(session.pauseStart);
+          elapsedMs = pauseStart - start;
+        }
+
+        if (elapsedMs < 0) elapsedMs = 0;
+
+        const hrs = Math.floor(elapsedMs / 3600000);
+        const mins = Math.floor((elapsedMs % 3600000) / 60000);
+        const secs = Math.floor((elapsedMs % 60000) / 1000);
+
+        document.getElementById('timer').innerText = 
+          `${String(hrs).padStart(2, '0')}:${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+      }, 1000);
+    }
+
+    // --- HISTORIQUE & ÉDITION ---
+
+    function toggleHistory() {
+      document.getElementById('history-section').classList.toggle('hidden');
+    }
+
+    function renderHistory() {
+      const container = document.getElementById('history-list');
+      const filterValue = document.getElementById('month-filter').value; // YYYY-MM
+      container.innerHTML = '';
+
+      const filtered = state.history.filter(item => item.date.startsWith(filterValue));
+
+      // Trier du plus récent au plus ancien
+      filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+      filtered.forEach(item => {
+        const hrs = Math.floor(item.totalMinutes / 60);
+        const mins = item.totalMinutes % 60;
+
+        const div = document.createElement('div');
+        div.className = 'history-item';
+        div.innerHTML = `
+          <div class="history-item-header">
+            <span>${item.date}</span>
+            <span>Total: ${hrs}h ${mins}m</span>
+          </div>
+          <div class="history-grid">
+            <label>Début: <input type="time" value="${getTimeInputVal(item.start)}" onchange="editHistoryItem(${item.id}, 'start', this.value)"></label>
+            <label>Fin: <input type="time" value="${getTimeInputVal(item.end)}" onchange="editHistoryItem(${item.id}, 'end', this.value)"></label>
+            <label>Début P.: <input type="time" value="${getTimeInputVal(item.pauseStart)}" onchange="editHistoryItem(${item.id}, 'pauseStart', this.value)"></label>
+            <label>Fin P.: <input type="time" value="${getTimeInputVal(item.pauseEnd)}" onchange="editHistoryItem(${item.id}, 'pauseEnd', this.value)"></label>
+          </div>
+          <div class="history-actions">
+            <button class="btn-sm btn-danger" onclick="deleteHistoryItem(${item.id})">Supprimer</button>
+          </div>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    function editHistoryItem(id, field, value) {
+      const item = state.history.find(h => h.id === id);
+      if (!item) return;
+
+      if (value) {
+        item[field] = new Date(`${item.date}T${value}`).toISOString();
+      } else {
+        item[field] = null;
+      }
+
+      // Recalculer le temps total
+      const startMs = item.start ? new Date(item.start).getTime() : 0;
+      const endMs = item.end ? new Date(item.end).getTime() : 0;
+      let pauseMs = 0;
+
+      if (item.pauseStart && item.pauseEnd) {
+        pauseMs = new Date(item.pauseEnd).getTime() - new Date(item.pauseStart).getTime();
+      }
+
+      item.totalMinutes = (startMs && endMs) ? Math.max(0, Math.round((endMs - startMs - pauseMs) / (1000 * 60))) : 0;
+
+      saveState();
+      renderHistory();
+    }
+
+    function deleteHistoryItem(id) {
+      if (confirm('Supprimer cette journée ?')) {
+        state.history = state.history.filter(h => h.id !== id);
+        saveState();
+        renderHistory();
+      }
+    }
+
+    function addNewDay() {
+      const today = new Date().toISOString().split('T')[0];
+      const dateStr = prompt("Date du jour à ajouter (AAAA-MM-JJ) :", today);
+      if (!dateStr) return;
+
+      const newItem = {
+        id: Date.now(),
+        date: dateStr,
+        start: new Date(`${dateStr}T08:00`).toISOString(),
+        pauseStart: new Date(`${dateStr}T12:00`).toISOString(),
+        pauseEnd: new Date(`${dateStr}T13:00`).toISOString(),
+        end: new Date(`${dateStr}T17:00`).toISOString(),
+        totalMinutes: 480 // 8h par défaut
+      };
+
+      state.history.push(newItem);
+      saveState();
+      renderHistory();
+    }
+
+    // --- EXPORT CSV ---
+
+    function exportCSV() {
+      const filterValue = document.getElementById('month-filter').value;
+      const filtered = state.history.filter(item => item.date.startsWith(filterValue));
+
+      if (filtered.length === 0) {
+        alert("Aucune donnée pour ce mois.");
+        return;
+      }
+
+      let csvContent = "data:text/csv;charset=utf-8,Date;Arrivee;Debut Pause;Fin Pause;Depart;Duree (Minutes);Duree (Heures)\n";
+
+      filtered.forEach(item => {
+        const hrs = (item.totalMinutes / 60).toFixed(2);
+        const row = [
+          item.date,
+          formatTime(item.start),
+          formatTime(item.pauseStart),
+          formatTime(item.pauseEnd),
+          formatTime(item.end),
+          item.totalMinutes,
+          hrs
+        ].join(";");
+        csvContent += row + "\n";
+      });
+
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", `heures_pointage_${filterValue}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+  </script>
+</body>
+</html>

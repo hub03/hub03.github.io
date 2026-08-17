@@ -29,7 +29,7 @@
     /* Session status & Timer */
     .status-box { text-align: center; margin-bottom: 1rem; }
     .status-title { font-size: 0.85rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.05em; }
-    .timer { font-size: 2.5rem; font-weight: bold; margin: 0.5rem 0; font-mono: monospace; color: var(--accent); }
+    .timer { font-size: 2.5rem; font-weight: bold; margin: 0.5rem 0; font-family: monospace; color: var(--accent); }
     .status-text { font-weight: 600; }
 
     /* Buttons */
@@ -46,12 +46,13 @@
     .time-inputs { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-top: 1rem; font-size: 0.85rem; }
     .input-field { display: flex; flex-direction: column; gap: 0.2rem; }
     label { color: var(--text-dim); font-size: 0.75rem; }
-    input[type="time"], input[type="date"] { background: var(--bg); border: 1px solid var(--border); color: var(--text); padding: 0.4rem; border-radius: 6px; }
+    input[type="time"], input[type="date"], input[type="month"] { background: var(--bg); border: 1px solid var(--border); color: var(--text); padding: 0.4rem; border-radius: 6px; }
 
     /* History section */
     .history-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
-    .history-controls { display: flex; gap: 0.5rem; }
-    .history-list { display: flex; flex-direction: column; gap: 0.75rem; margin-top: 1rem; }
+    .history-controls { display: flex; gap: 0.5rem; margin-bottom: 1rem; }
+    .history-summary { background: var(--bg); border: 1px dashed var(--accent); border-radius: 8px; padding: 0.75rem; margin-bottom: 1rem; font-size: 0.9rem; text-align: center; }
+    .history-list { display: flex; flex-direction: column; gap: 0.75rem; }
     .history-item { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 0.8rem; font-size: 0.85rem; }
     .history-item-header { display: flex; justify-content: space-between; margin-bottom: 0.5rem; font-weight: bold; color: var(--accent); }
     .history-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.4rem; color: var(--text-dim); }
@@ -115,22 +116,79 @@
         <button class="btn-sm" onclick="addNewDay()">+ Ajouter un jour</button>
       </div>
 
+      <div id="history-summary" class="history-summary"></div>
+
       <div id="history-list" class="history-list"></div>
     </div>
   </div>
 
   <script>
-    // Structure des données
-    let state = JSON.parse(localStorage.getItem('timeTrackerState')) || {
-      activeSession: null, // { date, start, pauseStart, pauseEnd }
-      history: []          // [{ id, date, start, pauseStart, pauseEnd, end, totalMinutes }]
-    };
+    // Historique initial pré-chargé
+    const initialHistoryRaw = [
+      // JUILLET 2026
+      { date: "2026-07-14", start: "09:46", pauseStart: "13:49", pauseEnd: "14:45", end: "18:04" },
+      { date: "2026-07-15", start: "11:20", pauseStart: "14:02", pauseEnd: "14:58", end: "19:37" },
+      { date: "2026-07-16", start: "11:24", pauseStart: "13:19", pauseEnd: "14:01", end: "19:41" },
+      { date: "2026-07-17", start: "09:57", pauseStart: "12:17", pauseEnd: "12:59", end: "18:12" },
+      { date: "2026-07-18", start: "09:56", pauseStart: "13:49", pauseEnd: "14:20", end: "18:23" },
+      { date: "2026-07-20", start: "11:25", pauseStart: "14:09", pauseEnd: "15:07", end: "19:31" },
+      { date: "2026-07-21", start: "08:42", pauseStart: "12:07", pauseEnd: "13:02", end: "17:15" },
+      { date: "2026-07-22", start: "08:55", pauseStart: "12:48", pauseEnd: "13:06", end: "18:15" },
+      { date: "2026-07-23", start: "11:26", pauseStart: "14:19", pauseEnd: "15:20", end: "19:31" },
+      { date: "2026-07-24", start: "11:23", pauseStart: "14:09", pauseEnd: "15:02", end: "19:35" },
+      { date: "2026-07-28", start: "08:55", pauseStart: "12:17", pauseEnd: "13:16", end: "17:12" },
+      { date: "2026-07-29", start: "10:30", pauseStart: "13:27", pauseEnd: "14:27", end: "18:42" },
+      { date: "2026-07-30", start: "11:26", pauseStart: "14:29", pauseEnd: "14:57", end: "19:37" },
+      { date: "2026-07-31", start: "10:33", pauseStart: "13:40", pauseEnd: "14:20", end: "17:42" },
+      
+      // AOÛT 2026
+      { date: "2026-08-01", start: "08:04", pauseStart: "09:30", pauseEnd: "12:30", end: "19:31" },
+      { date: "2026-08-04", start: "11:26", pauseStart: "14:30", pauseEnd: "15:12", end: "19:36" },
+      { date: "2026-08-05", start: "10:28", pauseStart: "13:39", pauseEnd: "14:23", end: "18:42" },
+      { date: "2026-08-06", start: "10:25", pauseStart: "14:20", pauseEnd: "15:12", end: "19:12" },
+      { date: "2026-08-07", start: "11:00", pauseStart: "14:05", pauseEnd: "14:30", end: "19:32" },
+      { date: "2026-08-08", start: "08:55", pauseStart: "12:17", pauseEnd: "12:40", end: "16:22" },
+      { date: "2026-08-11", start: "11:29", pauseStart: "14:06", pauseEnd: "14:37", end: "19:31" },
+      { date: "2026-08-12", start: "10:22", pauseStart: "14:48", pauseEnd: "15:32", end: "18:52" },
+      { date: "2026-08-13", start: "10:30", pauseStart: "13:09", pauseEnd: "14:02", end: "18:42" },
+      { date: "2026-08-14", start: "11:29", pauseStart: "13:36", pauseEnd: "14:15", end: "19:31" }
+    ];
+
+    function calculateMinutes(start, pauseStart, pauseEnd, end) {
+      if (!start || !end) return 0;
+      const [sH, sM] = start.split(':').map(Number);
+      const [eH, eM] = end.split(':').map(Number);
+      let total = (eH * 60 + eM) - (sH * 60 + sM);
+
+      if (pauseStart && pauseEnd) {
+        const [psH, psM] = pauseStart.split(':').map(Number);
+        const [peH, peM] = pauseEnd.split(':').map(Number);
+        const pause = (peH * 60 + peM) - (psH * 60 + psM);
+        if (pause > 0) total -= pause;
+      }
+      return Math.max(0, total);
+    }
+
+    // Charger les données ou initialiser avec l'historique ci-dessus
+    let savedState = localStorage.getItem('timeTrackerState');
+    let state = savedState ? JSON.parse(savedState) : { activeSession: null, history: [] };
+
+    if (!savedState || state.history.length === 0) {
+      state.history = initialHistoryRaw.map((item, idx) => ({
+        id: Date.now() + idx,
+        date: item.date,
+        start: new Date(`${item.date}T${item.start}`).toISOString(),
+        pauseStart: item.pauseStart ? new Date(`${item.date}T${item.pauseStart}`).toISOString() : null,
+        pauseEnd: item.pauseEnd ? new Date(`${item.date}T${item.pauseEnd}`).toISOString() : null,
+        end: new Date(`${item.date}T${item.end}`).toISOString(),
+        totalMinutes: calculateMinutes(item.start, item.pauseStart, item.pauseEnd, item.end)
+      }));
+      localStorage.setItem('timeTrackerState', JSON.stringify(state));
+    }
 
     let timerInterval = null;
 
-    // Initialisation
     document.addEventListener('DOMContentLoaded', () => {
-      // Définir le filtre du mois sur le mois en cours
       const today = new Date();
       document.getElementById('month-filter').value = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}`;
       
@@ -154,8 +212,6 @@
       const d = new Date(dateStr);
       return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
     }
-
-    // --- ACTIONS BOUTONS MAIN ---
 
     function actionStart() {
       const now = new Date();
@@ -191,7 +247,6 @@
       const end = new Date();
       const session = state.activeSession;
       
-      // Calcul du temps travaillé en minutes
       const startMs = new Date(session.start).getTime();
       const endMs = end.getTime();
       
@@ -202,7 +257,6 @@
 
       const totalMinutes = Math.max(0, Math.round((endMs - startMs - pauseMs) / (1000 * 60)));
 
-      // Enregistrement dans l'historique
       state.history.push({
         id: Date.now(),
         date: session.date,
@@ -221,12 +275,10 @@
       alert(`Journée terminée ! Temps travaillé : ${Math.floor(totalMinutes/60)}h ${totalMinutes%60}m`);
     }
 
-    // Ajustement en temps réel des horaires du jour
     function updateCurrentTimes() {
       if (!state.activeSession) return;
       
       const dateBase = state.activeSession.date;
-      
       const startVal = document.getElementById('input-start').value;
       const pauseStartVal = document.getElementById('input-pause-start').value;
       const pauseEndVal = document.getElementById('input-pause-end').value;
@@ -237,8 +289,6 @@
 
       saveState();
     }
-
-    // --- MISE À JOUR UI & TIMER ---
 
     function updateUI() {
       const session = state.activeSession;
@@ -265,7 +315,6 @@
       btnEnd.classList.remove('hidden');
       todayAdjustments.classList.remove('hidden');
 
-      // MAJ des champs de saisie directes
       document.getElementById('input-start').value = getTimeInputVal(session.start);
       document.getElementById('input-pause-start').value = getTimeInputVal(session.pauseStart);
       document.getElementById('input-pause-end').value = getTimeInputVal(session.pauseEnd);
@@ -291,7 +340,6 @@
 
         const now = new Date();
         const start = new Date(session.start);
-        
         let elapsedMs = 0;
 
         if (session.status === 'working') {
@@ -301,7 +349,6 @@
           }
           elapsedMs = now - start - pauseMs;
         } else if (session.status === 'paused') {
-          // Si en pause, figer le temps au moment du début de la pause
           let pauseStart = new Date(session.pauseStart);
           elapsedMs = pauseStart - start;
         }
@@ -317,8 +364,6 @@
       }, 1000);
     }
 
-    // --- HISTORIQUE & ÉDITION ---
-
     function toggleHistory() {
       document.getElementById('history-section').classList.toggle('hidden');
     }
@@ -330,7 +375,14 @@
 
       const filtered = state.history.filter(item => item.date.startsWith(filterValue));
 
-      // Trier du plus récent au plus ancien
+      // Calculer total du mois
+      const totalMonthMins = filtered.reduce((acc, item) => acc + (item.totalMinutes || 0), 0);
+      const totalHrs = Math.floor(totalMonthMins / 60);
+      const totalMins = totalMonthMins % 60;
+      
+      document.getElementById('history-summary').innerText = 
+        `Total travaillé ce mois : ${totalHrs}h ${String(totalMins).padStart(2, '0')}m (${filtered.length} jour(s))`;
+
       filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
 
       filtered.forEach(item => {
@@ -341,12 +393,12 @@
         div.className = 'history-item';
         div.innerHTML = `
           <div class="history-item-header">
-            <span>${item.date}</span>
-            <span>Total: ${hrs}h ${mins}m</span>
+            <span>${item.date.split('-').reverse().join('/')}</span>
+            <span>Total: ${hrs}h ${String(mins).padStart(2, '0')}m</span>
           </div>
           <div class="history-grid">
-            <label>Début: <input type="time" value="${getTimeInputVal(item.start)}" onchange="editHistoryItem(${item.id}, 'start', this.value)"></label>
-            <label>Fin: <input type="time" value="${getTimeInputVal(item.end)}" onchange="editHistoryItem(${item.id}, 'end', this.value)"></label>
+            <label>Arrivée: <input type="time" value="${getTimeInputVal(item.start)}" onchange="editHistoryItem(${item.id}, 'start', this.value)"></label>
+            <label>Départ: <input type="time" value="${getTimeInputVal(item.end)}" onchange="editHistoryItem(${item.id}, 'end', this.value)"></label>
             <label>Début P.: <input type="time" value="${getTimeInputVal(item.pauseStart)}" onchange="editHistoryItem(${item.id}, 'pauseStart', this.value)"></label>
             <label>Fin P.: <input type="time" value="${getTimeInputVal(item.pauseEnd)}" onchange="editHistoryItem(${item.id}, 'pauseEnd', this.value)"></label>
           </div>
@@ -368,7 +420,6 @@
         item[field] = null;
       }
 
-      // Recalculer le temps total
       const startMs = item.start ? new Date(item.start).getTime() : 0;
       const endMs = item.end ? new Date(item.end).getTime() : 0;
       let pauseMs = 0;
@@ -403,15 +454,13 @@
         pauseStart: new Date(`${dateStr}T12:00`).toISOString(),
         pauseEnd: new Date(`${dateStr}T13:00`).toISOString(),
         end: new Date(`${dateStr}T17:00`).toISOString(),
-        totalMinutes: 480 // 8h par défaut
+        totalMinutes: 480
       };
 
       state.history.push(newItem);
       saveState();
       renderHistory();
     }
-
-    // --- EXPORT CSV ---
 
     function exportCSV() {
       const filterValue = document.getElementById('month-filter').value;

@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#111827">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Pointage">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icon.svg">
+  <link rel="stylesheet" href="style.css">
+  <title>Pointage</title>
+</head>
+<body>
+  <main class="app">
+    <header class="topbar">
+      <div>
+        <div class="eyebrow">POINTAGE</div>
+        <h1 id="todayLabel">Aujourd’hui</h1>
+      </div>
+      <button class="icon-btn" id="menuBtn" aria-label="Ouvrir le menu">☰</button>
+    </header>
+
+    <section class="card status-card">
+      <div class="status-row">
+        <span id="statusDot" class="dot"></span>
+        <strong id="statusText">Pas encore pointé</strong>
+      </div>
+      <div id="liveTimer" class="timer">00:00:00</div>
+      <div id="todaySummary" class="summary"></div>
+    </section>
+
+    <section class="actions">
+      <button id="arriveBtn" class="action primary">Pointer l’arrivée</button>
+      <button id="pauseBtn" class="action" hidden>Commencer la pause</button>
+      <button id="resumeBtn" class="action" hidden>Reprendre le travail</button>
+      <button id="departBtn" class="action danger" hidden>Fin de journée</button>
+    </section>
+
+    <section id="editCurrent" class="card edit-card" hidden>
+      <div class="section-title">Modifier la journée</div>
+      <div class="grid">
+        <label>Arrivée<input type="time" id="eArrivee"></label>
+        <label>Début pause<input type="time" id="ePauseStart"></label>
+        <label>Fin pause<input type="time" id="ePauseEnd"></label>
+        <label>Départ<input type="time" id="eDepart"></label>
+      </div>
+      <button id="saveCurrentBtn" class="secondary">Enregistrer les horaires</button>
+    </section>
+
+    <section id="doneCard" class="card done-card" hidden>
+      <div class="section-title">Journée terminée</div>
+      <div id="doneSummary"></div>
+    </section>
+  </main>
+
+  <aside id="drawer" class="drawer" aria-hidden="true">
+    <div class="drawer-head">
+      <strong>Pointage</strong>
+      <button class="icon-btn" id="closeMenuBtn" aria-label="Fermer">×</button>
+    </div>
+    <button class="menu-item" data-view="history">Historique</button>
+    <button class="menu-item" data-view="backup">Sauvegarde / restauration</button>
+    <button class="menu-item" data-view="about">À propos</button>
+  </aside>
+  <div id="overlay" class="overlay" hidden></div>
+
+  <div id="modal" class="modal" hidden>
+    <div class="modal-box">
+      <div class="modal-head">
+        <h2 id="modalTitle">Historique</h2>
+        <button class="icon-btn" id="modalClose">×</button>
+      </div>
+      <div id="modalContent"></div>
+    </div>
+  </div>
+
+  <input id="importInput" type="file" accept=".json,application/json" hidden>
+  <script src="app.js"></script>
+</body>
+</html>

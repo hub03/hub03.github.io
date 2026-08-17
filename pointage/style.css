@@ -54,3 +54,5 @@ h2{margin:0;font-size:22px}
 .notice{padding:12px 14px;background:#fff7ed;border:1px solid #fed7aa;border-radius:12px;font-size:13px;margin-bottom:12px}
 .kpi{font-size:30px;font-weight:800;margin:4px 0 16px}
 @media(max-width:380px){.timer{font-size:36px}.grid{grid-template-columns:1fr}}
+
+[hidden]{display:none !important}

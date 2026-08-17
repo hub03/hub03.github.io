@@ -48,7 +48,7 @@ function refresh(){
  return getDay(todayKey()).then(d=>{currentDay=d;renderMain()});
 }
 function renderMain(){
- const date=todayKey();$("todayLabel").textContent=fmtDate(date);
+ const date=todayKey();$("todayLabel").textContent=fmtDate(date);$("modal").hidden=true;$("drawer").classList.remove("open");$("overlay").hidden=true;
  const d=currentDay;
  $("editCurrent").hidden=!d;
  if(!d){

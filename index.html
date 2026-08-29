@@ -189,6 +189,23 @@
       color: var(--text);
     }
 
+    /* Style du conteneur du globe */
+    .globe-wrapper {
+      margin-top: 3rem;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      transition: opacity 0.3s ease;
+    }
+
+    .globe-wrapper.hidden {
+      display: none;
+    }
+
+    canvas {
+      filter: drop-shadow(0 0 15px var(--accent-glow));
+    }
+
     .year-nav {
       display: flex;
       align-items: center;
@@ -238,7 +255,6 @@
       display: flex;
     }
 
-    /* Nouvelle disposition : 1 ligne par saison */
     .calendar-rows {
       display: flex;
       flex-direction: column;
@@ -267,7 +283,6 @@
       color: var(--accent);
     }
 
-    /* Les 3 mois en 3 colonnes dans chaque saison */
     .months-container {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -353,6 +368,11 @@
     <div class="current-date" id="current-fixed-date">---</div>
   </div>
 
+  <!-- Globe terrestre -->
+  <div class="globe-wrapper" id="globe-wrapper">
+    <canvas id="globeCanvas" width="280" height="280"></canvas>
+  </div>
+
   <div class="calendar-container" id="calendar-container">
     <div class="year-nav">
       <button class="nav-btn" id="prev-year">&lt;</button>
@@ -366,7 +386,7 @@
   <script>
     const I18N = {
       fr: {
-        title: "Le Calendrier Cosmologique Universal",
+        title: "Le Calendrier Cosmologique Universel",
         intro: "Ce calendrier s'affranchit de toute tradition religieuse, politique ou nationale. Il repose uniquement sur la géométrie orbitale terrestre et une logique mathématique pure.",
         hYear: "Origine de l'Année 1 (Ère Cénozoïque)",
         pYear: "Le point zéro est fixé à l'impact de la météorite de Chicxulub (~66 038 000 ans BP), événement planétaire absolu ayant terminé l'ère des dinosaures et ouvert le règne des mammifères.",
@@ -472,9 +492,10 @@
     };
 
     const CENOZOIC_BASE = 66038000;
-    
     let currentGregorianYear = new Date().getFullYear();
     let selectedGregorianYear = currentGregorianYear;
+    let isGlobeActive = true;
+    let animFrameId = null;
 
     function getCenozoicYear(gregorianYear) {
       return CENOZOIC_BASE + (gregorianYear - 1950);
@@ -528,7 +549,6 @@
           year: cenozoicYear
         };
       } else {
-        // 366e jour (Jour bissextile) -> S5 / M3 / D24
         return {
           season: 5,
           month: 3,
@@ -540,7 +560,6 @@
 
     function updateClockAndHeader() {
       const now = new Date();
-      
       const hrs = String(now.getHours()).padStart(2, '0');
       const mins = String(now.getMinutes()).padStart(2, '0');
       const secs = String(now.getSeconds()).padStart(2, '0');
@@ -548,7 +567,6 @@
 
       const fixed = convertToFixedDate(now);
       const dateString = `${formatYear(fixed.year)} / S${fixed.season} / M${fixed.month} / D${fixed.day}`;
-      
       document.getElementById('current-fixed-date').textContent = dateString;
     }
 
@@ -575,7 +593,6 @@
         const monthsContainer = document.createElement('div');
         monthsContainer.className = 'months-container';
 
-        // Durée standard de M3 = 23. Si S5 et année bissextile -> 24 jours.
         const m3Days = (s === 5 && leap) ? 24 : 23;
 
         const monthsConfig = [
@@ -616,6 +633,86 @@
       }
     }
 
+    /* Logic du Globe Wireframe */
+    const canvas = document.getElementById('globeCanvas');
+    const ctx = canvas.getContext('2d');
+    const width = canvas.width;
+    const height = canvas.height;
+    const cx = width / 2;
+    const cy = height / 2;
+    const radius = 100;
+    const tilt = 23.44 * (Math.PI / 180);
+
+    function drawGlobe() {
+      if (!isGlobeActive) return;
+
+      ctx.clearRect(0, 0, width, height);
+
+      const now = new Date();
+      const secondsInDay = (now.getUTCHours() * 3600) + 
+                           (now.getUTCMinutes() * 60) + 
+                           now.getUTCSeconds() + 
+                           (now.getUTCMilliseconds() / 1000);
+
+      // Vitesse ralentie de moitié : 2880 (1 tour complet en ~30s)
+      const SPEED_FACTOR = 2880;
+      const rotationAngle = ((secondsInDay * SPEED_FACTOR) / 86400) * (2 * Math.PI);
+
+      ctx.save();
+      ctx.translate(cx, cy);
+      ctx.rotate(tilt);
+
+      // Silhouette du globe
+      ctx.beginPath();
+      ctx.arc(0, 0, radius, 0, Math.PI * 2);
+      ctx.strokeStyle = '#38bdf8';
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+
+      // Axe de rotation (pointillé)
+      ctx.beginPath();
+      ctx.moveTo(0, -radius - 12);
+      ctx.lineTo(0, radius + 12);
+      ctx.strokeStyle = '#334155';
+      ctx.lineWidth = 1;
+      ctx.setLineDash([4, 4]);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      // Parallèles (Latitudes)
+      const parallels = [-60, -30, 0, 30, 60];
+      parallels.forEach(lat => {
+        const radLat = lat * (Math.PI / 180);
+        const y = -radius * Math.sin(radLat);
+        const rLat = radius * Math.cos(radLat);
+
+        ctx.beginPath();
+        ctx.ellipse(0, y, rLat, rLat * 0.3, 0, 0, Math.PI * 2);
+        ctx.strokeStyle = lat === 0 ? 'rgba(56, 189, 248, 0.6)' : 'rgba(148, 163, 184, 0.2)';
+        ctx.lineWidth = lat === 0 ? 1.2 : 0.8;
+        ctx.stroke();
+      });
+
+      // Méridiens (Longitudes)
+      const meridianCount = 12;
+      for (let i = 0; i < meridianCount; i++) {
+        const angle = rotationAngle + (i * (Math.PI * 2 / meridianCount));
+        const xOffset = Math.sin(angle) * radius;
+
+        if (Math.cos(angle) > 0) {
+          ctx.beginPath();
+          ctx.ellipse(0, 0, Math.abs(xOffset), radius, 0, 0, Math.PI * 2);
+          ctx.strokeStyle = 'rgba(56, 189, 248, 0.35)';
+          ctx.lineWidth = 0.8;
+          ctx.stroke();
+        }
+      }
+
+      ctx.restore();
+
+      animFrameId = requestAnimationFrame(drawGlobe);
+    }
+
     function updateModalLanguage(lang) {
       const data = I18N[lang] || I18N.fr;
       const content = document.getElementById('modal-content');
@@ -654,8 +751,24 @@
       updateModalLanguage(e.target.value);
     });
 
+    // Basculement Calendrier <-> Globe
     document.getElementById('hero-card').addEventListener('click', () => {
-      document.getElementById('calendar-container').classList.toggle('visible');
+      const calendarContainer = document.getElementById('calendar-container');
+      const globeWrapper = document.getElementById('globe-wrapper');
+      
+      const isCalendarVisible = calendarContainer.classList.toggle('visible');
+
+      if (isCalendarVisible) {
+        // Masquer le globe
+        globeWrapper.classList.add('hidden');
+        isGlobeActive = false;
+        if (animFrameId) cancelAnimationFrame(animFrameId);
+      } else {
+        // Réafficher le globe
+        globeWrapper.classList.remove('hidden');
+        isGlobeActive = true;
+        drawGlobe();
+      }
     });
 
     document.getElementById('prev-year').addEventListener('click', () => {
@@ -672,6 +785,7 @@
     renderCalendar();
     updateClockAndHeader();
     setInterval(updateClockAndHeader, 1000);
+    drawGlobe();
   </script>
 </body>
 </html>

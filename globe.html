@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Globe Wireframe</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --accent: #38bdf8;
+      --accent-glow: rgba(56, 189, 248, 0.3);
+      --border: #334155;
+    }
+
+    body {
+      background-color: var(--bg);
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+    }
+
+    .globe-container {
+      width: 300px;
+      height: 300px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    canvas {
+      filter: drop-shadow(0 0 15px var(--accent-glow));
+    }
+  </style>
+</head>
+<body>
+
+  <div class="globe-container">
+    <canvas id="globeCanvas" width="300" height="300"></canvas>
+  </div>
+
+  <script>
+    const canvas = document.getElementById('globeCanvas');
+    const ctx = canvas.getContext('2d');
+
+    const width = canvas.width;
+    const height = canvas.height;
+    const cx = width / 2;
+    const cy = height / 2;
+    const radius = 110;
+
+    // Inclinaison de l'axe terrestre en radians (~23.44°)
+    const tilt = 23.44 * (Math.PI / 180);
+
+    function drawGlobe() {
+      ctx.clearRect(0, 0, width, height);
+
+      // Calcul de la rotation réelle basée auf l'heure UTC
+      const now = new Date();
+      const secondsInDay = (now.getUTCHours() * 3600) + (now.getUTCMinutes() * 60) + now.getUTCSeconds() + (now.getUTCMilliseconds() / 1000);
+      
+      // Angle de rotation de la Terre (0 à 2PI)
+      // Note : Si tu souhaites accentuer la vitesse visuelle, multiplie `rotationAngle` par un facteur (ex: * 100)
+      const rotationAngle = (secondsInDay / 86400) * (2 * Math.PI);
+
+      ctx.save();
+      ctx.translate(cx, cy);
+      ctx.rotate(tilt); // Applique l'inclinaison axiale
+
+      // 1. Cercle extérieur (Silhouette du globe)
+      ctx.beginPath();
+      ctx.arc(0, 0, radius, 0, Math.PI * 2);
+      ctx.strokeStyle = '#38bdf8';
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+
+      // 2. Axe de rotation (Ligne qui traverse les pôle)
+      ctx.beginPath();
+      ctx.moveTo(0, -radius - 15);
+      ctx.lineTo(0, radius + 15);
+      ctx.strokeStyle = '#334155';
+      ctx.lineWidth = 1;
+      ctx.setLineDash([4, 4]); // Ligne pointillée pour l'axe
+      ctx.stroke();
+      ctx.setLineDash([]); // Réinitialisation
+
+      // 3. Parallèles (Lignes de latitude)
+      const parallels = [-60, -30, 0, 30, 60];
+      parallels.forEach(lat => {
+        const radLat = lat * (Math.PI / 180);
+        const y = -radius * Math.sin(radLat);
+        const rLat = radius * Math.cos(radLat);
+
+        ctx.beginPath();
+        ctx.ellipse(0, y, rLat, rLat * 0.3, 0, 0, Math.PI * 2);
+        ctx.strokeStyle = lat === 0 ? 'rgba(56, 189, 248, 0.6)' : 'rgba(148, 163, 184, 0.2)';
+        ctx.lineWidth = lat === 0 ? 1.2 : 0.8;
+        ctx.stroke();
+      });
+
+      // 4. Méridiens en rotation (Lignes de longitude)
+      const meridianCount = 12;
+      for (let i = 0; i < meridianCount; i++) {
+        const angle = rotationAngle + (i * (Math.PI * 2 / meridianCount));
+        const xOffset = Math.sin(angle) * radius;
+
+        // Dessine uniquement la face visible (front)
+        if (Math.cos(angle) > 0) {
+          ctx.beginPath();
+          ctx.ellipse(0, 0, Math.abs(xOffset), radius, 0, 0, Math.PI * 2);
+          ctx.strokeStyle = 'rgba(56, 189, 248, 0.35)';
+          ctx.lineWidth = 0.8;
+          ctx.stroke();
+        }
+      }
+
+      ctx.restore();
+
+      requestAnimationFrame(drawGlobe);
+    }
+
+    drawGlobe();
+  </script>
+</body>
+</html>

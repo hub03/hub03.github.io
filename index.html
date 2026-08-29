@@ -27,7 +27,7 @@
       background-color: var(--bg);
       color: var(--text);
       min-height: 100vh;
-      padding: 2rem;
+      padding: 2rem 1rem;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -196,7 +196,7 @@
       gap: 1.5rem;
       margin: 2rem 0 1.5rem 0;
       width: 100%;
-      max-width: 1200px;
+      max-width: 1000px;
     }
 
     .nav-btn {
@@ -228,7 +228,7 @@
 
     .calendar-container {
       width: 100%;
-      max-width: 1200px;
+      max-width: 1000px;
       display: none;
       flex-direction: column;
       align-items: center;
@@ -238,70 +238,72 @@
       display: flex;
     }
 
-    .calendar-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    /* Nouvelle disposition : 1 ligne par saison */
+    .calendar-rows {
+      display: flex;
+      flex-direction: column;
       gap: 1.5rem;
       width: 100%;
     }
 
-    .season-card {
+    .season-row {
       background: var(--card-bg);
       border: 1px solid var(--border);
       border-radius: 1rem;
       padding: 1.2rem;
-      transition: transform 0.2s, border-color 0.2s;
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+      transition: border-color 0.2s;
     }
 
-    .season-card:hover {
-      transform: translateY(-4px);
+    .season-row:hover {
       border-color: var(--accent);
-    }
-
-    .season-card.season-x {
-      border: 1px dashed var(--accent);
-      background: rgba(56, 189, 248, 0.05);
-      grid-column: 1 / -1;
-      max-width: 300px;
-      margin: 0 auto;
     }
 
     .season-title {
       font-size: 1.2rem;
-      font-weight: 700;
+      font-weight: 800;
       color: var(--accent);
-      margin-bottom: 0.8rem;
-      text-align: center;
     }
 
-    .month-section {
+    /* Les 3 mois en 3 colonnes dans chaque saison */
+    .months-container {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.2rem;
+    }
+
+    @media (max-width: 768px) {
+      .months-container {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .month-card {
+      background: rgba(15, 23, 42, 0.4);
+      border: 1px solid var(--border);
+      border-radius: 0.8rem;
+      padding: 0.8rem;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .month-label {
+      font-size: 0.85rem;
+      font-weight: 800;
+      color: var(--accent);
+      margin-bottom: 0.6rem;
+      text-align: center;
+      border-bottom: 1px dashed var(--border);
+      padding-bottom: 0.4rem;
+    }
+
+    .days-grid {
       display: grid;
       grid-template-columns: repeat(5, 1fr);
       gap: 0.3rem;
       text-align: center;
-      position: relative;
-      padding-top: 0.6rem;
-      margin-top: 0.4rem;
-    }
-
-    /* Séparateur en pointillés entre les mois */
-    .month-section + .month-section::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      border-top: 2px dashed var(--border);
-    }
-
-    .month-label {
-      grid-column: 1 / -1;
-      font-size: 0.75rem;
-      font-weight: 800;
-      color: var(--accent);
-      text-align: left;
-      padding-bottom: 0.2rem;
-      opacity: 0.8;
     }
 
     .day-cell {
@@ -358,7 +360,7 @@
       <button class="nav-btn" id="next-year">&gt;</button>
     </div>
 
-    <div class="calendar-grid" id="calendar-grid"></div>
+    <div class="calendar-rows" id="calendar-rows"></div>
   </div>
 
   <script>
@@ -371,10 +373,10 @@
         hDay: "Origine du Jour 1 (Le Périhélie)",
         pDay: "Le 1er jour de l'année est le Périhélie terrestre (~4 janvier) : le moment orbital exact où la Terre est au plus près du Soleil.",
         hGrid: "Structure : 5 Saisons (S1-S5) × 3 Mois (M1-M3)",
-        pGrid: "L'année compte 5 saisons de 73 jours. Aucun nom arbitraire n'est donné aux jours de la semaine : leur chiffre indique directement la position dans le cycle de 5 jours (ex. 1 ou 6 = début de semaine).",
-        li1: "Saisons : 5 périodes majeures numérotées S1 à S5.",
-        li2: "Mois : M1 et M2 comptent 25 jours (D1 à D25). M3 en compte 23 (D1 à D23) pour compléter le cycle de 73 jours tout en s'alignant sur les usages économiques (loyers, abonnements).",
-        li3: "1 Jour bissextile (✖️) ajouté séparément tous les 4 ans lors du 366e jour."
+        pGrid: "L'année compte 5 saisons de 73 jours. Les jours de la semaine ne portent pas de nom : leur numéro indique directement leur position dans le cycle de 5 jours.",
+        li1: "Saisons : 5 lignes principales numérotées de S1 à S5.",
+        li2: "Mois : M1 et M2 comptent 25 jours (D1 à D25). M3 en compte 23 (D1 à D23) afin de respecter le rythme économique (loyers, abonnements).",
+        li3: "Jour bissextile : tous les 4 ans, le 366e jour est directement intégré à la fin de l'année en tant que 24e jour du mois S5 M3 (D24)."
       },
       en: {
         title: "The Universal Cosmological Calendar",
@@ -384,23 +386,23 @@
         hDay: "Origin of Day 1 (Perihelion)",
         pDay: "Day 1 of the year is Earth's Perihelion (~Jan 4th), when Earth is closest to the Sun.",
         hGrid: "Structure: 5 Seasons (S1-S5) × 3 Months (M1-M3)",
-        pGrid: "The year has 5 seasons of 73 days. Days of the week carry no redundant names: their number naturally reveals their position in the 5-day cycle.",
-        li1: "Seasons: 5 major periods numbered S1 to S5.",
-        li2: "Months: M1 & M2 have 25 days (D1-D25). M3 has 23 days (D1-D23) to adapt to billing cycles.",
-        li3: "1 Leap day (✖️) added separately every 4 years."
+        pGrid: "The year consists of 5 seasons of 73 days. Days carry no names; their position indicates their place in the 5-day cycle.",
+        li1: "Seasons: 5 main rows numbered S1 to S5.",
+        li2: "Months: M1 & M2 have 25 days (D1-D25). M3 has 23 days (D1-D23) to align with standard billing cycles.",
+        li3: "Leap year: Every 4 years, the 366th day is added directly to the end of the year as the 24th day of S5 M3 (D24)."
       },
       es: {
         title: "El Calendario Cosmológico Universal",
-        intro: "Este calendario está libre de cualquier tradición religiosa o política. Se basa únicamente en la geometría orbital terrestre.",
+        intro: "Este calendario está libre de tradiciones religiosas o políticas. Se basa únicamente en la geometría orbital terrestre.",
         hYear: "Origen del Año 1 (Era Cenozoica)",
         pYear: "El año cero se establece en el impacto del asteroide Chicxulub (~66 038 000 AP).",
         hDay: "Origen del Día 1 (Perihelio)",
         pDay: "El día 1 del año es el Perihelio terrestre (~4 de enero).",
         hGrid: "Estructura: 5 Estaciones (S1-S5) × 3 Meses (M1-M3)",
-        pGrid: "El año cuenta con 5 estaciones de 73 días. No hay nombres arbitrarios para los días de la semana: su número indica su posición en el ciclo de 5 días.",
-        li1: "Estaciones: 5 periodos numerados de S1 a S5.",
+        pGrid: "El año cuenta con 5 estaciones de 73 días. No hay nombres para los días: su número muestra su posición en el ciclo de 5 días.",
+        li1: "Estaciones: 5 filas principales de S1 a S5.",
         li2: "Meses: M1 y M2 tienen 25 días (D1-D25). M3 tiene 23 días (D1-D23).",
-        li3: "1 Día bisiesto (✖️) añadido cada 4 años."
+        li3: "Año bisiesto: Cada 4 años, el día 366 se añade al final del año como el 24.º día de S5 M3 (D24)."
       },
       de: {
         title: "Der Universelle Kosmologische Kalender",
@@ -410,10 +412,10 @@
         hDay: "Ursprung von Tag 1 (Perihel)",
         pDay: "Tag 1 des Jahres ist das Erdperihel (~4. Januar).",
         hGrid: "Struktur: 5 Jahreszeiten (S1-S5) × 3 Monate (M1-M3)",
-        pGrid: "Das Jahr hat 5 Jahreszeiten zu 73 Tagen. Die Tage tragen keine Wochentagsnamen, da die Zahl die Position im 5-Tage-Zyklus anzeigt.",
-        li1: "Saisons: 5 Hauptperioden, S1 bis S5.",
+        pGrid: "Das Jahr hat 5 Jahreszeiten zu 73 Tagen. Keine Wochentagsnamen: Die Zahl zeigt die Position im 5-Tage-Zyklus an.",
+        li1: "Saisons: 5 Hauptzeilen von S1 bis S5.",
         li2: "Monate: M1 & M2 haben 25 Tage (D1-D25). M3 hat 23 Tage (D1-D23).",
-        li3: "1 Schaltjahr-Tag (✖️) alle 4 Jahre."
+        li3: "Schaltjahr: Alle 4 Jahre wird der 366. Tag am Ende des Jahres als 24. Tag von S5 M3 (D24) angehängt."
       },
       zh: {
         title: "宇宙通用历法",
@@ -423,10 +425,10 @@
         hDay: "第 1 天的由来（近日点）",
         pDay: "每年第 1 天为地球近日点（约 1 月 4 日）。",
         hGrid: "结构：5 个季节 (S1-S5) × 3 个月份 (M1-M3)",
-        pGrid: "每年 5 个 73 天的季节。无冗余的星期名称，天数直接指示 5 天周期中的位置。",
-        li1: "季节：5 个主要阶段，编号 S1 至 S5。",
+        pGrid: "每年 5 个 73 天的季节。无星期名称，数字直接指示 5 天周期中的位置。",
+        li1: "季节：5 个主要行，编号 S1 至 S5。",
         li2: "月份：M1 和 M2 为 25 天（D1-D25），M3 为 23 天（D1-D23）。",
-        li3: "每 4 年在第 366 天增加 1 天闰日（✖️）。"
+        li3: "闰年：每 4 年将第 366 天直接作为 S5 M3 的第 24 天（D24）附加于年末。"
       },
       ja: {
         title: "宇宙汎用暦",
@@ -436,10 +438,10 @@
         hDay: "1日の起源（近日点）",
         pDay: "一年の第1日は地球の近日点（約1月4日）です。",
         hGrid: "構造：5つの季節 (S1-S5) × 3つの月 (M1-M3)",
-        pGrid: "一年は73日間の5つの季節で構成されます。曜日の名前は廃止され、数字が5日周期内の位置をそのまま示します。",
-        li1: "季節：S1からS5までの5つの期間。",
+        pGrid: "一年は73日間の5つの季節で構成されます。曜日の名前はなく、数字が5日周期内の位置を示します。",
+        li1: "季節：S1からS5までの5つの行。",
         li2: "月：M1とM2は25日間（D1-D25）、M3は23日間（D1-D23）。",
-        li3: "4年ごとに1日のうるう日（✖️）を追加。"
+        li3: "うるう年：4年ごとに366日目がS5 M3の24日目（D24）として年末に追加されます。"
       },
       ar: {
         title: "التقويم الكوني العالمي",
@@ -449,10 +451,10 @@
         hDay: "أصل اليوم 1 (الحضيض الشمسي)",
         pDay: "اليوم الأول هو الحضيض الشمسي للأرض (حوالي 4 يناير).",
         hGrid: "الهيكل: 5 فصول (S1-S5) × 3 أشهر (M1-M3)",
-        pGrid: "السنة 5 فصول من 73 يوماً. تم إلغاء أسماء أيام الأسبوع، حيث يشير رقم اليوم مباشرة إلى موقعه في الدورة المكونة من 5 أيام.",
-        li1: "الفصول: 5 فصول مرقمة من S1 إلى S5.",
+        pGrid: "السنة 5 فصول من 73 يوماً. لا توجد أسماء للأيام، حيث يشير الرقم مباشرة إلى موقعه في الدورة.",
+        li1: "الفصول: 5 أسطر رئيسية مرقمة من S1 إلى S5.",
         li2: "الأشهر: M1 و M2 يتكونان من 25 يوماً، و M3 من 23 يوماً.",
-        li3: "يوم كبيس واحد (✖️) يضاف كل 4 سنوات."
+        li3: "السنة الكبيسة: كل 4 سنوات، يضاف اليوم 366 مباشرة كـ اليوم 24 من S5 M3 (D24)."
       },
       ru: {
         title: "Вселенский Космологический Календарь",
@@ -462,10 +464,10 @@
         hDay: "Происхождение 1-го дня (Перигелий)",
         pDay: "1-й день года — перигелий Земли (~4 января).",
         hGrid: "Структура: 5 Сезонов (S1-S5) × 3 Месяца (M1-M3)",
-        pGrid: "Год состоит из 5 сезонов по 73 дня. Названия дней недели упразднены, их число указывает позицию в 5-дневном цикле.",
-        li1: "Сезоны: 5 периодов с S1 по S5.",
+        pGrid: "Год состоит из 5 сезонов по 73 дня. Названия дней упразднены.",
+        li1: "Сезоны: 5 основных строк с S1 по S5.",
         li2: "Месяцы: M1 и M2 содержат по 25 дней (D1-D25), M3 — 23 дня (D1-D23).",
-        li3: "1 високосный день (✖️) каждые 4 года."
+        li3: "Високосный год: каждые 4 года 366-й день добавляется в конец года как 24-й день S5 M3 (D24)."
       }
     };
 
@@ -523,15 +525,14 @@
           season: seasonIndex,
           month: monthInSeason,
           day: dayInMonth,
-          isX: false,
           year: cenozoicYear
         };
       } else {
+        // 366e jour (Jour bissextile) -> S5 / M3 / D24
         return {
-          season: '✖️',
-          month: '✖️',
-          day: 1,
-          isX: true,
+          season: 5,
+          month: 3,
+          day: 24,
           year: cenozoicYear
         };
       }
@@ -546,16 +547,14 @@
       document.getElementById('clock').textContent = `${hrs}:${mins}:${secs}`;
 
       const fixed = convertToFixedDate(now);
-      const dateString = fixed.isX
-        ? `${formatYear(fixed.year)} / ✖️ / D1 ✖️`
-        : `${formatYear(fixed.year)} / S${fixed.season} / M${fixed.month} / D${fixed.day}`;
+      const dateString = `${formatYear(fixed.year)} / S${fixed.season} / M${fixed.month} / D${fixed.day}`;
       
       document.getElementById('current-fixed-date').textContent = dateString;
     }
 
     function renderCalendar() {
-      const grid = document.getElementById('calendar-grid');
-      grid.innerHTML = '';
+      const container = document.getElementById('calendar-rows');
+      container.innerHTML = '';
       
       const displayedCenozoicYear = getCenozoicYear(selectedGregorianYear);
       document.getElementById('displayed-year').textContent = formatYear(displayedCenozoicYear);
@@ -565,69 +564,55 @@
       const leap = isLeapYear(selectedGregorianYear);
 
       for (let s = 1; s <= 5; s++) {
-        const card = document.createElement('div');
-        card.className = 'season-card';
+        const seasonRow = document.createElement('div');
+        seasonRow.className = 'season-row';
 
         const title = document.createElement('div');
         title.className = 'season-title';
         title.textContent = `S${s}`;
-        card.appendChild(title);
+        seasonRow.appendChild(title);
+
+        const monthsContainer = document.createElement('div');
+        monthsContainer.className = 'months-container';
+
+        // Durée standard de M3 = 23. Si S5 et année bissextile -> 24 jours.
+        const m3Days = (s === 5 && leap) ? 24 : 23;
 
         const monthsConfig = [
-          { m: 1, startDaySeason: 1, totalDays: 25 },
-          { m: 2, startDaySeason: 26, totalDays: 25 },
-          { m: 3, startDaySeason: 51, totalDays: 23 }
+          { m: 1, totalDays: 25 },
+          { m: 2, totalDays: 25 },
+          { m: 3, totalDays: m3Days }
         ];
 
         monthsConfig.forEach(cfg => {
-          const monthSec = document.createElement('div');
-          monthSec.className = 'month-section';
+          const monthCard = document.createElement('div');
+          monthCard.className = 'month-card';
 
           const monthLabel = document.createElement('div');
           monthLabel.className = 'month-label';
           monthLabel.textContent = `M${cfg.m}`;
-          monthSec.appendChild(monthLabel);
+          monthCard.appendChild(monthLabel);
+
+          const daysGrid = document.createElement('div');
+          daysGrid.className = 'days-grid';
 
           for (let d = 1; d <= cfg.totalDays; d++) {
             const cell = document.createElement('div');
             cell.className = 'day-cell';
             cell.textContent = d;
 
-            if (selectedGregorianYear === now.getFullYear() && !fixedToday.isX && fixedToday.season === s && fixedToday.month === cfg.m && fixedToday.day === d) {
+            if (selectedGregorianYear === now.getFullYear() && fixedToday.season === s && fixedToday.month === cfg.m && fixedToday.day === d) {
               cell.classList.add('today');
             }
-            monthSec.appendChild(cell);
+            daysGrid.appendChild(cell);
           }
 
-          card.appendChild(monthSec);
+          monthCard.appendChild(daysGrid);
+          monthsContainer.appendChild(monthCard);
         });
 
-        grid.appendChild(card);
-      }
-
-      if (leap) {
-        const cardX = document.createElement('div');
-        cardX.className = 'season-card season-x';
-
-        const titleX = document.createElement('div');
-        titleX.className = 'season-title';
-        titleX.textContent = `✖️`;
-        cardX.appendChild(titleX);
-
-        const daysGridX = document.createElement('div');
-        daysGridX.className = 'month-section';
-
-        const cell = document.createElement('div');
-        cell.className = 'day-cell';
-        cell.textContent = `✖️1`;
-
-        if (selectedGregorianYear === now.getFullYear() && fixedToday.isX) {
-          cell.classList.add('today');
-        }
-        daysGridX.appendChild(cell);
-
-        cardX.appendChild(daysGridX);
-        grid.appendChild(cardX);
+        seasonRow.appendChild(monthsContainer);
+        container.appendChild(seasonRow);
       }
     }
 

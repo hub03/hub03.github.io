@@ -193,7 +193,7 @@
         return {
           month: '✖️',
           day: xDay,
-          dayLabel: `✖️${xDay}`,
+          dayLabel: `✖️`,
           isX: true,
           year: date.getFullYear()
         };
@@ -209,11 +209,9 @@
       const secs = String(now.getSeconds()).padStart(2, '0');
       document.getElementById('clock').textContent = `${hrs}:${mins}:${secs}`;
 
-      // Date actuelle universelle
+      // Date au format : AAAA / MM / JJ
       const fixed = convertToFixedDate(now);
-      const dateString = fixed.isX 
-        ? `(${fixed.day}) - ${fixed.year}`
-        : `${fixed.month} - ${fixed.dayLabel} ${fixed.day} — ${fixed.year}`;
+      const dateString = `${fixed.year} / ${fixed.month} / ${fixed.day} ${fixed.dayLabel}`;
       
       document.getElementById('current-fixed-date').textContent = dateString;
 

@@ -33,22 +33,7 @@
       align-items: center;
     }
 
-    header {
-      text-align: center;
-      margin-bottom: 2rem;
-    }
-
-    h1 {
-      font-size: 2.5rem;
-      margin-bottom: 0.5rem;
-    }
-
-    .subtitle {
-      color: var(--text-muted);
-      font-size: 1.1rem;
-      letter-spacing: 2px;
-    }
-
+    /* Hero Card pliable */
     .hero-card {
       background: var(--card-bg);
       border: 1px solid var(--border);
@@ -56,9 +41,16 @@
       padding: 2rem 3rem;
       text-align: center;
       box-shadow: 0 10px 30px var(--accent-glow);
-      margin-bottom: 3rem;
+      cursor: pointer;
+      user-select: none;
+      transition: transform 0.2s, border-color 0.2s;
       max-width: 500px;
       width: 100%;
+    }
+
+    .hero-card:hover {
+      transform: translateY(-2px);
+      border-color: var(--accent);
     }
 
     .clock {
@@ -75,12 +67,62 @@
       color: var(--text);
     }
 
+    /* Barre de navigation d'année */
+    .year-nav {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1.5rem;
+      margin: 2rem 0 1.5rem 0;
+      width: 100%;
+      max-width: 1200px;
+    }
+
+    .nav-btn {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      color: var(--accent);
+      font-size: 1.2rem;
+      font-weight: bold;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s, border-color 0.2s;
+    }
+
+    .nav-btn:hover {
+      border-color: var(--accent);
+      background: rgba(56, 189, 248, 0.1);
+    }
+
+    .year-display {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--text);
+    }
+
+    /* Conteneur rétractable du calendrier */
+    .calendar-container {
+      width: 100%;
+      max-width: 1200px;
+      display: none; /* Masqué par défaut */
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .calendar-container.visible {
+      display: flex;
+    }
+
     .calendar-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
       gap: 1.5rem;
       width: 100%;
-      max-width: 1200px;
     }
 
     .month-card {
@@ -148,20 +190,25 @@
 </head>
 <body>
 
-  <header>
-    <h1>📅</h1>
-    <div class="subtitle">13 × 28 + ✖️</div>
-  </header>
-
-  <div class="hero-card">
+  <div class="hero-card" id="hero-card">
     <div class="clock" id="clock">00:00:00</div>
     <div class="current-date" id="current-fixed-date">---</div>
   </div>
 
-  <div class="calendar-grid" id="calendar-grid"></div>
+  <div class="calendar-container" id="calendar-container">
+    
+    <div class="year-nav">
+      <button class="nav-btn" id="prev-year">&lt;</button>
+      <div class="year-display" id="displayed-year">2026</div>
+      <button class="nav-btn" id="next-year">&gt;</button>
+    </div>
+
+    <div class="calendar-grid" id="calendar-grid"></div>
+  </div>
 
   <script>
     const DAY_LABELS = ['A', 'B', 'C', 'D', 'E', 'F', 'G'];
+    let selectedYear = new Date().getFullYear();
     
     function isLeapYear(year) {
       return (year % 4 === 0 && year % 100 !== 0) || (year % 400 === 0);
@@ -209,7 +256,7 @@
       const secs = String(now.getSeconds()).padStart(2, '0');
       document.getElementById('clock').textContent = `${hrs}:${mins}:${secs}`;
 
-      // Date au format : AAAA / MM / JJ
+      // Date au format AAAA / MM / JJ
       const fixed = convertToFixedDate(now);
       const dateString = `${fixed.year} / ${fixed.month} / ${fixed.day} ${fixed.dayLabel}`;
       
@@ -222,10 +269,13 @@
       const grid = document.getElementById('calendar-grid');
       grid.innerHTML = '';
       
+      document.getElementById('displayed-year').textContent = selectedYear;
+
       const now = new Date();
       const fixedToday = convertToFixedDate(now);
-      const leap = isLeapYear(now.getFullYear());
+      const leap = isLeapYear(selectedYear);
 
+      // Render 13 Mois
       for (let m = 1; m <= 13; m++) {
         const card = document.createElement('div');
         card.className = 'month-card';
@@ -252,7 +302,8 @@
           cell.className = 'day-cell';
           cell.textContent = d;
 
-          if (!fixedToday.isX && fixedToday.month === m && fixedToday.day === d) {
+          // Surligner le jour actuel uniquement si l'année affichée est l'année courante
+          if (selectedYear === now.getFullYear() && !fixedToday.isX && fixedToday.month === m && fixedToday.day === d) {
             cell.classList.add('today');
           }
           daysGrid.appendChild(cell);
@@ -262,7 +313,7 @@
         grid.appendChild(card);
       }
 
-      // Mois X
+      // Render Mois X
       const cardX = document.createElement('div');
       cardX.className = 'month-card month-x';
 
@@ -280,7 +331,7 @@
         cell.className = 'day-cell';
         cell.textContent = `✖️${x}`;
 
-        if (fixedToday.isX && fixedToday.day === x) {
+        if (selectedYear === now.getFullYear() && fixedToday.isX && fixedToday.day === x) {
           cell.classList.add('today');
         }
         daysGridX.appendChild(cell);
@@ -289,6 +340,23 @@
       cardX.appendChild(daysGridX);
       grid.appendChild(cardX);
     }
+
+    // Toggle Affichage du calendrier
+    document.getElementById('hero-card').addEventListener('click', () => {
+      const container = document.getElementById('calendar-container');
+      container.classList.toggle('visible');
+    });
+
+    // Navigation d'année
+    document.getElementById('prev-year').addEventListener('click', () => {
+      selectedYear--;
+      renderCalendar();
+    });
+
+    document.getElementById('next-year').addEventListener('click', () => {
+      selectedYear++;
+      renderCalendar();
+    });
 
     renderCalendar();
     updateClockAndHeader();

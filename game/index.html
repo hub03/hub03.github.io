@@ -1,68 +1,736 @@
-<!doctype html>
+```html
+<!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Mini-Ville</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Jeu de la Vie — Conway</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg: #0b0d10;
+      --panel: #11151a;
+      --border: #252c34;
+      --grid: #1a2027;
+      --cell: #c8ff00;
+      --cell-glow: rgba(200, 255, 0, 0.25);
+      --text: #e8edf2;
+      --muted: #7d8792;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at 50% 0%, #172016 0%, transparent 40%),
+        var(--bg);
+      color: var(--text);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 32px 20px;
+    }
+
+    header {
+      width: min(100%, 1000px);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo {
+      width: 34px;
+      height: 34px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 2px;
+    }
+
+    .logo span {
+      background: var(--cell);
+      box-shadow: 0 0 8px var(--cell-glow);
+    }
+
+    .logo span:nth-child(2),
+    .logo span:nth-child(5),
+    .logo span:nth-child(8),
+    .logo span:nth-child(11),
+    .logo span:nth-child(13),
+    .logo span:nth-child(15) {
+      opacity: 0;
+    }
+
+    h1 {
+      font-size: 20px;
+      margin: 0;
+      letter-spacing: -0.5px;
+    }
+
+    .generation {
+      color: var(--muted);
+      font-size: 13px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .board-wrapper {
+      width: min(100%, 1000px);
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+    }
+
+    #game {
+      width: 100%;
+      display: grid;
+
+      /* Modifié automatiquement par JavaScript */
+      grid-template-columns: repeat(50, 1fr);
+
+      background: var(--grid);
+      border: 1px solid #20262d;
+
+      user-select: none;
+      touch-action: none;
+      cursor: crosshair;
+    }
+
+    .cell {
+      aspect-ratio: 1;
+      border-right: 1px solid rgba(255, 255, 255, 0.025);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.025);
+      transition:
+        background 80ms linear,
+        box-shadow 80ms linear;
+    }
+
+    .cell.alive {
+      background: var(--cell);
+      box-shadow:
+        0 0 5px var(--cell-glow),
+        inset 0 0 3px rgba(255, 255, 255, 0.2);
+    }
+
+    .controls {
+      width: min(100%, 1000px);
+      margin-top: 16px;
+
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .buttons {
+      display: flex;
+      gap: 8px;
+    }
+
+    button {
+      border: 1px solid var(--border);
+      background: #151a20;
+      color: var(--text);
+
+      height: 42px;
+      min-width: 42px;
+      padding: 0 16px;
+
+      border-radius: 8px;
+      font-size: 15px;
+      cursor: pointer;
+
+      transition:
+        background 120ms ease,
+        border-color 120ms ease,
+        transform 80ms ease;
+    }
+
+    button:hover {
+      background: #1c232b;
+      border-color: #3a434d;
+    }
+
+    button:active {
+      transform: scale(0.96);
+    }
+
+    #play {
+      background: var(--cell);
+      color: #101400;
+      border-color: var(--cell);
+      font-weight: 700;
+      font-size: 18px;
+    }
+
+    #play:hover {
+      background: #d5ff3d;
+    }
+
+    .speed {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    input[type="range"] {
+      width: 130px;
+      accent-color: var(--cell);
+      cursor: pointer;
+    }
+
+    .help {
+      width: min(100%, 1000px);
+      margin-top: 14px;
+
+      display: flex;
+      justify-content: space-between;
+
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .status {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+
+    .dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #59636d;
+    }
+
+    .dot.running {
+      background: var(--cell);
+      box-shadow: 0 0 8px var(--cell);
+    }
+
+    @media (max-width: 650px) {
+      body {
+        padding: 18px 10px;
+      }
+
+      header {
+        margin-bottom: 12px;
+      }
+
+      .board-wrapper {
+        padding: 5px;
+      }
+
+      .controls {
+        flex-wrap: wrap;
+      }
+
+      .speed {
+        width: 100%;
+      }
+
+      input[type="range"] {
+        flex: 1;
+      }
+
+      .help {
+        flex-direction: column;
+        gap: 6px;
+      }
+    }
+  </style>
 </head>
+
 <body>
-  <main class="game">
-    <header class="topbar">
+
+  <header>
+    <div class="title">
+      <div class="logo">
+        <span></span><span></span><span></span><span></span>
+        <span></span><span></span><span></span><span></span>
+        <span></span><span></span><span></span><span></span>
+        <span></span><span></span><span></span><span></span>
+      </div>
+
       <div>
-        <h1>🏙️ Mini-Ville</h1>
-        <p id="levelLabel">⭐ Village · Niveau 1</p>
-      </div>
-      <div class="stats">
-        <div><span>💰</span><strong id="money">200</strong><small>€</small></div>
-        <div><span>👥</span><strong id="population">0</strong></div>
-        <div><span>😊</span><strong id="happiness">70</strong><small>%</small></div>
-        <div><span>📈</span><strong id="income">0</strong><small>€/tour</small></div>
-      </div>
-    </header>
-
-    <section class="controls">
-      <button id="pauseBtn">⏸ Pause</button>
-      <button id="tickBtn">▶ 1 tour</button>
-      <button id="expandBtn">🗺️ Agrandir <span id="expandPrice"></span></button>
-      <button id="resetBtn" class="danger">↻ Recommencer</button>
-    </section>
-
-    <section class="content">
-      <div>
-        <div id="grid" class="grid" aria-label="Grille de la ville"></div>
-        <p class="hint">Clique sur une case vide pour construire. Clique sur un bâtiment pour voir ses détails.</p>
-      </div>
-
-      <aside class="panel">
-        <div id="selectedPanel">
-          <h2>Bienvenue 👋</h2>
-          <p>Construis quelques maisons, puis ajoute des commerces et des parcs pour faire grandir ta ville.</p>
+        <h1>Jeu de la Vie</h1>
+        <div class="generation">
+          Génération <span id="generation">0</span>
         </div>
-        <hr>
-        <div>
-          <h2>🔓 Déblocages</h2>
-          <div id="unlockList"></div>
-        </div>
-        <hr>
-        <div>
-          <h2>📋 Objectifs</h2>
-          <div id="goals"></div>
-        </div>
-        <hr>
-        <div id="log" class="log"></div>
-      </aside>
-    </section>
+      </div>
+    </div>
+
+    <div class="status">
+      <span class="dot" id="statusDot"></span>
+      <span id="statusText">En pause</span>
+    </div>
+  </header>
+
+
+  <main class="board-wrapper">
+    <div id="game"></div>
   </main>
 
-  <div id="modal" class="modal hidden">
-    <div class="modal-card">
-      <button id="closeModal" class="close">×</button>
-      <h2 id="modalTitle"></h2>
-      <div id="buildingChoices" class="building-choices"></div>
+
+  <div class="controls">
+
+    <div class="buttons">
+      <button id="play" title="Lancer / mettre en pause">
+        ▶
+      </button>
+
+      <button id="step" title="Avancer d'une génération">
+        ⏭
+      </button>
+
+      <button id="clear" title="Effacer la grille">
+        ↻
+      </button>
     </div>
+
+    <div class="speed">
+      <span>Vitesse</span>
+      <input
+        id="speed"
+        type="range"
+        min="1"
+        max="20"
+        value="8"
+      >
+      <span id="speedValue">8 gen/s</span>
+    </div>
+
   </div>
 
-  <script src="script.js"></script>
+
+  <div class="help">
+    <span>Clique sur les cases pour créer ta forme.</span>
+    <span>▶ pour lancer la simulation.</span>
+  </div>
+
+
+  <script>
+    /*
+     * ==========================================
+     * CONFIGURATION
+     * ==========================================
+     */
+
+    const COLS = 50;
+    const ROWS = 30;
+
+
+    /*
+     * ==========================================
+     * ÉTAT DU JEU
+     * ==========================================
+     */
+
+    let grid = createEmptyGrid();
+
+    let running = false;
+    let generation = 0;
+
+    let lastTime = 0;
+    let accumulator = 0;
+
+    let speed = 8;
+
+    let mouseDown = false;
+    let drawState = true;
+
+
+    /*
+     * ==========================================
+     * DOM
+     * ==========================================
+     */
+
+    const game = document.getElementById("game");
+    const playButton = document.getElementById("play");
+    const stepButton = document.getElementById("step");
+    const clearButton = document.getElementById("clear");
+
+    const generationElement =
+      document.getElementById("generation");
+
+    const speedInput =
+      document.getElementById("speed");
+
+    const speedValue =
+      document.getElementById("speedValue");
+
+    const statusText =
+      document.getElementById("statusText");
+
+    const statusDot =
+      document.getElementById("statusDot");
+
+
+    /*
+     * ==========================================
+     * CRÉATION DE LA GRILLE
+     * ==========================================
+     */
+
+    function createEmptyGrid() {
+      return Array.from(
+        { length: ROWS },
+        () => Array(COLS).fill(false)
+      );
+    }
+
+
+    /*
+     * ==========================================
+     * AFFICHAGE
+     * ==========================================
+     */
+
+    function createBoard() {
+      game.innerHTML = "";
+
+      game.style.gridTemplateColumns =
+        `repeat(${COLS}, 1fr)`;
+
+      for (let y = 0; y < ROWS; y++) {
+
+        for (let x = 0; x < COLS; x++) {
+
+          const cell = document.createElement("div");
+
+          cell.className = "cell";
+
+          cell.dataset.x = x;
+          cell.dataset.y = y;
+
+          game.appendChild(cell);
+        }
+      }
+    }
+
+
+    function render() {
+
+      const cells =
+        game.children;
+
+      for (let y = 0; y < ROWS; y++) {
+
+        for (let x = 0; x < COLS; x++) {
+
+          const index =
+            y * COLS + x;
+
+          cells[index].classList.toggle(
+            "alive",
+            grid[y][x]
+          );
+        }
+      }
+
+      generationElement.textContent =
+        generation;
+    }
+
+
+    /*
+     * ==========================================
+     * INTERACTION AVEC LA GRILLE
+     * ==========================================
+     */
+
+    game.addEventListener("pointerdown", event => {
+
+      const cell =
+        event.target.closest(".cell");
+
+      if (!cell) return;
+
+      mouseDown = true;
+
+      const x = Number(cell.dataset.x);
+      const y = Number(cell.dataset.y);
+
+      /*
+       * Si la cellule est déjà vivante,
+       * on passe en mode suppression.
+       *
+       * Sinon on passe en mode création.
+       */
+      drawState = !grid[y][x];
+
+      grid[y][x] = drawState;
+
+      render();
+
+      game.setPointerCapture(event.pointerId);
+    });
+
+
+    game.addEventListener("pointermove", event => {
+
+      if (!mouseDown) return;
+
+      const cell =
+        document.elementFromPoint(
+          event.clientX,
+          event.clientY
+        )?.closest(".cell");
+
+      if (!cell || !game.contains(cell))
+        return;
+
+      const x = Number(cell.dataset.x);
+      const y = Number(cell.dataset.y);
+
+      grid[y][x] = drawState;
+
+      render();
+    });
+
+
+    window.addEventListener("pointerup", () => {
+      mouseDown = false;
+    });
+
+
+    /*
+     * ==========================================
+     * JEU DE LA VIE DE CONWAY
+     * ==========================================
+     */
+
+    function countNeighbors(x, y) {
+
+      let count = 0;
+
+      for (let dy = -1; dy <= 1; dy++) {
+
+        for (let dx = -1; dx <= 1; dx++) {
+
+          if (dx === 0 && dy === 0)
+            continue;
+
+          const nx = x + dx;
+          const ny = y + dy;
+
+          /*
+           * Les bords sont considérés comme
+           * des cellules mortes.
+           */
+          if (
+            nx >= 0 &&
+            nx < COLS &&
+            ny >= 0 &&
+            ny < ROWS
+          ) {
+            if (grid[ny][nx])
+              count++;
+          }
+        }
+      }
+
+      return count;
+    }
+
+
+    function nextGeneration() {
+
+      const next =
+        createEmptyGrid();
+
+      for (let y = 0; y < ROWS; y++) {
+
+        for (let x = 0; x < COLS; x++) {
+
+          const neighbors =
+            countNeighbors(x, y);
+
+          const alive =
+            grid[y][x];
+
+          /*
+           * Cellule vivante :
+           * elle survit avec 2 ou 3 voisins.
+           */
+          if (alive) {
+
+            next[y][x] =
+              neighbors === 2 ||
+              neighbors === 3;
+
+          }
+
+          /*
+           * Cellule morte :
+           * elle naît avec exactement 3 voisins.
+           */
+          else {
+
+            next[y][x] =
+              neighbors === 3;
+          }
+        }
+      }
+
+      grid = next;
+
+      generation++;
+
+      render();
+    }
+
+
+    /*
+     * ==========================================
+     * PLAY / PAUSE
+     * ==========================================
+     */
+
+    function toggleRunning() {
+
+      running = !running;
+
+      if (running) {
+
+        playButton.textContent = "⏸";
+        statusText.textContent = "Simulation";
+        statusDot.classList.add("running");
+
+        lastTime = performance.now();
+        accumulator = 0;
+
+        requestAnimationFrame(loop);
+
+      } else {
+
+        playButton.textContent = "▶";
+        statusText.textContent = "En pause";
+        statusDot.classList.remove("running");
+      }
+    }
+
+
+    playButton.addEventListener(
+      "click",
+      toggleRunning
+    );
+
+
+    /*
+     * ==========================================
+     * BOUTON "UNE GÉNÉRATION"
+     * ==========================================
+     */
+
+    stepButton.addEventListener("click", () => {
+
+      if (running)
+        toggleRunning();
+
+      nextGeneration();
+    });
+
+
+    /*
+     * ==========================================
+     * RESET
+     * ==========================================
+     */
+
+    clearButton.addEventListener("click", () => {
+
+      running = false;
+
+      playButton.textContent = "▶";
+
+      statusText.textContent = "En pause";
+
+      statusDot.classList.remove("running");
+
+      generation = 0;
+
+      grid = createEmptyGrid();
+
+      render();
+    });
+
+
+    /*
+     * ==========================================
+     * VITESSE
+     * ==========================================
+     */
+
+    speedInput.addEventListener("input", () => {
+
+      speed =
+        Number(speedInput.value);
+
+      speedValue.textContent =
+        `${speed} gen/s`;
+    });
+
+
+    /*
+     * ==========================================
+     * BOUCLE D'ANIMATION
+     * ==========================================
+     */
+
+    function loop(timestamp) {
+
+      if (!running)
+        return;
+
+      const delta =
+        timestamp - lastTime;
+
+      lastTime = timestamp;
+
+      accumulator += delta;
+
+      const interval =
+        1000 / speed;
+
+      while (accumulator >= interval) {
+
+        nextGeneration();
+
+        accumulator -= interval;
+      }
+
+      requestAnimationFrame(loop);
+    }
+
+
+    /*
+     * ==========================================
+     * INITIALISATION
+     * ==========================================
+     */
+
+    createBoard();
+    render();
+
+  </script>
+
 </body>
 </html>
+```

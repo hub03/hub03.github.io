@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Mini-Ville</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="game">
+    <header class="topbar">
+      <div>
+        <h1>🏙️ Mini-Ville</h1>
+        <p id="levelLabel">⭐ Village · Niveau 1</p>
+      </div>
+      <div class="stats">
+        <div><span>💰</span><strong id="money">200</strong><small>€</small></div>
+        <div><span>👥</span><strong id="population">0</strong></div>
+        <div><span>😊</span><strong id="happiness">70</strong><small>%</small></div>
+        <div><span>📈</span><strong id="income">0</strong><small>€/tour</small></div>
+      </div>
+    </header>
+
+    <section class="controls">
+      <button id="pauseBtn">⏸ Pause</button>
+      <button id="tickBtn">▶ 1 tour</button>
+      <button id="expandBtn">🗺️ Agrandir <span id="expandPrice"></span></button>
+      <button id="resetBtn" class="danger">↻ Recommencer</button>
+    </section>
+
+    <section class="content">
+      <div>
+        <div id="grid" class="grid" aria-label="Grille de la ville"></div>
+        <p class="hint">Clique sur une case vide pour construire. Clique sur un bâtiment pour voir ses détails.</p>
+      </div>
+
+      <aside class="panel">
+        <div id="selectedPanel">
+          <h2>Bienvenue 👋</h2>
+          <p>Construis quelques maisons, puis ajoute des commerces et des parcs pour faire grandir ta ville.</p>
+        </div>
+        <hr>
+        <div>
+          <h2>🔓 Déblocages</h2>
+          <div id="unlockList"></div>
+        </div>
+        <hr>
+        <div>
+          <h2>📋 Objectifs</h2>
+          <div id="goals"></div>
+        </div>
+        <hr>
+        <div id="log" class="log"></div>
+      </aside>
+    </section>
+  </main>
+
+  <div id="modal" class="modal hidden">
+    <div class="modal-card">
+      <button id="closeModal" class="close">×</button>
+      <h2 id="modalTitle"></h2>
+      <div id="buildingChoices" class="building-choices"></div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

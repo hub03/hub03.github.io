@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>📅</title>
+  <title>📅 Saisons & Mois</title>
   <style>
     :root {
       --bg: #0f172a;
@@ -34,7 +34,6 @@
       position: relative;
     }
 
-    /* Bouton d'aide discret */
     .help-btn {
       position: fixed;
       top: 1.5rem;
@@ -61,7 +60,6 @@
       box-shadow: 0 0 10px var(--accent-glow);
     }
 
-    /* Modal / Popup */
     .modal-overlay {
       position: fixed;
       top: 0;
@@ -157,7 +155,6 @@
       margin-bottom: 0.8rem;
     }
 
-    /* Hero Card (Horloge & Date) */
     .hero-card {
       background: var(--card-bg);
       border: 1px solid var(--border);
@@ -192,7 +189,6 @@
       color: var(--text);
     }
 
-    /* Navigation d'année */
     .year-nav {
       display: flex;
       align-items: center;
@@ -230,7 +226,6 @@
       color: var(--text);
     }
 
-    /* Conteneur du calendrier */
     .calendar-container {
       width: 100%;
       max-width: 1200px;
@@ -245,12 +240,12 @@
 
     .calendar-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
       gap: 1.5rem;
       width: 100%;
     }
 
-    .month-card {
+    .season-card {
       background: var(--card-bg);
       border: 1px solid var(--border);
       border-radius: 1rem;
@@ -258,12 +253,12 @@
       transition: transform 0.2s, border-color 0.2s;
     }
 
-    .month-card:hover {
+    .season-card:hover {
       transform: translateY(-4px);
       border-color: var(--accent);
     }
 
-    .month-card.month-x {
+    .season-card.season-x {
       border: 1px dashed var(--accent);
       background: rgba(56, 189, 248, 0.05);
       grid-column: 1 / -1;
@@ -271,7 +266,7 @@
       margin: 0 auto;
     }
 
-    .month-title {
+    .season-title {
       font-size: 1.2rem;
       font-weight: 700;
       color: var(--accent);
@@ -279,18 +274,47 @@
       text-align: center;
     }
 
-    .days-header, .days-grid {
+    .days-header {
       display: grid;
       grid-template-columns: repeat(5, 1fr);
       gap: 0.3rem;
       text-align: center;
+      margin-bottom: 0.4rem;
     }
 
     .days-header span {
       font-size: 0.8rem;
       font-weight: 700;
       color: var(--text-muted);
-      padding-bottom: 0.4rem;
+    }
+
+    .month-section {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 0.3rem;
+      text-align: center;
+      position: relative;
+      padding-top: 0.4rem;
+    }
+
+    /* Séparateur en pointillés entre les mois */
+    .month-section + .month-section::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      border-top: 2px dashed var(--border);
+    }
+
+    .month-label {
+      grid-column: 1 / -1;
+      font-size: 0.7rem;
+      font-weight: 800;
+      color: var(--accent);
+      text-align: left;
+      padding: 0.2rem 0;
+      opacity: 0.8;
     }
 
     .day-cell {
@@ -314,8 +338,6 @@
 </head>
 <body>
 
-  <div style="text-align:center;font-size:2em;">📅</div>
-  
   <button class="help-btn" id="open-help" title="Explications">?</button>
 
   <div class="modal-overlay" id="modal-overlay">
@@ -353,111 +375,32 @@
   </div>
 
   <script>
-    // Dictionnaire multilingue pour la fenêtre d'explications
     const I18N = {
       fr: {
         title: "Le Calendrier Cosmologique Universal",
         intro: "Ce calendrier est entièrement conçu pour s'affranchir de toute tradition religieuse, politique ou nationale. Il repose uniquement sur la géométrie orbitale et la physique de la planète Terre.",
         hYear: "Origine de l'Année 1 (Ère Cénozoïque)",
-        pYear: "Le point zéro est fixé à l'impact de la météorite de Chicxulub (~66 038 000 ans BP), événement planétaire absolu ayant mis fin à l'ère des dinosaures et ouvert le règne des mammifères. Aucun événement humain ou religieux n'est privilégié.",
+        pYear: "Le point zéro est fixé à l'impact de la météorite de Chicxulub (~66 038 000 ans BP), événement planétaire absolu ayant mis fin à l'ère des dinosaures et ouvert le règne des mammifères.",
         hDay: "Origine du Jour 1 (Le Périhélie)",
-        pDay: "Le 1er jour de l'année n'est pas le 1er janvier romain, mais le Périhélie terrestre (~4 janvier) : le moment orbital exact où la Terre est au plus près du Soleil. C'est un événement astronomique mondial qui concerne l'ensemble de la planète.",
-        hGrid: "La division mathématique 5 × 73",
-        pGrid: "La semaine de 7 jours (d'origine babylonienne) est abandonnée. L'année solaire compte 365 jours. Le seul facteur mathématique pur pour diviser 365 est 5 × 73 :",
-        li1: "5 Semaines de jours nommés A, B, C, D, E (abandon du septénaire).",
-        li2: "5 Mois (Saisons) de 73 jours rigoureusement égaux.",
-        li3: "1 Jour bissextile (✖️) ajouté séparément tous les 4 ans lors du 366e jour."
+        pDay: "Le 1er jour de l'année est le Périhélie terrestre (~4 janvier) : le moment orbital exact où la Terre est au plus près du Soleil.",
+        hGrid: "Structure 5 Saisons × 3 Mois",
+        pGrid: "L'année compte 5 Saisons de 73 jours. Chaque Saison se divise en 3 Mois administratifs de 25, 25 et 23 jours pour faciliter la gestion économique (loyers, abonnements) :",
+        li1: "Semaines de 5 jours (A, B, C, D, E).",
+        li2: "M1 et M2 = 25 jours (5 semaines). M3 = 23 jours.",
+        li3: "1 Jour bissextile (✖️) ajouté séparément tous les 4 ans."
       },
       en: {
         title: "The Universal Cosmological Calendar",
-        intro: "This calendar is designed to be free from any religious, political, or national traditions. It relies solely on orbital geometry and planet Earth's physics.",
+        intro: "This calendar is designed to be free from any religious, political, or national traditions.",
         hYear: "Origin of Year 1 (Cenozoic Era)",
-        pYear: "Year Zero is set at the Chicxulub asteroid impact (~66,038,000 BP), an absolute planetary event that ended the dinosaur era and began the age of mammals. No human or religious event is favored.",
+        pYear: "Year Zero is set at the Chicxulub asteroid impact (~66,038,000 BP).",
         hDay: "Origin of Day 1 (Perihelion)",
-        pDay: "Day 1 of the year is not January 1st, but Earth's Perihelion (~Jan 4th): the exact orbital moment when Earth is closest to the Sun. It is a global astronomical event shared by the entire planet.",
-        hGrid: "The 5 × 73 Mathematical Division",
-        pGrid: "The 7-day week (Babylonian origin) is discarded. A solar year has 365 days. The only pure mathematical factor to divide 365 is 5 × 73:",
-        li1: "5-day weeks named A, B, C, D, E.",
-        li2: "5 Months (Seasons) of exactly 73 days.",
-        li3: "1 Leap day (✖️) added separately every 4 years for the 366th day."
-      },
-      es: {
-        title: "El Calendario Cosmológico Universal",
-        intro: "Este calendario está libre de cualquier tradición religiosa, política o nacional. Se basa únicamente en la geometría orbital y la física de la Tierra.",
-        hYear: "Origen del Año 1 (Era Cenozoica)",
-        pYear: "El año cero se establece en el impacto del asteroide Chicxulub (~66 038 000 AP), un evento planetario absoluto que puso fin a la era de los dinosaurios y dio paso al reinado de los mamíferos.",
-        hDay: "Origen del Día 1 (Perihelio)",
-        pDay: "El día 1 del año es el Perihelio terrestre (~4 de enero): el momento orbital exacto en que la Tierra está más cerca del Sol. Es un evento astronómico global.",
-        hGrid: "División matemática 5 × 73",
-        pGrid: "Se abandona la semana de 7 días. El año solar tiene 365 días. La única división matemática pura de 365 es 5 × 73:",
-        li1: "Semanas de 5 días nombradas A, B, C, D, E.",
-        li2: "5 Meses (Estaciones) de 73 días exactos.",
-        li3: "1 Día bisiesto (✖️) añadido cada 4 años para el día 366."
-      },
-      de: {
-        title: "Der Universelle Kosmologische Kalender",
-        intro: "Dieser Kalender ist frei von religiösen, politischen oder nationalen Traditionen. Er basiert ausschließlich auf orbitaler Geometrie und der Physik der Erde.",
-        hYear: "Ursprung von Jahr 1 (Känozoikum)",
-        pYear: "Jahr Null ist der Einschlag des Chicxulub-Asteroiden (~66.038.000 BP), ein globales Ereignis, das das Zeitalter der Dinosaurier beendete.",
-        hDay: "Ursprung von Tag 1 (Perihel)",
-        pDay: "Tag 1 des Jahres ist das Erdperihel (~4. Januar): der exakte orbitale Moment, in dem die Erde der Sonne am nächsten ist.",
-        hGrid: "Die mathematische Teilung 5 × 73",
-        pGrid: "Die 7-Tage-Woche wird aufgegeben. Ein Sonnenjahr hat 365 Tage. Die einzige reine mathematische Aufteilung von 365 ist 5 × 73:",
-        li1: "5-Tage-Wochen benannt nach A, B, C, D, E.",
-        li2: "5 Monate (Jahreszeiten) von genau 73 Tagen.",
-        li3: "1 Schaltjahr-Tag (✖️) alle 4 Jahre für den 366. Tag."
-      },
-      zh: {
-        title: "宇宙通用历法",
-        intro: "本历法摆脱了所有宗教、政治或民族传统，完全基于地球的轨道几何与物理规律。",
-        hYear: "第 1 年的由来（新生代）",
-        pYear: "元年设定为希克苏鲁伯陨石撞击事件（约 66,038,000 年前），该全球性事件终结了恐龙时代，开启了哺乳动物时代。",
-        hDay: "第 1 天的由来（近日点）",
-        pDay: "每年的第 1 天是地球近日点（约 1 月 4 日）：地球距离太阳最近的轨道时刻，属于全人类共同的自然天文事件。",
-        hGrid: "5 × 73 的数学分割",
-        pGrid: "放弃传统的 7 天星期制。太阳年为 365 天，将其进行纯数学整除的唯二因子是 5 × 73：",
-        li1: "每周 5 天，标记为 A、B、C、D、E。",
-        li2: "每年 5 个月份（季节），每月恰好 73 天。",
-        li3: "每 4 年在第 366 天额外增加 1 天闰日（✖️）。"
-      },
-      ja: {
-        title: "宇宙汎用暦",
-        intro: "この暦は、宗教的、政治的、国家的な伝統から完全に独立しています。地球の軌道幾何学と物理学のみに基づいています。",
-        hYear: "1年の起源（新生代）",
-        pYear: "紀元0年は、恐竜時代を終わらせ哺乳類の時代を開いたチクシュルーブ・クレーターの隕石衝突（約66,038,000年前）に設定されています。",
-        hDay: "1日の起源（近日点）",
-        pDay: "一年の第1日は、地球が太陽に最も接近する軌道上の瞬間である「近日点」（約1月4日）です。地球全体で共有される自然の天文学的イベントです。",
-        hGrid: "5 × 73 の数学的分割",
-        pGrid: "伝統的な7日制の一週間を廃止します。太陽年は365日であり、これを純粋に数学的に分割できる唯一の係数は 5 × 73 です：",
-        li1: "A、B、C、D、E と名付けられた1週5日制。",
-        li2: "1ヶ月73日きっかりの 5つの月（季節）。",
-        li3: "4年ごとに366日目として追加される 1日のうるう日（✖️）。"
-      },
-      ar: {
-        title: "التقويم الكوني العالمي",
-        intro: "تم تصميم هذا التقويم ليكون خالياً من أي تقاليد دينية أو سياسية أو وطنية. وهو يعتمد فقط على الهندسة المدارية وفيزياء كوكب الأرض.",
-        hYear: "أصل السنة 1 (العصر الحديث)",
-        pYear: "تم تحديد سنة الصفر عند اصطدام كويكب تشيكشولوب (حوالي 66,038,000 سنة قبل الحاضر)، وهو حدث كوكبي أنهى عصر الديناصورات.",
-        hDay: "أصل اليوم 1 (الحضيض الشمسي)",
-        pDay: "اليوم الأول من السنة ليس 1 يناير، بل الحضيض الشمسي للأرض (حوالي 4 يناير): اللحظة المدارية التي تكون فيها الأرض أقرب ما يمكن إلى الشمس.",
-        hGrid: "التقسيم الرياضي 5 × 73",
-        pGrid: "تم التخلي عن أسبوع الـ 7 أيام. السنة الشمسية تتكون من 365 يوماً. التقسيم الرياضي الوحيد لـ 365 هو 5 × 73:",
-        li1: "أسابيع من 5 أيام مسماة A, B, C, D, E.",
-        li2: "5 أشهر (فصول) من 73 يوماً بالتمام.",
-        li3: "يوم كبيس واحد (✖️) يضاف كل 4 سنوات كـ يوم 366."
-      },
-      ru: {
-        title: "Вселенский Космологический Календарь",
-        intro: "Этот календарь полностью свободен от религиозных, политических или национальных традиций. Он основан исключительно на орбитальной геометрии и физике Земли.",
-        hYear: "Происхождение 1-го года (Кайнозой)",
-        pYear: "Нулевой год привязан к падению Чикшулубского метеорита (~66 038 000 лет назад) — глобальному событию, положившему конец эре динозавров.",
-        hDay: "Происхождение 1-го дня (Перигелий)",
-        pDay: "1-й день года — это перигелий Земли (~4 января): точный момент, когда Земля находится ближе всего к Солнцу.",
-        hGrid: "Математическое деление 5 × 73",
-        pGrid: "7-дневная неделя упразднена. Солнечный год равен 365 дням. Единственное чистое математическое деление 365 — это 5 × 73:",
-        li1: "5-дневная неделя с днями A, B, C, D, E.",
-        li2: "5 месяцев (сезонов) ровно по 73 дня.",
-        li3: "1 високосный день (✖️) каждые 4 года для 366-го дня."
+        pDay: "Day 1 of the year is Earth's Perihelion (~Jan 4th).",
+        hGrid: "Structure: 5 Seasons × 3 Months",
+        pGrid: "The year has 5 Seasons of 73 days. Each Season is split into 3 Months (25, 25, and 23 days) to adapt to billing cycles (rents, subscriptions):",
+        li1: "5-day weeks (A, B, C, D, E).",
+        li2: "M1 & M2 = 25 days. M3 = 23 days.",
+        li3: "1 Leap day (✖️) added every 4 years."
       }
     };
 
@@ -498,18 +441,32 @@
       const cenozoicYear = getCenozoicYear(date.getFullYear());
       
       if (dayOfYear <= 365) {
-        const monthIndex = Math.floor((dayOfYear - 1) / 73);
-        const dayOfMonth = ((dayOfYear - 1) % 73) + 1;
-        const dayOfWeekIndex = (dayOfMonth - 1) % 5;
+        const seasonIndex = Math.floor((dayOfYear - 1) / 73) + 1;
+        const dayOfSeason = ((dayOfYear - 1) % 73) + 1;
+        const dayOfWeekIndex = (dayOfSeason - 1) % 5;
+        
+        let monthInSeason = 1;
+        let dayInMonth = dayOfSeason;
+
+        if (dayOfSeason > 50) {
+          monthInSeason = 3;
+          dayInMonth = dayOfSeason - 50; // 1 à 23
+        } else if (dayOfSeason > 25) {
+          monthInSeason = 2;
+          dayInMonth = dayOfSeason - 25; // 1 à 25
+        }
+
         return {
-          month: monthIndex + 1,
-          day: dayOfMonth,
+          season: seasonIndex,
+          month: monthInSeason,
+          day: dayInMonth,
           dayLabel: DAY_LABELS[dayOfWeekIndex],
           isX: false,
           year: cenozoicYear
         };
       } else {
         return {
+          season: '✖️',
           month: '✖️',
           day: 1,
           dayLabel: `✖️`,
@@ -530,7 +487,7 @@
       const fixed = convertToFixedDate(now);
       const dateString = fixed.isX
         ? `${formatYear(fixed.year)} / ✖️ / 1 ✖️`
-        : `${formatYear(fixed.year)} / ${fixed.month} / ${fixed.day} ${fixed.dayLabel}`;
+        : `${formatYear(fixed.year)} / S${fixed.season} / M${fixed.month} / D${fixed.day} ${fixed.dayLabel}`;
       
       document.getElementById('current-fixed-date').textContent = dateString;
     }
@@ -546,13 +503,14 @@
       const fixedToday = convertToFixedDate(now);
       const leap = isLeapYear(selectedGregorianYear);
 
-      for (let m = 1; m <= 5; m++) {
+      // Render 5 Saisons
+      for (let s = 1; s <= 5; s++) {
         const card = document.createElement('div');
-        card.className = 'month-card';
+        card.className = 'season-card';
 
         const title = document.createElement('div');
-        title.className = 'month-title';
-        title.textContent = `${m}`;
+        title.className = 'season-title';
+        title.textContent = `Saison ${s}`;
         card.appendChild(title);
 
         const header = document.createElement('div');
@@ -564,35 +522,53 @@
         });
         card.appendChild(header);
 
-        const daysGrid = document.createElement('div');
-        daysGrid.className = 'days-grid';
+        // Mois 1 (25 j.), Mois 2 (25 j.), Mois 3 (23 j.)
+        const monthsConfig = [
+          { m: 1, startDaySeason: 1, totalDays: 25 },
+          { m: 2, startDaySeason: 26, totalDays: 25 },
+          { m: 3, startDaySeason: 51, totalDays: 23 }
+        ];
 
-        for (let d = 1; d <= 73; d++) {
-          const cell = document.createElement('div');
-          cell.className = 'day-cell';
-          cell.textContent = d;
+        monthsConfig.forEach(cfg => {
+          const monthSec = document.createElement('div');
+          monthSec.className = 'month-section';
 
-          if (selectedGregorianYear === now.getFullYear() && !fixedToday.isX && fixedToday.month === m && fixedToday.day === d) {
-            cell.classList.add('today');
+          const monthLabel = document.createElement('div');
+          monthLabel.className = 'month-label';
+          monthLabel.textContent = `M${cfg.m}`;
+          monthSec.appendChild(monthLabel);
+
+          for (let d = 1; d <= cfg.totalDays; d++) {
+            const cell = document.createElement('div');
+            cell.className = 'day-cell';
+            cell.textContent = d;
+
+            const dayInSeason = cfg.startDaySeason + d - 1;
+
+            if (selectedGregorianYear === now.getFullYear() && !fixedToday.isX && fixedToday.season === s && fixedToday.month === cfg.m && fixedToday.day === d) {
+              cell.classList.add('today');
+            }
+            monthSec.appendChild(cell);
           }
-          daysGrid.appendChild(cell);
-        }
 
-        card.appendChild(daysGrid);
+          card.appendChild(monthSec);
+        });
+
         grid.appendChild(card);
       }
 
+      // Render Jour Bissextile (si bissextile)
       if (leap) {
         const cardX = document.createElement('div');
-        cardX.className = 'month-card month-x';
+        cardX.className = 'season-card season-x';
 
         const titleX = document.createElement('div');
-        titleX.className = 'month-title';
+        titleX.className = 'season-title';
         titleX.textContent = `✖️`;
         cardX.appendChild(titleX);
 
         const daysGridX = document.createElement('div');
-        daysGridX.className = 'days-grid';
+        daysGridX.className = 'days-header';
 
         const cell = document.createElement('div');
         cell.className = 'day-cell';
@@ -608,20 +584,16 @@
       }
     }
 
-    // Modal / Multilingue
     function updateModalLanguage(lang) {
       const data = I18N[lang] || I18N.fr;
       const content = document.getElementById('modal-content');
       content.innerHTML = `
         <h2>${data.title}</h2>
         <p>${data.intro}</p>
-        
         <h3>${data.hYear}</h3>
         <p>${data.pYear}</p>
-        
         <h3>${data.hDay}</h3>
         <p>${data.pDay}</p>
-        
         <h3>${data.hGrid}</h3>
         <p>${data.pGrid}</p>
         <ul>
@@ -650,12 +622,10 @@
       updateModalLanguage(e.target.value);
     });
 
-    // Toggle Affichage Calendrier
     document.getElementById('hero-card').addEventListener('click', () => {
       document.getElementById('calendar-container').classList.toggle('visible');
     });
 
-    // Navigation d'année
     document.getElementById('prev-year').addEventListener('click', () => {
       selectedGregorianYear--;
       renderCalendar();
@@ -666,7 +636,6 @@
       renderCalendar();
     });
 
-    // Init
     updateModalLanguage('fr');
     renderCalendar();
     updateClockAndHeader();

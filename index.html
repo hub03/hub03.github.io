@@ -33,7 +33,7 @@
       align-items: center;
     }
 
-    /* Bloc principal cliquable */
+    /* Hero Card (Horloge & Date) */
     .hero-card {
       background: var(--card-bg);
       border: 1px solid var(--border);
@@ -105,7 +105,7 @@
       color: var(--text);
     }
 
-    /* Conteneur rétractable */
+    /* Conteneur du calendrier */
     .calendar-container {
       width: 100%;
       max-width: 1200px;
@@ -206,7 +206,7 @@
 
   <script>
     const DAY_LABELS = ['A', 'B', 'C', 'D', 'E']; // Semaine de 5 jours
-    const CENOZOIC_BASE = 66038000;
+    const CENOZOIC_BASE = 66038000; // Ère Cénozoïque (Météorite)
     
     let currentGregorianYear = new Date().getFullYear();
     let selectedGregorianYear = currentGregorianYear;
@@ -223,15 +223,23 @@
       return (year % 4 === 0 && year % 100 !== 0) || (year % 400 === 0);
     }
 
-    function getDayOfYear(date) {
-      const start = new Date(date.getFullYear(), 0, 0);
+    // Calcul du jour de l'année orbitale (début au Périhélie le 4 janvier)
+    function getOrbitalDay(date) {
+      const year = date.getFullYear();
+      let perihelion = new Date(year, 0, 4); // 4 Janvier
+      
+      let start = perihelion;
+      if (date < perihelion) {
+        start = new Date(year - 1, 0, 4);
+      }
+      
       const diff = date - start;
       const oneDay = 1000 * 60 * 60 * 24;
-      return Math.floor(diff / oneDay);
+      return Math.floor(diff / oneDay) + 1;
     }
 
     function convertToFixedDate(date) {
-      const dayOfYear = getDayOfYear(date);
+      const dayOfYear = getOrbitalDay(date);
       const cenozoicYear = getCenozoicYear(date.getFullYear());
       
       if (dayOfYear <= 365) {
@@ -246,7 +254,7 @@
           year: cenozoicYear
         };
       } else {
-        // Uniquement le jour bissextile (366e jour)
+        // Jour bissextile (366e jour)
         return {
           month: '✖️',
           day: 1,
@@ -284,7 +292,7 @@
       const fixedToday = convertToFixedDate(now);
       const leap = isLeapYear(selectedGregorianYear);
 
-      // Render les 5 Mois de 73 jours
+      // Render 5 Mois
       for (let m = 1; m <= 5; m++) {
         const card = document.createElement('div');
         card.className = 'month-card';
@@ -321,7 +329,7 @@
         grid.appendChild(card);
       }
 
-      // Render le jour bissextile (uniquement si année bissextile)
+      // Render Jour Bissextile (si applicable)
       if (leap) {
         const cardX = document.createElement('div');
         cardX.className = 'month-card month-x';
@@ -348,12 +356,12 @@
       }
     }
 
-    // Toggle Affichage
+    // Interactive Toggle
     document.getElementById('hero-card').addEventListener('click', () => {
       document.getElementById('calendar-container').classList.toggle('visible');
     });
 
-    // Navigation d'année
+    // Navigation
     document.getElementById('prev-year').addEventListener('click', () => {
       selectedGregorianYear--;
       renderCalendar();

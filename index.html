@@ -44,7 +44,7 @@
       cursor: pointer;
       user-select: none;
       transition: transform 0.2s, border-color 0.2s;
-      max-width: 500px;
+      max-width: 600px;
       width: 100%;
     }
 
@@ -67,7 +67,7 @@
       color: var(--text);
     }
 
-    /* Barre de navigation d'année */
+    /* Navigation d'année */
     .year-nav {
       display: flex;
       align-items: center;
@@ -105,11 +105,11 @@
       color: var(--text);
     }
 
-    /* Conteneur rétractable du calendrier */
+    /* Conteneur rétractable */
     .calendar-container {
       width: 100%;
       max-width: 1200px;
-      display: none; /* Masqué par défaut */
+      display: none;
       flex-direction: column;
       align-items: center;
     }
@@ -149,10 +149,6 @@
       color: var(--accent);
       margin-bottom: 1rem;
       text-align: center;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.5rem;
     }
 
     .days-header, .days-grid {
@@ -196,10 +192,9 @@
   </div>
 
   <div class="calendar-container" id="calendar-container">
-    
     <div class="year-nav">
       <button class="nav-btn" id="prev-year">&lt;</button>
-      <div class="year-display" id="displayed-year">2026</div>
+      <div class="year-display" id="displayed-year">---</div>
       <button class="nav-btn" id="next-year">&gt;</button>
     </div>
 
@@ -208,8 +203,19 @@
 
   <script>
     const DAY_LABELS = ['A', 'B', 'C', 'D', 'E', 'F', 'G'];
-    let selectedYear = new Date().getFullYear();
+    const CENOZOIC_BASE = 66038000; // An zéro fixé à l'extinction Chicxulub (-66 038 000 en 1950)
     
+    let currentGregorianYear = new Date().getFullYear();
+    let selectedGregorianYear = currentGregorianYear;
+
+    function getCenozoicYear(gregorianYear) {
+      return CENOZOIC_BASE + (gregorianYear - 1950);
+    }
+
+    function formatYear(year) {
+      return year.toLocaleString('fr-FR');
+    }
+
     function isLeapYear(year) {
       return (year % 4 === 0 && year % 100 !== 0) || (year % 400 === 0);
     }
@@ -223,6 +229,7 @@
 
     function convertToFixedDate(date) {
       const dayOfYear = getDayOfYear(date);
+      const cenozoicYear = getCenozoicYear(date.getFullYear());
       
       if (dayOfYear <= 364) {
         const monthIndex = Math.floor((dayOfYear - 1) / 28);
@@ -233,7 +240,7 @@
           day: dayOfMonth,
           dayLabel: DAY_LABELS[dayOfWeekIndex],
           isX: false,
-          year: date.getFullYear()
+          year: cenozoicYear
         };
       } else {
         const xDay = dayOfYear - 364;
@@ -242,7 +249,7 @@
           day: xDay,
           dayLabel: `✖️`,
           isX: true,
-          year: date.getFullYear()
+          year: cenozoicYear
         };
       }
     }
@@ -250,32 +257,29 @@
     function updateClockAndHeader() {
       const now = new Date();
       
-      // Horloge
       const hrs = String(now.getHours()).padStart(2, '0');
       const mins = String(now.getMinutes()).padStart(2, '0');
       const secs = String(now.getSeconds()).padStart(2, '0');
       document.getElementById('clock').textContent = `${hrs}:${mins}:${secs}`;
 
-      // Date au format AAAA / MM / JJ
       const fixed = convertToFixedDate(now);
-      const dateString = `${fixed.year} / ${fixed.month} / ${fixed.day} ${fixed.dayLabel}`;
+      const dateString = `${formatYear(fixed.year)} / ${fixed.month} / ${fixed.day} ${fixed.dayLabel}`;
       
       document.getElementById('current-fixed-date').textContent = dateString;
-
-      return fixed;
     }
 
     function renderCalendar() {
       const grid = document.getElementById('calendar-grid');
       grid.innerHTML = '';
       
-      document.getElementById('displayed-year').textContent = selectedYear;
+      const displayedCenozoicYear = getCenozoicYear(selectedGregorianYear);
+      document.getElementById('displayed-year').textContent = formatYear(displayedCenozoicYear);
 
       const now = new Date();
       const fixedToday = convertToFixedDate(now);
-      const leap = isLeapYear(selectedYear);
+      const leap = isLeapYear(selectedGregorianYear);
 
-      // Render 13 Mois
+      // 13 Mois
       for (let m = 1; m <= 13; m++) {
         const card = document.createElement('div');
         card.className = 'month-card';
@@ -302,8 +306,7 @@
           cell.className = 'day-cell';
           cell.textContent = d;
 
-          // Surligner le jour actuel uniquement si l'année affichée est l'année courante
-          if (selectedYear === now.getFullYear() && !fixedToday.isX && fixedToday.month === m && fixedToday.day === d) {
+          if (selectedGregorianYear === now.getFullYear() && !fixedToday.isX && fixedToday.month === m && fixedToday.day === d) {
             cell.classList.add('today');
           }
           daysGrid.appendChild(cell);
@@ -313,7 +316,7 @@
         grid.appendChild(card);
       }
 
-      // Render Mois X
+      // Mois X
       const cardX = document.createElement('div');
       cardX.className = 'month-card month-x';
 
@@ -331,7 +334,7 @@
         cell.className = 'day-cell';
         cell.textContent = `✖️${x}`;
 
-        if (selectedYear === now.getFullYear() && fixedToday.isX && fixedToday.day === x) {
+        if (selectedGregorianYear === now.getFullYear() && fixedToday.isX && fixedToday.day === x) {
           cell.classList.add('today');
         }
         daysGridX.appendChild(cell);
@@ -341,20 +344,19 @@
       grid.appendChild(cardX);
     }
 
-    // Toggle Affichage du calendrier
+    // Toggle Affichage
     document.getElementById('hero-card').addEventListener('click', () => {
-      const container = document.getElementById('calendar-container');
-      container.classList.toggle('visible');
+      document.getElementById('calendar-container').classList.toggle('visible');
     });
 
     // Navigation d'année
     document.getElementById('prev-year').addEventListener('click', () => {
-      selectedYear--;
+      selectedGregorianYear--;
       renderCalendar();
     });
 
     document.getElementById('next-year').addEventListener('click', () => {
-      selectedYear++;
+      selectedGregorianYear++;
       renderCalendar();
     });
 

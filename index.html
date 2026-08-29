@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>📅 🌍</title>
+  <title>📅</title>
   <style>
     :root {
       --bg: #0f172a;
@@ -49,7 +49,6 @@
       letter-spacing: 2px;
     }
 
-    /* Hero Card (Horloge & Jour Actuel) */
     .hero-card {
       background: var(--card-bg);
       border: 1px solid var(--border);
@@ -76,7 +75,6 @@
       color: var(--text);
     }
 
-    /* Grille des mois */
     .calendar-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
@@ -151,7 +149,7 @@
 <body>
 
   <header>
-    <h1>📅 🌍</h1>
+    <h1>📅</h1>
     <div class="subtitle">13 × 28 + ✖️</div>
   </header>
 
@@ -214,8 +212,8 @@
       // Date actuelle universelle
       const fixed = convertToFixedDate(now);
       const dateString = fixed.isX 
-        ? `📆 🗓️ ✖️ (${fixed.day}) — ${fixed.year}`
-        : `📆 🗓️ ${fixed.month} — ${fixed.dayLabel} ${fixed.day} — ${fixed.year}`;
+        ? `(${fixed.day}) - ${fixed.year}`
+        : `${fixed.month} - ${fixed.dayLabel} ${fixed.day} — ${fixed.year}`;
       
       document.getElementById('current-fixed-date').textContent = dateString;
 
@@ -230,14 +228,13 @@
       const fixedToday = convertToFixedDate(now);
       const leap = isLeapYear(now.getFullYear());
 
-      // 13 Mois
       for (let m = 1; m <= 13; m++) {
         const card = document.createElement('div');
         card.className = 'month-card';
 
         const title = document.createElement('div');
         title.className = 'month-title';
-        title.textContent = `🗓️ ${m}`;
+        title.textContent = `${m}`;
         card.appendChild(title);
 
         const header = document.createElement('div');
@@ -273,7 +270,7 @@
 
       const titleX = document.createElement('div');
       titleX.className = 'month-title';
-      titleX.textContent = `🗓️ ✖️`;
+      titleX.textContent = `✖️`;
       cardX.appendChild(titleX);
 
       const daysGridX = document.createElement('div');

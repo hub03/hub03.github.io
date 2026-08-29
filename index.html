@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>📅</title>
+  <title>📅 5×73</title>
   <style>
     :root {
       --bg: #0f172a;
@@ -33,7 +33,7 @@
       align-items: center;
     }
 
-    /* Hero Card pliable */
+    /* Bloc principal cliquable */
     .hero-card {
       background: var(--card-bg);
       border: 1px solid var(--border);
@@ -120,7 +120,7 @@
 
     .calendar-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
       gap: 1.5rem;
       width: 100%;
     }
@@ -141,6 +141,9 @@
     .month-card.month-x {
       border: 1px dashed var(--accent);
       background: rgba(56, 189, 248, 0.05);
+      grid-column: 1 / -1;
+      max-width: 300px;
+      margin: 0 auto;
     }
 
     .month-title {
@@ -153,7 +156,7 @@
 
     .days-header, .days-grid {
       display: grid;
-      grid-template-columns: repeat(7, 1fr);
+      grid-template-columns: repeat(5, 1fr);
       gap: 0.3rem;
       text-align: center;
     }
@@ -170,7 +173,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 0.9rem;
+      font-size: 0.8rem;
       border-radius: 0.4rem;
       background: rgba(255, 255, 255, 0.03);
       color: var(--text);
@@ -202,8 +205,8 @@
   </div>
 
   <script>
-    const DAY_LABELS = ['A', 'B', 'C', 'D', 'E', 'F', 'G'];
-    const CENOZOIC_BASE = 66038000; // An zéro fixé à l'extinction Chicxulub (-66 038 000 en 1950)
+    const DAY_LABELS = ['A', 'B', 'C', 'D', 'E']; // Semaine de 5 jours
+    const CENOZOIC_BASE = 66038000;
     
     let currentGregorianYear = new Date().getFullYear();
     let selectedGregorianYear = currentGregorianYear;
@@ -231,10 +234,10 @@
       const dayOfYear = getDayOfYear(date);
       const cenozoicYear = getCenozoicYear(date.getFullYear());
       
-      if (dayOfYear <= 364) {
-        const monthIndex = Math.floor((dayOfYear - 1) / 28);
-        const dayOfMonth = ((dayOfYear - 1) % 28) + 1;
-        const dayOfWeekIndex = (dayOfMonth - 1) % 7;
+      if (dayOfYear <= 365) {
+        const monthIndex = Math.floor((dayOfYear - 1) / 73); // 5 mois de 73 jours
+        const dayOfMonth = ((dayOfYear - 1) % 73) + 1;
+        const dayOfWeekIndex = (dayOfMonth - 1) % 5;
         return {
           month: monthIndex + 1,
           day: dayOfMonth,
@@ -243,10 +246,10 @@
           year: cenozoicYear
         };
       } else {
-        const xDay = dayOfYear - 364;
+        // Uniquement le jour bissextile (366e jour)
         return {
           month: '✖️',
-          day: xDay,
+          day: 1,
           dayLabel: `✖️`,
           isX: true,
           year: cenozoicYear
@@ -263,7 +266,9 @@
       document.getElementById('clock').textContent = `${hrs}:${mins}:${secs}`;
 
       const fixed = convertToFixedDate(now);
-      const dateString = `${formatYear(fixed.year)} / ${fixed.month} / ${fixed.day} ${fixed.dayLabel}`;
+      const dateString = fixed.isX
+        ? `${formatYear(fixed.year)} / ✖️ / 1 ✖️`
+        : `${formatYear(fixed.year)} / ${fixed.month} / ${fixed.day} ${fixed.dayLabel}`;
       
       document.getElementById('current-fixed-date').textContent = dateString;
     }
@@ -279,8 +284,8 @@
       const fixedToday = convertToFixedDate(now);
       const leap = isLeapYear(selectedGregorianYear);
 
-      // 13 Mois
-      for (let m = 1; m <= 13; m++) {
+      // Render les 5 Mois de 73 jours
+      for (let m = 1; m <= 5; m++) {
         const card = document.createElement('div');
         card.className = 'month-card';
 
@@ -301,7 +306,7 @@
         const daysGrid = document.createElement('div');
         daysGrid.className = 'days-grid';
 
-        for (let d = 1; d <= 28; d++) {
+        for (let d = 1; d <= 73; d++) {
           const cell = document.createElement('div');
           cell.className = 'day-cell';
           cell.textContent = d;
@@ -316,32 +321,31 @@
         grid.appendChild(card);
       }
 
-      // Mois X
-      const cardX = document.createElement('div');
-      cardX.className = 'month-card month-x';
+      // Render le jour bissextile (uniquement si année bissextile)
+      if (leap) {
+        const cardX = document.createElement('div');
+        cardX.className = 'month-card month-x';
 
-      const titleX = document.createElement('div');
-      titleX.className = 'month-title';
-      titleX.textContent = `✖️`;
-      cardX.appendChild(titleX);
+        const titleX = document.createElement('div');
+        titleX.className = 'month-title';
+        titleX.textContent = `✖️`;
+        cardX.appendChild(titleX);
 
-      const daysGridX = document.createElement('div');
-      daysGridX.className = 'days-grid';
+        const daysGridX = document.createElement('div');
+        daysGridX.className = 'days-grid';
 
-      const totalXDays = leap ? 2 : 1;
-      for (let x = 1; x <= totalXDays; x++) {
         const cell = document.createElement('div');
         cell.className = 'day-cell';
-        cell.textContent = `✖️${x}`;
+        cell.textContent = `✖️1`;
 
-        if (selectedGregorianYear === now.getFullYear() && fixedToday.isX && fixedToday.day === x) {
+        if (selectedGregorianYear === now.getFullYear() && fixedToday.isX) {
           cell.classList.add('today');
         }
         daysGridX.appendChild(cell);
-      }
 
-      cardX.appendChild(daysGridX);
-      grid.appendChild(cardX);
+        cardX.appendChild(daysGridX);
+        grid.appendChild(cardX);
+      }
     }
 
     // Toggle Affichage

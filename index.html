@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>📅 Saisons & Mois</title>
+  <title>📅</title>
   <style>
     :root {
       --bg: #0f172a;
@@ -270,22 +270,8 @@
       font-size: 1.2rem;
       font-weight: 700;
       color: var(--accent);
-      margin-bottom: 1rem;
+      margin-bottom: 0.8rem;
       text-align: center;
-    }
-
-    .days-header {
-      display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      gap: 0.3rem;
-      text-align: center;
-      margin-bottom: 0.4rem;
-    }
-
-    .days-header span {
-      font-size: 0.8rem;
-      font-weight: 700;
-      color: var(--text-muted);
     }
 
     .month-section {
@@ -294,7 +280,8 @@
       gap: 0.3rem;
       text-align: center;
       position: relative;
-      padding-top: 0.4rem;
+      padding-top: 0.6rem;
+      margin-top: 0.4rem;
     }
 
     /* Séparateur en pointillés entre les mois */
@@ -309,11 +296,11 @@
 
     .month-label {
       grid-column: 1 / -1;
-      font-size: 0.7rem;
+      font-size: 0.75rem;
       font-weight: 800;
       color: var(--accent);
       text-align: left;
-      padding: 0.2rem 0;
+      padding-bottom: 0.2rem;
       opacity: 0.8;
     }
 
@@ -378,33 +365,110 @@
     const I18N = {
       fr: {
         title: "Le Calendrier Cosmologique Universal",
-        intro: "Ce calendrier est entièrement conçu pour s'affranchir de toute tradition religieuse, politique ou nationale. Il repose uniquement sur la géométrie orbitale et la physique de la planète Terre.",
+        intro: "Ce calendrier s'affranchit de toute tradition religieuse, politique ou nationale. Il repose uniquement sur la géométrie orbitale terrestre et une logique mathématique pure.",
         hYear: "Origine de l'Année 1 (Ère Cénozoïque)",
-        pYear: "Le point zéro est fixé à l'impact de la météorite de Chicxulub (~66 038 000 ans BP), événement planétaire absolu ayant mis fin à l'ère des dinosaures et ouvert le règne des mammifères.",
+        pYear: "Le point zéro est fixé à l'impact de la météorite de Chicxulub (~66 038 000 ans BP), événement planétaire absolu ayant terminé l'ère des dinosaures et ouvert le règne des mammifères.",
         hDay: "Origine du Jour 1 (Le Périhélie)",
         pDay: "Le 1er jour de l'année est le Périhélie terrestre (~4 janvier) : le moment orbital exact où la Terre est au plus près du Soleil.",
-        hGrid: "Structure 5 Saisons × 3 Mois",
-        pGrid: "L'année compte 5 Saisons de 73 jours. Chaque Saison se divise en 3 Mois administratifs de 25, 25 et 23 jours pour faciliter la gestion économique (loyers, abonnements) :",
-        li1: "Semaines de 5 jours (A, B, C, D, E).",
-        li2: "M1 et M2 = 25 jours (5 semaines). M3 = 23 jours.",
-        li3: "1 Jour bissextile (✖️) ajouté séparément tous les 4 ans."
+        hGrid: "Structure : 5 Saisons (S1-S5) × 3 Mois (M1-M3)",
+        pGrid: "L'année compte 5 saisons de 73 jours. Aucun nom arbitraire n'est donné aux jours de la semaine : leur chiffre indique directement la position dans le cycle de 5 jours (ex. 1 ou 6 = début de semaine).",
+        li1: "Saisons : 5 périodes majeures numérotées S1 à S5.",
+        li2: "Mois : M1 et M2 comptent 25 jours (D1 à D25). M3 en compte 23 (D1 à D23) pour compléter le cycle de 73 jours tout en s'alignant sur les usages économiques (loyers, abonnements).",
+        li3: "1 Jour bissextile (✖️) ajouté séparément tous les 4 ans lors du 366e jour."
       },
       en: {
         title: "The Universal Cosmological Calendar",
-        intro: "This calendar is designed to be free from any religious, political, or national traditions.",
+        intro: "This calendar is free from religious, political, or national traditions. It relies solely on Earth's orbital geometry and pure mathematical logic.",
         hYear: "Origin of Year 1 (Cenozoic Era)",
-        pYear: "Year Zero is set at the Chicxulub asteroid impact (~66,038,000 BP).",
+        pYear: "Year Zero is set at the Chicxulub asteroid impact (~66,038,000 BP), the planetary event ending the dinosaur era.",
         hDay: "Origin of Day 1 (Perihelion)",
-        pDay: "Day 1 of the year is Earth's Perihelion (~Jan 4th).",
-        hGrid: "Structure: 5 Seasons × 3 Months",
-        pGrid: "The year has 5 Seasons of 73 days. Each Season is split into 3 Months (25, 25, and 23 days) to adapt to billing cycles (rents, subscriptions):",
-        li1: "5-day weeks (A, B, C, D, E).",
-        li2: "M1 & M2 = 25 days. M3 = 23 days.",
-        li3: "1 Leap day (✖️) added every 4 years."
+        pDay: "Day 1 of the year is Earth's Perihelion (~Jan 4th), when Earth is closest to the Sun.",
+        hGrid: "Structure: 5 Seasons (S1-S5) × 3 Months (M1-M3)",
+        pGrid: "The year has 5 seasons of 73 days. Days of the week carry no redundant names: their number naturally reveals their position in the 5-day cycle.",
+        li1: "Seasons: 5 major periods numbered S1 to S5.",
+        li2: "Months: M1 & M2 have 25 days (D1-D25). M3 has 23 days (D1-D23) to adapt to billing cycles.",
+        li3: "1 Leap day (✖️) added separately every 4 years."
+      },
+      es: {
+        title: "El Calendario Cosmológico Universal",
+        intro: "Este calendario está libre de cualquier tradición religiosa o política. Se basa únicamente en la geometría orbital terrestre.",
+        hYear: "Origen del Año 1 (Era Cenozoica)",
+        pYear: "El año cero se establece en el impacto del asteroide Chicxulub (~66 038 000 AP).",
+        hDay: "Origen del Día 1 (Perihelio)",
+        pDay: "El día 1 del año es el Perihelio terrestre (~4 de enero).",
+        hGrid: "Estructura: 5 Estaciones (S1-S5) × 3 Meses (M1-M3)",
+        pGrid: "El año cuenta con 5 estaciones de 73 días. No hay nombres arbitrarios para los días de la semana: su número indica su posición en el ciclo de 5 días.",
+        li1: "Estaciones: 5 periodos numerados de S1 a S5.",
+        li2: "Meses: M1 y M2 tienen 25 días (D1-D25). M3 tiene 23 días (D1-D23).",
+        li3: "1 Día bisiesto (✖️) añadido cada 4 años."
+      },
+      de: {
+        title: "Der Universelle Kosmologische Kalender",
+        intro: "Dieser Kalender ist frei von religiösen oder politischen Traditionen. Er basiert auf orbitaler Geometrie und reiner Logik.",
+        hYear: "Ursprung von Jahr 1 (Känozoikum)",
+        pYear: "Jahr Null ist der Einschlag des Chicxulub-Asteroiden (~66.038.000 BP).",
+        hDay: "Ursprung von Tag 1 (Perihel)",
+        pDay: "Tag 1 des Jahres ist das Erdperihel (~4. Januar).",
+        hGrid: "Struktur: 5 Jahreszeiten (S1-S5) × 3 Monate (M1-M3)",
+        pGrid: "Das Jahr hat 5 Jahreszeiten zu 73 Tagen. Die Tage tragen keine Wochentagsnamen, da die Zahl die Position im 5-Tage-Zyklus anzeigt.",
+        li1: "Saisons: 5 Hauptperioden, S1 bis S5.",
+        li2: "Monate: M1 & M2 haben 25 Tage (D1-D25). M3 hat 23 Tage (D1-D23).",
+        li3: "1 Schaltjahr-Tag (✖️) alle 4 Jahre."
+      },
+      zh: {
+        title: "宇宙通用历法",
+        intro: "本历法无宗教或政治背景，完全基于地球轨道几何学与数学逻辑。",
+        hYear: "第 1 年的由来（新生代）",
+        pYear: "元年定为希克苏鲁伯陨石撞击事件（约 66,038,000 年前）。",
+        hDay: "第 1 天的由来（近日点）",
+        pDay: "每年第 1 天为地球近日点（约 1 月 4 日）。",
+        hGrid: "结构：5 个季节 (S1-S5) × 3 个月份 (M1-M3)",
+        pGrid: "每年 5 个 73 天的季节。无冗余的星期名称，天数直接指示 5 天周期中的位置。",
+        li1: "季节：5 个主要阶段，编号 S1 至 S5。",
+        li2: "月份：M1 和 M2 为 25 天（D1-D25），M3 为 23 天（D1-D23）。",
+        li3: "每 4 年在第 366 天增加 1 天闰日（✖️）。"
+      },
+      ja: {
+        title: "宇宙汎用暦",
+        intro: "この暦は宗教や政治的伝統から完全に独立し、軌道幾何学に基づいています。",
+        hYear: "1年の起源（新生代）",
+        pYear: "紀元0年はチクシュルーブ隕石衝突（約66,038,000年前）です。",
+        hDay: "1日の起源（近日点）",
+        pDay: "一年の第1日は地球の近日点（約1月4日）です。",
+        hGrid: "構造：5つの季節 (S1-S5) × 3つの月 (M1-M3)",
+        pGrid: "一年は73日間の5つの季節で構成されます。曜日の名前は廃止され、数字が5日周期内の位置をそのまま示します。",
+        li1: "季節：S1からS5までの5つの期間。",
+        li2: "月：M1とM2は25日間（D1-D25）、M3は23日間（D1-D23）。",
+        li3: "4年ごとに1日のうるう日（✖️）を追加。"
+      },
+      ar: {
+        title: "التقويم الكوني العالمي",
+        intro: "هذا التقويم خالي من أي تقاليد دينية أو سياسية، ويعتمد على الهندسة المدارية والمنطق الرياضي.",
+        hYear: "أصل السنة 1 (العصر الحديث)",
+        pYear: "سنة الصفر هي اصطدام كويكب تشيكشولوب (حوالي 66,038,000 سنة).",
+        hDay: "أصل اليوم 1 (الحضيض الشمسي)",
+        pDay: "اليوم الأول هو الحضيض الشمسي للأرض (حوالي 4 يناير).",
+        hGrid: "الهيكل: 5 فصول (S1-S5) × 3 أشهر (M1-M3)",
+        pGrid: "السنة 5 فصول من 73 يوماً. تم إلغاء أسماء أيام الأسبوع، حيث يشير رقم اليوم مباشرة إلى موقعه في الدورة المكونة من 5 أيام.",
+        li1: "الفصول: 5 فصول مرقمة من S1 إلى S5.",
+        li2: "الأشهر: M1 و M2 يتكونان من 25 يوماً، و M3 من 23 يوماً.",
+        li3: "يوم كبيس واحد (✖️) يضاف كل 4 سنوات."
+      },
+      ru: {
+        title: "Вселенский Космологический Календарь",
+        intro: "Этот календарь свободен от религиозных и политических традиций. Он основан на орбитальной геометрии.",
+        hYear: "Происхождение 1-го года (Кайнозой)",
+        pYear: "Нулевой год — падение Чикшулубского метеорита (~66 038 000 лет назад).",
+        hDay: "Происхождение 1-го дня (Перигелий)",
+        pDay: "1-й день года — перигелий Земли (~4 января).",
+        hGrid: "Структура: 5 Сезонов (S1-S5) × 3 Месяца (M1-M3)",
+        pGrid: "Год состоит из 5 сезонов по 73 дня. Названия дней недели упразднены, их число указывает позицию в 5-дневном цикле.",
+        li1: "Сезоны: 5 периодов с S1 по S5.",
+        li2: "Месяцы: M1 и M2 содержат по 25 дней (D1-D25), M3 — 23 дня (D1-D23).",
+        li3: "1 високосный день (✖️) каждые 4 года."
       }
     };
 
-    const DAY_LABELS = ['A', 'B', 'C', 'D', 'E'];
     const CENOZOIC_BASE = 66038000;
     
     let currentGregorianYear = new Date().getFullYear();
@@ -443,24 +507,22 @@
       if (dayOfYear <= 365) {
         const seasonIndex = Math.floor((dayOfYear - 1) / 73) + 1;
         const dayOfSeason = ((dayOfYear - 1) % 73) + 1;
-        const dayOfWeekIndex = (dayOfSeason - 1) % 5;
         
         let monthInSeason = 1;
         let dayInMonth = dayOfSeason;
 
         if (dayOfSeason > 50) {
           monthInSeason = 3;
-          dayInMonth = dayOfSeason - 50; // 1 à 23
+          dayInMonth = dayOfSeason - 50;
         } else if (dayOfSeason > 25) {
           monthInSeason = 2;
-          dayInMonth = dayOfSeason - 25; // 1 à 25
+          dayInMonth = dayOfSeason - 25;
         }
 
         return {
           season: seasonIndex,
           month: monthInSeason,
           day: dayInMonth,
-          dayLabel: DAY_LABELS[dayOfWeekIndex],
           isX: false,
           year: cenozoicYear
         };
@@ -469,7 +531,6 @@
           season: '✖️',
           month: '✖️',
           day: 1,
-          dayLabel: `✖️`,
           isX: true,
           year: cenozoicYear
         };
@@ -486,8 +547,8 @@
 
       const fixed = convertToFixedDate(now);
       const dateString = fixed.isX
-        ? `${formatYear(fixed.year)} / ✖️ / 1 ✖️`
-        : `${formatYear(fixed.year)} / S${fixed.season} / M${fixed.month} / D${fixed.day} ${fixed.dayLabel}`;
+        ? `${formatYear(fixed.year)} / ✖️ / D1 ✖️`
+        : `${formatYear(fixed.year)} / S${fixed.season} / M${fixed.month} / D${fixed.day}`;
       
       document.getElementById('current-fixed-date').textContent = dateString;
     }
@@ -503,26 +564,15 @@
       const fixedToday = convertToFixedDate(now);
       const leap = isLeapYear(selectedGregorianYear);
 
-      // Render 5 Saisons
       for (let s = 1; s <= 5; s++) {
         const card = document.createElement('div');
         card.className = 'season-card';
 
         const title = document.createElement('div');
         title.className = 'season-title';
-        title.textContent = `Saison ${s}`;
+        title.textContent = `S${s}`;
         card.appendChild(title);
 
-        const header = document.createElement('div');
-        header.className = 'days-header';
-        DAY_LABELS.forEach(label => {
-          const span = document.createElement('span');
-          span.textContent = label;
-          header.appendChild(span);
-        });
-        card.appendChild(header);
-
-        // Mois 1 (25 j.), Mois 2 (25 j.), Mois 3 (23 j.)
         const monthsConfig = [
           { m: 1, startDaySeason: 1, totalDays: 25 },
           { m: 2, startDaySeason: 26, totalDays: 25 },
@@ -543,8 +593,6 @@
             cell.className = 'day-cell';
             cell.textContent = d;
 
-            const dayInSeason = cfg.startDaySeason + d - 1;
-
             if (selectedGregorianYear === now.getFullYear() && !fixedToday.isX && fixedToday.season === s && fixedToday.month === cfg.m && fixedToday.day === d) {
               cell.classList.add('today');
             }
@@ -557,7 +605,6 @@
         grid.appendChild(card);
       }
 
-      // Render Jour Bissextile (si bissextile)
       if (leap) {
         const cardX = document.createElement('div');
         cardX.className = 'season-card season-x';
@@ -568,7 +615,7 @@
         cardX.appendChild(titleX);
 
         const daysGridX = document.createElement('div');
-        daysGridX.className = 'days-header';
+        daysGridX.className = 'month-section';
 
         const cell = document.createElement('div');
         cell.className = 'day-cell';

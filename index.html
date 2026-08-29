@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="und">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Universal Calendar</title>
+  <title>📅 🌍</title>
   <style>
     :root {
       --bg: #0f172a;
@@ -20,7 +20,7 @@
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      font-family: system-ui, -apple-system, sans-serif;
     }
 
     body {
@@ -35,20 +35,21 @@
 
     header {
       text-align: center;
-      margin-bottom: 2.5rem;
+      margin-bottom: 2rem;
     }
 
     h1 {
-      font-size: 2.2rem;
-      font-weight: 700;
-      letter-spacing: 1px;
+      font-size: 2.5rem;
       margin-bottom: 0.5rem;
-      background: linear-gradient(to right, #38bdf8, #818cf8);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
     }
 
-    /* Section Jour Actuel & Horloge */
+    .subtitle {
+      color: var(--text-muted);
+      font-size: 1.1rem;
+      letter-spacing: 2px;
+    }
+
+    /* Hero Card (Horloge & Jour Actuel) */
     .hero-card {
       background: var(--card-bg);
       border: 1px solid var(--border);
@@ -64,21 +65,15 @@
     .clock {
       font-size: 3rem;
       font-weight: 800;
-      font-mono: monospace;
+      font-family: monospace;
       color: var(--accent);
-      margin-bottom: 0.5rem;
+      margin-bottom: 0.8rem;
     }
 
     .current-date {
-      font-size: 1.4rem;
-      font-weight: 600;
+      font-size: 1.5rem;
+      font-weight: 700;
       color: var(--text);
-    }
-
-    .current-gregorian {
-      font-size: 0.9rem;
-      color: var(--text-muted);
-      margin-top: 0.5rem;
     }
 
     /* Grille des mois */
@@ -109,11 +104,15 @@
     }
 
     .month-title {
-      font-size: 1.1rem;
+      font-size: 1.2rem;
       font-weight: 700;
       color: var(--accent);
       margin-bottom: 1rem;
       text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
     }
 
     .days-header, .days-grid {
@@ -124,7 +123,7 @@
     }
 
     .days-header span {
-      font-size: 0.75rem;
+      font-size: 0.8rem;
       font-weight: 700;
       color: var(--text-muted);
       padding-bottom: 0.4rem;
@@ -135,7 +134,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 0.85rem;
+      font-size: 0.9rem;
       border-radius: 0.4rem;
       background: rgba(255, 255, 255, 0.03);
       color: var(--text);
@@ -147,22 +146,18 @@
       font-weight: 800;
       box-shadow: 0 0 12px var(--accent);
     }
-
-    .day-cell.empty {
-      background: transparent;
-    }
   </style>
 </head>
 <body>
 
   <header>
-    <h1>UNIVERSAL CALENDAR</h1>
+    <h1>📅 🌍</h1>
+    <div class="subtitle">13 × 28 + ✖️</div>
   </header>
 
   <div class="hero-card">
     <div class="clock" id="clock">00:00:00</div>
-    <div class="current-date" id="current-fixed-date">Chargement...</div>
-    <div class="current-gregorian" id="current-gregorian-date">---</div>
+    <div class="current-date" id="current-fixed-date">---</div>
   </div>
 
   <div class="calendar-grid" id="calendar-grid"></div>
@@ -183,9 +178,7 @@
 
     function convertToFixedDate(date) {
       const dayOfYear = getDayOfYear(date);
-      const leap = isLeapYear(date.getFullYear());
       
-      // Les 364 premiers jours sont répartis sur 13 mois de 28 jours
       if (dayOfYear <= 364) {
         const monthIndex = Math.floor((dayOfYear - 1) / 28);
         const dayOfMonth = ((dayOfYear - 1) % 28) + 1;
@@ -198,12 +191,11 @@
           year: date.getFullYear()
         };
       } else {
-        // Jours intercalaires dans le Mois X
-        const xDay = dayOfYear - 364; // 1 ou 2
+        const xDay = dayOfYear - 364;
         return {
-          month: 'X',
+          month: '✖️',
           day: xDay,
-          dayLabel: `X${xDay}`,
+          dayLabel: `✖️${xDay}`,
           isX: true,
           year: date.getFullYear()
         };
@@ -219,17 +211,13 @@
       const secs = String(now.getSeconds()).padStart(2, '0');
       document.getElementById('clock').textContent = `${hrs}:${mins}:${secs}`;
 
-      // Date fixe actuelle
+      // Date actuelle universelle
       const fixed = convertToFixedDate(now);
       const dateString = fixed.isX 
-        ? `Jour Hors-Semaine : Mois X (Jour ${fixed.day}) - ${fixed.year}`
-        : `Mois ${fixed.month} — Jour ${fixed.dayLabel} (${fixed.day}) - ${fixed.year}`;
+        ? `📆 🗓️ ✖️ (${fixed.day}) — ${fixed.year}`
+        : `📆 🗓️ ${fixed.month} — ${fixed.dayLabel} ${fixed.day} — ${fixed.year}`;
       
       document.getElementById('current-fixed-date').textContent = dateString;
-      
-      // Date grégorienne équivalente
-      const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-      document.getElementById('current-gregorian-date').textContent = `Équivalent Grégorien : ${now.toLocaleDateString('fr-FR', options)}`;
 
       return fixed;
     }
@@ -242,14 +230,14 @@
       const fixedToday = convertToFixedDate(now);
       const leap = isLeapYear(now.getFullYear());
 
-      // Affichage des 13 mois standard
+      // 13 Mois
       for (let m = 1; m <= 13; m++) {
         const card = document.createElement('div');
         card.className = 'month-card';
 
         const title = document.createElement('div');
         title.className = 'month-title';
-        title.textContent = `Mois ${m}`;
+        title.textContent = `🗓️ ${m}`;
         card.appendChild(title);
 
         const header = document.createElement('div');
@@ -279,13 +267,13 @@
         grid.appendChild(card);
       }
 
-      // Affichage du Mois X (Jours hors-semaine)
+      // Mois X
       const cardX = document.createElement('div');
       cardX.className = 'month-card month-x';
 
       const titleX = document.createElement('div');
       titleX.className = 'month-title';
-      titleX.textContent = `Mois X`;
+      titleX.textContent = `🗓️ ✖️`;
       cardX.appendChild(titleX);
 
       const daysGridX = document.createElement('div');
@@ -295,7 +283,7 @@
       for (let x = 1; x <= totalXDays; x++) {
         const cell = document.createElement('div');
         cell.className = 'day-cell';
-        cell.textContent = `X${x}`;
+        cell.textContent = `✖️${x}`;
 
         if (fixedToday.isX && fixedToday.day === x) {
           cell.classList.add('today');
@@ -307,7 +295,6 @@
       grid.appendChild(cardX);
     }
 
-    // Initialisation
     renderCalendar();
     updateClockAndHeader();
     setInterval(updateClockAndHeader, 1000);

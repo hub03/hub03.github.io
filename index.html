@@ -1,156 +1,317 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="fr">
 <head>
-  <title>HUB03</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calendrier Fixe Universel</title>
   <style>
-* {
-  box-sizing: border-box;
-}
+    :root {
+      --bg: #0f172a;
+      --card-bg: #1e293b;
+      --accent: #38bdf8;
+      --accent-glow: rgba(56, 189, 248, 0.3);
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --today-bg: #0284c7;
+      --border: #334155;
+    }
 
-body {
-  min-height: 100vh;
-  display: grid;
-  place-items: center;
-  font-family: "SF Pro Text", "SF Pro Icons", "AOS Icons", "Helvetica Neue", Helvetica, Arial, sans-serif, system-ui;
-  background: hsl(0 0% 0%);
-  gap: 2rem;
-}
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    }
 
-body::before {
-	--line: hsl(0 0% 95% / 0.25);
-	content: "";
-	height: 100vh;
-	width: 100vw;
-	position: fixed;
-	background:
-		linear-gradient(90deg, var(--line) 1px, transparent 1px 10vmin) 0 -5vmin / 10vmin 10vmin,
-		linear-gradient(var(--line) 1px, transparent 1px 10vmin) 0 -5vmin / 10vmin 10vmin;
-	mask: linear-gradient(-15deg, transparent 30%, white);
-	top: 0;
-	z-index: -1;
-}
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 2rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
 
-section {
-  display: grid;
-  gap: 4rem;
-  align-items: center;
-  justify-content: center;
-}
+    header {
+      text-align: center;
+      margin-bottom: 2.5rem;
+    }
 
-section p {
-  margin: 0;
-  font-size: 2.25rem;
-  color: hsl(0 0% 40%);
-  text-align: center;
-  background: linear-gradient(hsl(0 0% 80%), hsl(0 0% 50%));
-  color: transparent;
-  background-clip: text;
-}
+    h1 {
+      font-size: 2.2rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      margin-bottom: 0.5rem;
+      background: linear-gradient(to right, #38bdf8, #818cf8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
 
-.code {
-  font-size: 3rem;
-  display: flex;
-  flex-wrap: nowrap;
-  color: hsl(0 0% 100%);
-  border-radius: 1rem;
-  background: hsl(0 0% 6%);
-  justify-content: center;
-  box-shadow: 0 1px hsl(0 0% 100% / 0.25) inset;
-}
+    /* Section Jour Actuel & Horloge */
+    .hero-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 1.5rem;
+      padding: 2rem 3rem;
+      text-align: center;
+      box-shadow: 0 10px 30px var(--accent-glow);
+      margin-bottom: 3rem;
+      max-width: 500px;
+      width: 100%;
+    }
 
-.code:hover {
-  cursor: grab;
-}
+    .clock {
+      font-size: 3rem;
+      font-weight: 800;
+      font-mono: monospace;
+      color: var(--accent);
+      margin-bottom: 0.5rem;
+    }
 
-.digit {
-  display: flex;
-  height: 100%;
-  padding: 5.5rem 1rem;
-}
+    .current-date {
+      font-size: 1.4rem;
+      font-weight: 600;
+      color: var(--text);
+    }
 
-.digit:focus-visible {
-  outline-color: hsl(0 0% 50% / 0.25);
-  outline-offset: 1rem;
-}
+    .current-gregorian {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      margin-top: 0.5rem;
+    }
 
-.digit span {
-  scale: calc(var(--active, 0) + 0.5);
-  filter: blur(calc((1 - var(--active, 0)) * 1rem));
-  transition: scale calc(((1 - var(--active, 0)) + 0.2) * 1s), filter calc(((1 - var(--active, 0)) + 0.2) * 1s);
-}
+    /* Grille des mois */
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1.5rem;
+      width: 100%;
+      max-width: 1200px;
+    }
 
-ul {
-  padding: 0;
-  margin: 0;
-}
+    .month-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 1rem;
+      padding: 1.2rem;
+      transition: transform 0.2s, border-color 0.2s;
+    }
 
-.digit:first-of-type {
-  padding-left: 5rem;
-}
-.digit:last-of-type {
-  padding-right: 5rem;
-}
+    .month-card:hover {
+      transform: translateY(-4px);
+      border-color: var(--accent);
+    }
 
-:root {
-  --lerp-0: 1; /* === sin(90deg) */
-  --lerp-1: calc(sin(50deg));
-  --lerp-2: calc(sin(45deg));
-  --lerp-3: calc(sin(35deg));
-  --lerp-4: calc(sin(25deg));
-  --lerp-5: calc(sin(15deg));
-}
+    .month-card.month-x {
+      border: 1px dashed var(--accent);
+      background: rgba(56, 189, 248, 0.05);
+    }
 
-.digit:is(:hover, :focus-visible) {
-  --active: var(--lerp-0);
-}
-.digit:is(:hover, :focus-visible) + .digit,
-.digit:has(+ .digit:is(:hover, :focus-visible)) {
-  --active: var(--lerp-1);
-}
-.digit:is(:hover, :focus-visible) + .digit + .digit,
-.digit:has(+ .digit + .digit:is(:hover, :focus-visible)) {
-  --active: var(--lerp-2);
-}
-.digit:is(:hover, :focus-visible) + .digit + .digit + .digit,
-.digit:has(+ .digit + .digit + .digit:is(:hover, :focus-visible)) {
-  --active: var(--lerp-3);
-}
-.digit:is(:hover, :focus-visible) + .digit + .digit + .digit + .digit,
-.digit:has(+ .digit + .digit + .digit + .digit:is(:hover, :focus-visible)) {
-  --active: var(--lerp-4);
-}
-.digit:is(:hover, :focus-visible) + .digit + .digit + .digit + .digit + .digit,
-.digit:has(+ .digit + .digit + .digit + .digit + .digit:is(:hover, :focus-visible)) {
-  --active: var(--lerp-5);
-}
+    .month-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--accent);
+      margin-bottom: 1rem;
+      text-align: center;
+    }
+
+    .days-header, .days-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 0.3rem;
+      text-align: center;
+    }
+
+    .days-header span {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      padding-bottom: 0.4rem;
+    }
+
+    .day-cell {
+      aspect-ratio: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+      border-radius: 0.4rem;
+      background: rgba(255, 255, 255, 0.03);
+      color: var(--text);
+    }
+
+    .day-cell.today {
+      background: var(--today-bg);
+      color: #fff;
+      font-weight: 800;
+      box-shadow: 0 0 12px var(--accent);
+    }
+
+    .day-cell.empty {
+      background: transparent;
+    }
   </style>
 </head>
 <body>
- <section>
-  <p>salve sup hub03
-	<br>le site ebu privari
-	<br>le dokumente ebu secrete
-	<br>gratise te ambulu ekstr ik</p>
-  <ul class="code">
-    <li tabindex="0" class="digit">
-      <span>H</span>
-    </li>
-    <li tabindex="0" class="digit">
-      <span>U</span>
-    </li>
-    <li tabindex="0" class="digit">
-      <span>B</span>
-    </li>
-    <li tabindex="0" class="digit">
-      <span>-</span>
-    </li>
-    <li tabindex="0" class="digit">
-      <span>0</span>
-    </li>
-    <li tabindex="0" class="digit">
-      <span>3</span>
-    </li>
-  </ul>
-</section>
+
+  <header>
+    <h1>CALENDRIER FIXE UNIVERSEL</h1>
+    <p style="color: var(--text-muted);">13 mois × 28 jours + Jours Intercalaires (Mois X)</p>
+  </header>
+
+  <div class="hero-card">
+    <div class="clock" id="clock">00:00:00</div>
+    <div class="current-date" id="current-fixed-date">Chargement...</div>
+    <div class="current-gregorian" id="current-gregorian-date">---</div>
+  </div>
+
+  <div class="calendar-grid" id="calendar-grid"></div>
+
+  <script>
+    const DAY_LABELS = ['A', 'B', 'C', 'D', 'E', 'F', 'G'];
+    
+    function isLeapYear(year) {
+      return (year % 4 === 0 && year % 100 !== 0) || (year % 400 === 0);
+    }
+
+    function getDayOfYear(date) {
+      const start = new Date(date.getFullYear(), 0, 0);
+      const diff = date - start;
+      const oneDay = 1000 * 60 * 60 * 24;
+      return Math.floor(diff / oneDay);
+    }
+
+    function convertToFixedDate(date) {
+      const dayOfYear = getDayOfYear(date);
+      const leap = isLeapYear(date.getFullYear());
+      
+      // Les 364 premiers jours sont répartis sur 13 mois de 28 jours
+      if (dayOfYear <= 364) {
+        const monthIndex = Math.floor((dayOfYear - 1) / 28);
+        const dayOfMonth = ((dayOfYear - 1) % 28) + 1;
+        const dayOfWeekIndex = (dayOfMonth - 1) % 7;
+        return {
+          month: monthIndex + 1,
+          day: dayOfMonth,
+          dayLabel: DAY_LABELS[dayOfWeekIndex],
+          isX: false,
+          year: date.getFullYear()
+        };
+      } else {
+        // Jours intercalaires dans le Mois X
+        const xDay = dayOfYear - 364; // 1 ou 2
+        return {
+          month: 'X',
+          day: xDay,
+          dayLabel: `X${xDay}`,
+          isX: true,
+          year: date.getFullYear()
+        };
+      }
+    }
+
+    function updateClockAndHeader() {
+      const now = new Date();
+      
+      // Horloge
+      const hrs = String(now.getHours()).padStart(2, '0');
+      const mins = String(now.getMinutes()).padStart(2, '0');
+      const secs = String(now.getSeconds()).padStart(2, '0');
+      document.getElementById('clock').textContent = `${hrs}:${mins}:${secs}`;
+
+      // Date fixe actuelle
+      const fixed = convertToFixedDate(now);
+      const dateString = fixed.isX 
+        ? `Jour Hors-Semaine : Mois X (Jour ${fixed.day}) - ${fixed.year}`
+        : `Mois ${fixed.month} — Jour ${fixed.dayLabel} (${fixed.day}) - ${fixed.year}`;
+      
+      document.getElementById('current-fixed-date').textContent = dateString;
+      
+      // Date grégorienne équivalente
+      const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+      document.getElementById('current-gregorian-date').textContent = `Équivalent Grégorien : ${now.toLocaleDateString('fr-FR', options)}`;
+
+      return fixed;
+    }
+
+    function renderCalendar() {
+      const grid = document.getElementById('calendar-grid');
+      grid.innerHTML = '';
+      
+      const now = new Date();
+      const fixedToday = convertToFixedDate(now);
+      const leap = isLeapYear(now.getFullYear());
+
+      // Affichage des 13 mois standard
+      for (let m = 1; m <= 13; m++) {
+        const card = document.createElement('div');
+        card.className = 'month-card';
+
+        const title = document.createElement('div');
+        title.className = 'month-title';
+        title.textContent = `Mois ${m}`;
+        card.appendChild(title);
+
+        const header = document.createElement('div');
+        header.className = 'days-header';
+        DAY_LABELS.forEach(label => {
+          const span = document.createElement('span');
+          span.textContent = label;
+          header.appendChild(span);
+        });
+        card.appendChild(header);
+
+        const daysGrid = document.createElement('div');
+        daysGrid.className = 'days-grid';
+
+        for (let d = 1; d <= 28; d++) {
+          const cell = document.createElement('div');
+          cell.className = 'day-cell';
+          cell.textContent = d;
+
+          if (!fixedToday.isX && fixedToday.month === m && fixedToday.day === d) {
+            cell.classList.add('today');
+          }
+          daysGrid.appendChild(cell);
+        }
+
+        card.appendChild(daysGrid);
+        grid.appendChild(card);
+      }
+
+      // Affichage du Mois X (Jours hors-semaine)
+      const cardX = document.createElement('div');
+      cardX.className = 'month-card month-x';
+
+      const titleX = document.createElement('div');
+      titleX.className = 'month-title';
+      titleX.textContent = `Mois X (Intercalaire)`;
+      cardX.appendChild(titleX);
+
+      const daysGridX = document.createElement('div');
+      daysGridX.className = 'days-grid';
+
+      const totalXDays = leap ? 2 : 1;
+      for (let x = 1; x <= totalXDays; x++) {
+        const cell = document.createElement('div');
+        cell.className = 'day-cell';
+        cell.textContent = `X${x}`;
+
+        if (fixedToday.isX && fixedToday.day === x) {
+          cell.classList.add('today');
+        }
+        daysGridX.appendChild(cell);
+      }
+
+      cardX.appendChild(daysGridX);
+      grid.appendChild(cardX);
+    }
+
+    // Initialisation
+    renderCalendar();
+    updateClockAndHeader();
+    setInterval(updateClockAndHeader, 1000);
+  </script>
 </body>
 </html>

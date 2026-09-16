@@ -37,6 +37,27 @@
       text-decoration: none;
       color: #000;
     }
+
+    #lineSettings {
+      margin-top: 8px;
+      padding: 8px;
+      background: #f8f8f8;
+      border-radius: 4px;
+      display: none;
+    }
+
+    #lineSettings label {
+      display: inline;
+      margin-right: 8px;
+      margin-top: 0;
+    }
+
+    #lineAmount {
+      width: 60px;
+      display: inline;
+      padding: 6px;
+      font-size: 14px;
+    }
   </style>
 </head>
 <body>
@@ -81,6 +102,14 @@
     </select>
   </label>
 
+  <!-- Paramètres de cagnotte pour la ligne sélectionnée -->
+  <div id="lineSettings">
+    <label>
+      Validé : <input type="checkbox" id="lineCheckbox">
+    </label>
+    cagnotte : <input type="tel" id="lineAmount" maxlength="3" placeholder="0"> €
+  </div>
+
   <!-- OPTION -->
   <label>
     Option
@@ -124,16 +153,60 @@ const envInput = document.getElementById("environment");
 const codeInput = document.getElementById("codeOption");
 const pointsInput = document.getElementById("pointsConsommes");
 const link = document.getElementById("finalLink");
+const lineCheckbox = document.getElementById("lineCheckbox");
+const lineAmount = document.getElementById("lineAmount");
+const lineSettings = document.getElementById("lineSettings");
 
 let currentEnv = null;
 
+// Charger les données de cagnotte depuis localStorage
+function loadCagnotteData(lineValue) {
+  if (!lineValue) {
+    lineCheckbox.checked = false;
+    lineAmount.value = '';
+    return;
+  }
+  const data = localStorage.getItem(`cagnotte_${lineValue}`);
+  if (data) {
+    try {
+      const parsed = JSON.parse(data);
+      lineCheckbox.checked = parsed.checked || false;
+      lineAmount.value = parsed.amount || '';
+    } catch (e) {
+      console.error('Erreur de chargement des données de cagnotte', e);
+      lineCheckbox.checked = false;
+      lineAmount.value = '';
+    }
+  } else {
+    lineCheckbox.checked = false;
+    lineAmount.value = '';
+  }
+}
+
+// Sauvegarder les données de cagnotte dans localStorage
+function saveCagnotteData(lineValue) {
+  if (!lineValue) return;
+  const data = {
+    checked: lineCheckbox.checked,
+    amount: lineAmount.value
+  };
+  localStorage.setItem(`cagnotte_${lineValue}`, JSON.stringify(data));
+}
+
 lineSelect.addEventListener("change", () => {
   const opt = lineSelect.selectedOptions[0];
-  if (!opt) return;
+  if (!opt) {
+    lineSettings.style.display = 'none';
+    return;
+  }
 
   currentEnv = opt.dataset.env;
   envInput.value = currentEnv;
   idParrainInput.value = opt.dataset.parrain;
+
+  // Afficher les paramètres de cagnotte
+  lineSettings.style.display = 'block';
+  loadCagnotteData(opt.value);
 
   operationSelect.innerHTML = "";
   for (const key in OPTIONS[currentEnv]) {
@@ -146,6 +219,21 @@ lineSelect.addEventListener("change", () => {
 
   updateOperation();
   updateLink();
+});
+
+// Écouteurs pour la checkbox et l'input amount
+lineCheckbox.addEventListener('change', () => {
+  const opt = lineSelect.selectedOptions[0];
+  if (opt) {
+    saveCagnotteData(opt.value);
+  }
+});
+
+lineAmount.addEventListener('input', () => {
+  const opt = lineSelect.selectedOptions[0];
+  if (opt) {
+    saveCagnotteData(opt.value);
+  }
 });
 
 operationSelect.addEventListener("change", () => {
@@ -169,6 +257,14 @@ function updateLink() {
   link.href = url;
   link.innerText = url;
 }
+
+// Charger les données de cagnotte pour la ligne sélectionnée au chargement
+window.addEventListener('DOMContentLoaded', () => {
+  if (lineSelect.value) {
+    lineSettings.style.display = 'block';
+    loadCagnotteData(lineSelect.value);
+  }
+});
 </script>
 
 </body>

@@ -5,17 +5,23 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>📅</title>
   <style>
-    :root {
-      --bg: #0f172a;
-      --card-bg: #1e293b;
-      --accent: #38bdf8;
-      --accent-glow: rgba(56, 189, 248, 0.3);
-      --text: #f8fafc;
-      --text-muted: #94a3b8;
-      --today-bg: #0284c7;
-      --border: #334155;
-    }
+:root {
+  --bg: #f8fafc;          /* Fond blanc cassé (slate-50) */
+  --card-bg: #ffffff;     /* Cartes blanches */
+  --accent: #0ea5e9;      /* Bleu ciel (sky-500) */
+  --accent-glow: rgba(14, 165, 233, 0.2); /* Lueur bleutée subtile */
+  --text: #0f172a;        /* Texte noir (slate-900) */
+  --text-muted: #64748b;  /* Texte gris (slate-500) */
+  --today-bg: #0284c7;    /* Bleu plus foncé pour le jour actuel (sky-700) */
+  --border: #e2e8f0;      /* Bordures grises claires (slate-200) */
+}
+.hero-card, .modal-card, .season-row {
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.1);
+}
 
+canvas {
+  filter: drop-shadow(0 0 10px rgba(14, 165, 233, 0.3));
+}
     * {
       box-sizing: border-box;
       margin: 0;

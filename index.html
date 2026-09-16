@@ -34,17 +34,16 @@
       position: relative;
     }
 
-    .help-btn {
+    .help-btn, .timezone-btn {
       position: fixed;
       top: 1.5rem;
-      right: 1.5rem;
       width: 36px;
       height: 36px;
       border-radius: 50%;
       background: var(--card-bg);
       border: 1px solid var(--border);
       color: var(--text-muted);
-      font-size: 1.1rem;
+      font-size: 1rem;
       font-weight: bold;
       cursor: pointer;
       display: flex;
@@ -54,7 +53,15 @@
       z-index: 100;
     }
 
-    .help-btn:hover {
+    .help-btn {
+      right: 1.5rem;
+    }
+
+    .timezone-btn {
+      right: 60px;
+    }
+
+    .help-btn:hover, .timezone-btn:hover {
       color: var(--accent);
       border-color: var(--accent);
       box-shadow: 0 0 10px var(--accent-glow);
@@ -342,6 +349,7 @@
 </head>
 <body>
 
+  <button class="timezone-btn" id="toggle-timezone" title="Basculer entre UTC et heure locale">UTC</button>
   <button class="help-btn" id="open-help" title="Explications">?</button>
 
   <div class="modal-overlay" id="modal-overlay">
@@ -364,7 +372,7 @@
   </div>
 
   <div class="hero-card" id="hero-card">
-    <div class="clock" id="clock">00:00:00</div>
+    <div class="clock" id="clock">00:00:00 UTC</div>
     <div class="current-date" id="current-fixed-date">---</div>
   </div>
 
@@ -456,7 +464,7 @@
         hYear: "1年の起源（新生代）",
         pYear: "紀元0年はチクシュルーブ隕石衝突（約66,038,000年前）です。",
         hDay: "1日の起源（近日点）",
-        pDay: "一年の第1日は地球の近日点（約1月4日）です。",
+        pDay: "一の第1日は地球の近日点（約1月4日）です。",
         hGrid: "構造：5つの季節 (S1-S5) × 3つの月 (M1-M3)",
         pGrid: "一年は73日間の5つの季節で構成されます。曜日の名前はなく、数字が5日周期内の位置を示します。",
         li1: "季節：S1からS5までの5つの行。",
@@ -492,10 +500,11 @@
     };
 
     const CENOZOIC_BASE = 66038000;
-    let currentGregorianYear = new Date().getFullYear();
+    let currentGregorianYear = new Date().getUTCFullYear();
     let selectedGregorianYear = currentGregorianYear;
     let isGlobeActive = true;
     let animFrameId = null;
+    let useUTC = true; // Basculer entre UTC et heure locale
 
     function getCenozoicYear(gregorianYear) {
       return CENOZOIC_BASE + (gregorianYear - 1950);
@@ -510,27 +519,29 @@
     }
 
     function getOrbitalDay(date) {
-      const year = date.getFullYear();
-      let perihelion = new Date(year, 0, 4);
-      
+      const year = date.getUTCFullYear();
+      // Crée le périhélie en UTC (4 janvier à 00:00:00 UTC)
+      let perihelion = new Date(Date.UTC(year, 0, 4, 0, 0, 0, 0));
+
       let start = perihelion;
-      if (date < perihelion) {
-        start = new Date(year - 1, 0, 4);
+      // Compare les timestamps UTC
+      if (date.getTime() < perihelion.getTime()) {
+        start = new Date(Date.UTC(year - 1, 0, 4, 0, 0, 0, 0));
       }
-      
-      const diff = date - start;
+
+      const diff = date.getTime() - start.getTime();
       const oneDay = 1000 * 60 * 60 * 24;
       return Math.floor(diff / oneDay) + 1;
     }
 
     function convertToFixedDate(date) {
       const dayOfYear = getOrbitalDay(date);
-      const cenozoicYear = getCenozoicYear(date.getFullYear());
-      
+      const cenozoicYear = getCenozoicYear(date.getUTCFullYear());
+
       if (dayOfYear <= 365) {
         const seasonIndex = Math.floor((dayOfYear - 1) / 73) + 1;
         const dayOfSeason = ((dayOfYear - 1) % 73) + 1;
-        
+
         let monthInSeason = 1;
         let dayInMonth = dayOfSeason;
 
@@ -560,10 +571,21 @@
 
     function updateClockAndHeader() {
       const now = new Date();
-      const hrs = String(now.getHours()).padStart(2, '0');
-      const mins = String(now.getMinutes()).padStart(2, '0');
-      const secs = String(now.getSeconds()).padStart(2, '0');
-      document.getElementById('clock').textContent = `${hrs}:${mins}:${secs}`;
+      let hrs, mins, secs, timezoneLabel;
+
+      if (useUTC) {
+        hrs = String(now.getUTCHours()).padStart(2, '0');
+        mins = String(now.getUTCMinutes()).padStart(2, '0');
+        secs = String(now.getUTCSeconds()).padStart(2, '0');
+        timezoneLabel = 'UTC';
+      } else {
+        hrs = String(now.getHours()).padStart(2, '0');
+        mins = String(now.getMinutes()).padStart(2, '0');
+        secs = String(now.getSeconds()).padStart(2, '0');
+        timezoneLabel = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      }
+
+      document.getElementById('clock').textContent = `${hrs}:${mins}:${secs} ${timezoneLabel}`;
 
       const fixed = convertToFixedDate(now);
       const dateString = `${formatYear(fixed.year)} / S${fixed.season} / M${fixed.month} / D${fixed.day}`;
@@ -573,7 +595,7 @@
     function renderCalendar() {
       const container = document.getElementById('calendar-rows');
       container.innerHTML = '';
-      
+
       const displayedCenozoicYear = getCenozoicYear(selectedGregorianYear);
       document.getElementById('displayed-year').textContent = formatYear(displayedCenozoicYear);
 
@@ -618,7 +640,7 @@
             cell.className = 'day-cell';
             cell.textContent = d;
 
-            if (selectedGregorianYear === now.getFullYear() && fixedToday.season === s && fixedToday.month === cfg.m && fixedToday.day === d) {
+            if (selectedGregorianYear === now.getUTCFullYear() && fixedToday.season === s && fixedToday.month === cfg.m && fixedToday.day === d) {
               cell.classList.add('today');
             }
             daysGrid.appendChild(cell);
@@ -649,9 +671,9 @@
       ctx.clearRect(0, 0, width, height);
 
       const now = new Date();
-      const secondsInDay = (now.getUTCHours() * 3600) + 
-                           (now.getUTCMinutes() * 60) + 
-                           now.getUTCSeconds() + 
+      const secondsInDay = (now.getUTCHours() * 3600) +
+                           (now.getUTCMinutes() * 60) +
+                           now.getUTCSeconds() +
                            (now.getUTCMilliseconds() / 1000);
 
       // Vitesse ralentie de moitié : 2880 (1 tour complet en ~30s)
@@ -751,11 +773,18 @@
       updateModalLanguage(e.target.value);
     });
 
+    // Basculer entre UTC et heure locale
+    document.getElementById('toggle-timezone').addEventListener('click', () => {
+      useUTC = !useUTC;
+      document.getElementById('toggle-timezone').textContent = useUTC ? 'UTC' : 'Local';
+      updateClockAndHeader();
+    });
+
     // Basculement Calendrier <-> Globe
     document.getElementById('hero-card').addEventListener('click', () => {
       const calendarContainer = document.getElementById('calendar-container');
       const globeWrapper = document.getElementById('globe-wrapper');
-      
+
       const isCalendarVisible = calendarContainer.classList.toggle('visible');
 
       if (isCalendarVisible) {

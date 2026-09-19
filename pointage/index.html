@@ -462,7 +462,7 @@
       renderHistory();
     }
 
-    function exportCSV() {
+function exportCSV() {
   const filterValue = document.getElementById('month-filter').value;
   const filtered = state.history.filter(item => item.date.startsWith(filterValue));
 
@@ -471,14 +471,11 @@
     return;
   }
 
-  // En-têtes du CSV
   const headers = ["Date", "Arrivée", "Début Pause", "Fin Pause", "Départ", "Durée (Minutes)", "Durée (Heures)"];
   let csvContent = "data:text/csv;charset=utf-8,";
 
-  // Ajouter les en-têtes (entourés de guillemets)
   csvContent += headers.map(header => `"${header}"`).join(";") + "\n";
 
-  // Ajouter les données
   filtered.forEach(item => {
     const hrs = (item.totalMinutes / 60).toFixed(2);
     const row = [
@@ -493,10 +490,9 @@
     csvContent += row + "\n";
   });
 
-  // Encodage correct de l'URI
-  const encodedUri = encodeURIComponent(csvContent);
+  // ✅ On utilise directement csvContent (qui contient déjà le type MIME)
   const link = document.createElement("a");
-  link.setAttribute("href", `data:text/csv;charset=utf-8,${encodedUri}`);
+  link.setAttribute("href", csvContent); // <-- Plus besoin de répéter "data:text/csv;charset=utf-8,"
   link.setAttribute("download", `heures_pointage_${filterValue}.csv`);
   document.body.appendChild(link);
   link.click();

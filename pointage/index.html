@@ -471,13 +471,16 @@ function exportCSV() {
     return;
   }
 
+  // En-têtes du CSV
   const headers = ["Date", "Arrivée", "Début Pause", "Fin Pause", "Départ", "Durée (Minutes)", "Durée (Heures)"];
-  let csvContent = "data:text/csv;charset=utf-8,";
+  let csvContent = "";
 
+  // Ajouter les en-têtes (entourés de guillemets)
   csvContent += headers.map(header => `"${header}"`).join(";") + "\n";
 
+  // Ajouter les données
   filtered.forEach(item => {
-    const hrs = (item.totalMinutes / 60).toFixed(2);
+    const hrs = (item.totalMinutes / 60).toFixed(2).replace('.', ',');
     const row = [
       `"${item.date}"`,
       `"${formatTime(item.start)}"`,
@@ -490,13 +493,20 @@ function exportCSV() {
     csvContent += row + "\n";
   });
 
-  // ✅ On utilise directement csvContent (qui contient déjà le type MIME)
+  // Créer un Blob pour gérer correctement l'encodage UTF-8
+  const blob = new Blob(["\uFEFF" + csvContent], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+
+  // Créer le lien de téléchargement
   const link = document.createElement("a");
-  link.setAttribute("href", csvContent); // <-- Plus besoin de répéter "data:text/csv;charset=utf-8,"
+  link.setAttribute("href", url);
   link.setAttribute("download", `heures_pointage_${filterValue}.csv`);
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
+
+  // Libérer l'URL du Blob après téléchargement
+  setTimeout(() => URL.revokeObjectURL(url), 100);
 }
   </script>
 </body>

@@ -58,6 +58,58 @@
       padding: 6px;
       font-size: 14px;
     }
+
+    /* Sauvegarde / restauration */
+    #backupSection {
+      margin-top: 24px;
+      padding: 12px;
+      background: #f0f4ff;
+      border: 1px solid #ccd6f5;
+      border-radius: 6px;
+    }
+
+    #backupSection h2 {
+      margin: 0 0 8px;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    #backupSection button {
+      padding: 8px 12px;
+      font-size: 14px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-right: 8px;
+      margin-top: 4px;
+    }
+
+    #exportBtn {
+      background: #e00070;
+      color: #fff;
+    }
+
+    #exportBtn:hover {
+      background: #b8005e;
+    }
+
+    #importBtn {
+      background: #fff;
+      color: #e00070;
+      border: 1px solid #e00070 !important;
+    }
+
+    #importBtn:hover {
+      background: #ffe6f2;
+    }
+
+    #backupStatus {
+      display: block;
+      margin-top: 8px;
+      font-size: 13px;
+      color: #2a7a2a;
+      min-height: 1em;
+    }
   </style>
 </head>
 <body>
@@ -87,7 +139,7 @@
       <option value="0634223543" data-env="MOBILE" data-parrain="REDA3918FB">O634223543 – Lambert</option>
       <option value="0646609398" data-env="MOBILE" data-parrain="RED43B2F41">O646609398 – Laurent</option>
       <option value="0787759080" data-env="MOBILE" data-parrain="RED15A801D">O787759080 – Léana</option>
-      
+
       <option value="0777834537" data-env="MOBILE" data-parrain="Aucun">O777834537 – Loïc</option>
       <option value="0626625355" data-env="MOBILE" data-parrain="Aucun">O626625355 – Loïc</option>
       <option value="0623618242" data-env="MOBILE" data-parrain="Aucun">O623618242 – Loïc</option>
@@ -131,6 +183,15 @@
 
 <a id="finalLink" target="_blank"></a>
 
+<!-- SAUVEGARDE / RESTAURATION -->
+<div id="backupSection">
+  <h2>Sauvegarde des données</h2>
+  <button type="button" id="exportBtn">Exporter les données</button>
+  <button type="button" id="importBtn">Restaurer depuis un fichier</button>
+  <input type="file" id="importFile" accept="application/json,.json" hidden>
+  <span id="backupStatus"></span>
+</div>
+
 <script>
 const OPTIONS = {
   MOBILE: {
@@ -156,8 +217,22 @@ const link = document.getElementById("finalLink");
 const lineCheckbox = document.getElementById("lineCheckbox");
 const lineAmount = document.getElementById("lineAmount");
 const lineSettings = document.getElementById("lineSettings");
+const exportBtn = document.getElementById("exportBtn");
+const importBtn = document.getElementById("importBtn");
+const importFile = document.getElementById("importFile");
+const backupStatus = document.getElementById("backupStatus");
 
 let currentEnv = null;
+
+// Affiche un message de statut sous les boutons (disparaît après 5 s)
+function showBackupStatus(message, isError) {
+  backupStatus.textContent = message;
+  backupStatus.style.color = isError ? '#c00000' : '#2a7a2a';
+  clearTimeout(showBackupStatus._timer);
+  showBackupStatus._timer = setTimeout(() => {
+    backupStatus.textContent = '';
+  }, 5000);
+}
 
 // Charger les données de cagnotte depuis localStorage
 function loadCagnotteData(lineValue) {
@@ -192,6 +267,98 @@ function saveCagnotteData(lineValue) {
   };
   localStorage.setItem(`cagnotte_${lineValue}`, JSON.stringify(data));
 }
+
+// ===== EXPORT =====
+// Regroupe toutes les entrées "cagnotte_*" du localStorage dans un fichier JSON
+function exportData() {
+  const data = {};
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if (key.startsWith('cagnotte_')) {
+      data[key] = localStorage.getItem(key);
+    }
+  }
+
+  if (Object.keys(data).length === 0) {
+    showBackupStatus('Aucune donnée à exporter.', true);
+    return;
+  }
+
+  const backup = {
+    app: 'generateur-de-lien',
+    exportedAt: new Date().toISOString(),
+    entries: data
+  };
+
+  const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const date = new Date().toISOString().slice(0, 10);
+  a.href = url;
+  a.download = `cagnotte-backup-${date}.json`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+
+  showBackupStatus(`Export réussi : ${Object.keys(data).length} ligne(s) sauvegardée(s).`);
+}
+
+// ===== IMPORT =====
+// Restaure les entrées du fichier JSON dans le localStorage
+function importData(file) {
+  if (!file) return;
+  const reader = new FileReader();
+
+  reader.onload = (event) => {
+    let backup;
+    try {
+      backup = JSON.parse(event.target.result);
+    } catch (e) {
+      showBackupStatus('Fichier invalide : ce n\'est pas un JSON.', true);
+      return;
+    }
+
+    // Accepte à la fois le format d'export de cette page et un simple { "cagnotte_x": "..." }
+    const entries = backup.entries || backup;
+
+    let count = 0;
+    for (const key in entries) {
+      if (key.startsWith('cagnotte_') && typeof entries[key] === 'string') {
+        localStorage.setItem(key, entries[key]);
+        count++;
+      }
+    }
+
+    // Rafraîchit l'affichage de la ligne actuellement sélectionnée
+    if (lineSelect.value) {
+      loadCagnotteData(lineSelect.value);
+    }
+
+    if (count > 0) {
+      showBackupStatus(`Restauration réussie : ${count} ligne(s) réimportée(s).`);
+    } else {
+      showBackupStatus('Aucune donnée "cagnotte_" trouvée dans ce fichier.', true);
+    }
+  };
+
+  reader.onerror = () => {
+    showBackupStatus('Erreur de lecture du fichier.', true);
+  };
+
+  reader.readAsText(file);
+}
+
+exportBtn.addEventListener('click', exportData);
+
+importBtn.addEventListener('click', () => {
+  importFile.value = '';
+  importFile.click();
+});
+
+importFile.addEventListener('change', () => {
+  importData(importFile.files[0]);
+});
 
 lineSelect.addEventListener("change", () => {
   const opt = lineSelect.selectedOptions[0];

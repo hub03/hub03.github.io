@@ -3,33 +3,89 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Ma note</title>
+    <title>Mes comptes</title>
     <style>
-      /* Les inputs côte à côte, avec retour à la ligne si besoin */
-      #champs {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 10px;
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        font-family: system-ui, sans-serif;
+        background: #eef2f7;
+        padding: 20px 12px 90px;
+      }
+      h1 {
+        text-align: center;
+        font-size: 22px;
+        color: #1e293b;
+      }
+      #carte {
+        max-width: 900px;
+        margin: 0 auto;
+        background: white;
+        border-radius: 14px;
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+        padding: 12px;
+      }
+      #entetes,
+      .ligne {
+        display: grid;
+        grid-template-columns: 1.4fr 1.4fr 1fr 0.7fr;
+        gap: 8px;
         align-items: center;
       }
+      #entetes div {
+        font-size: 11px;
+        font-weight: bold;
+        color: #64748b;
+        text-transform: uppercase;
+        padding: 0 6px 8px;
+      }
+      .ligne {
+        margin-bottom: 8px;
+      }
       input[type="text"] {
-        font-size: 18px;
-        padding: 10px;
-        box-sizing: border-box;
-        flex: 1 1 45%; /* 2 par ligne environ */
-      }
-      input[type="checkbox"] {
-        width: 22px;
-        height: 22px;
-      }
-      button {
         font-size: 16px;
         padding: 10px;
-        margin-top: 15px;
+        width: 100%;
+        border: 1px solid #cbd5e1;
+        border-radius: 8px;
+        background: #f8fafc;
+      }
+      input[type="text"]:focus {
+        outline: none;
+        border-color: #3b82f6;
+        background: white;
+      }
+      /* Barre de boutons fixée en bas, toujours accessible */
+      #actions {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        display: flex;
+        gap: 10px;
+        padding: 12px;
+        background: rgba(255, 255, 255, 0.95);
+        box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.08);
+      }
+      #actions button {
+        flex: 1; /* même taille pour les deux */
+        font-size: 16px;
+        padding: 14px;
+        color: white;
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+      }
+      #actions button:active {
+        transform: scale(0.97);
+      }
+      #sauver {
+        background: #16a34a;
       }
       #importer {
-        font-size: 13px;
-        padding: 6px 8px;
+        background: #2563eb;
       }
       #fichier {
         display: none;
@@ -37,84 +93,77 @@
     </style>
   </head>
   <body>
-    <div id="champs">
-      <input type="text" id="principal" placeholder="Compte principal" />
-      <input type="text" id="attached" placeholder="Compte rattaché" />
-      <input type="text" id="services" placeholder="Services" />
-      <label><input type="checkbox" id="used" /> Utilisé ?</label>
+    <h1>📋 Mes comptes</h1>
+
+    <div id="carte">
+      <div id="entetes">
+        <div>Compte principal</div>
+        <div>Compte rattaché</div>
+        <div>Services</div>
+        <div>Utilisé</div>
+      </div>
+      <!-- Les 50 lignes sont créées par le script juste en dessous -->
+      <div id="grille"></div>
     </div>
 
-    <button onclick="exporter()">💾 Sauvegarder</button>
-    <button id="importer" onclick="document.getElementById('fichier').click()">⬆️ Importer</button>
-    <input type="file" id="fichier" onchange="importerFichier(event)" />
+    <div id="actions">
+      <button id="sauver" onclick="exporter()">💾 Sauvegarder</button>
+      <button id="importer" onclick="document.getElementById('fichier').click()">⬆️ Importer</button>
+      <input type="file" id="fichier" onchange="importerFichier(event)" />
+    </div>
 
     <script>
-      // Seulement les inputs du formulaire (pas celui qui sert à importer)
-      const inputs = document.querySelectorAll("#champs input");
+      // 1. Générer les 50 lignes de 4 inputs
+      const NB_LIGNES = 50;
+      const NOMS = ["principal", "attached", "services", "utilise"];
 
-      // --- Sauvegarder et restaurer un seul input ---
-      function save(input) {
-        if (input.type === "checkbox") {
-          localStorage.setItem(input.id, input.checked);
-        } else {
-          localStorage.setItem(input.id, input.value);
-        }
+      const grille = document.getElementById("grille");
+      for (let i = 1; i <= NB_LIGNES; i++) {
+        const ligne = document.createElement("div");
+        ligne.className = "ligne";
+        NOMS.forEach(function (nom) {
+          const input = document.createElement("input");
+          input.type = "text";
+          input.id = nom + "-" + i;
+          ligne.appendChild(input);
+        });
+        grille.appendChild(ligne);
       }
 
-      function load(input) {
-        if (input.type === "checkbox") {
-          input.checked = localStorage.getItem(input.id) === "true";
-        } else {
-          input.value = localStorage.getItem(input.id) || "";
-        }
-      }
+      const inputs = document.querySelectorAll("#grille input");
 
-      // 1. Au chargement : restaurer, puis sauvegarder à chaque changement
+      // 2. Restauration + sauvegarde automatique (tous type text maintenant)
       inputs.forEach(function (input) {
-        load(input);
-        if (input.type === "checkbox") {
-          input.addEventListener("change", function () {
-            save(input);
-          });
-        } else {
-          input.addEventListener("input", function () {
-            save(input);
-          });
-        }
+        input.value = localStorage.getItem(input.id) || "";
+        input.addEventListener("input", function () {
+          localStorage.setItem(input.id, input.value);
+        });
       });
 
-      // 2. Bouton Sauvegarder : télécharger un fichier avec toutes les données
+      // 3. Bouton Sauvegarder : télécharger toutes les données dans un fichier
       function exporter() {
         const donnees = {};
         inputs.forEach(function (input) {
-          if (input.type === "checkbox") {
-            donnees[input.id] = input.checked;
-          } else {
-            donnees[input.id] = input.value;
-          }
+          donnees[input.id] = input.value;
         });
         const blob = new Blob([JSON.stringify(donnees, null, 2)], {
           type: "application/json",
         });
         const lien = document.createElement("a");
         lien.href = URL.createObjectURL(blob);
-        lien.download = "mes-donnees.json";
+        lien.download = "mes-comptes.json";
         lien.click();
       }
 
-      // 3. Bouton Importer : lire le fichier et remettre les données
+      // 4. Bouton Importer : lire le fichier et remettre les données
       function importerFichier(event) {
         const fichier = event.target.files[0];
         const lecteur = new FileReader();
         lecteur.onload = function () {
           const donnees = JSON.parse(lecteur.result);
           inputs.forEach(function (input) {
-            if (input.type === "checkbox") {
-              input.checked = donnees[input.id];
-            } else {
-              input.value = donnees[input.id] || "";
-            }
-            save(input); // on remet aussi dans le localStorage
+            input.value = donnees[input.id] || "";
+            localStorage.setItem(input.id, input.value);
           });
         };
         lecteur.readAsText(fichier);

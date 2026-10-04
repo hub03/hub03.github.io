@@ -10,21 +10,26 @@
         padding: 10px;
         width: 100%;
         box-sizing: border-box;
+        margin-bottom: 10px;
       }
     </style>
   </head>
   <body>
+    <input id="titre" placeholder="Titre..." />
     <input id="note" placeholder="Écris quelque chose..." />
+    <input id="auteur" placeholder="Auteur..." />
 
     <script>
-      const note = document.getElementById("note");
+      const inputs = document.querySelectorAll("input");
 
-      // 1. Au chargement : afficher ce qui est sauvegardé
-      note.value = localStorage.getItem("note") || "";
+      inputs.forEach(function (input) {
+        // 1. Au chargement : afficher ce qui est sauvegardé
+        input.value = localStorage.getItem(input.id) || "";
 
-      // 2. À chaque frappe : sauvegarder automatiquement
-      note.addEventListener("input", function () {
-        localStorage.setItem("note", note.value);
+        // 2. À chaque frappe : sauvegarder automatiquement
+        input.addEventListener("input", function () {
+          localStorage.setItem(input.id, input.value);
+        });
       });
     </script>
   </body>

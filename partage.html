@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ma note</title>
+    <style>
+      input {
+        font-size: 18px;
+        padding: 10px;
+        width: 100%;
+        box-sizing: border-box;
+      }
+    </style>
+  </head>
+  <body>
+    <input id="note" placeholder="Écris quelque chose..." />
+
+    <script>
+      const note = document.getElementById("note");
+
+      // 1. Au chargement : afficher ce qui est sauvegardé
+      note.value = localStorage.getItem("note") || "";
+
+      // 2. À chaque frappe : sauvegarder automatiquement
+      note.addEventListener("input", function () {
+        localStorage.setItem("note", note.value);
+      });
+    </script>
+  </body>
+</html>

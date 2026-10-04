@@ -1,1 +1,667 @@
-d
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="theme-color" content="#202124" />
+<title>Bloc-notes</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  :root {
+    --bg: #f1f3f4;
+    --surface: #ffffff;
+    --text: #202124;
+    --text-2: #5f6368;
+    --border: #e0e0e0;
+    --hover: #f1f3f4;
+    --accent: #fbbc04;
+    --danger: #d93025;
+    --radius: 12px;
+    --shadow: 0 1px 3px rgba(0,0,0,.12);
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #131314;
+      --surface: #1e1f20;
+      --text: #e3e3e3;
+      --text-2: #9aa0a6;
+      --border: #2d2e30;
+      --hover: #2a2b2d;
+      --danger: #f28b82;
+      --shadow: 0 1px 3px rgba(0,0,0,.5);
+    }
+  }
+  html, body { height: 100%; }
+  body { background: var(--bg); color: var(--text); padding-bottom: env(safe-area-inset-bottom); }
+
+  header {
+    position: sticky; top: 0; z-index: 10;
+    display: flex; align-items: center; gap: 10px;
+    padding: 12px 14px;
+    background: var(--bg);
+  }
+  header h1 { font-size: 1.15rem; font-weight: 600; letter-spacing: .2px; display: flex; align-items: center; gap: 8px; }
+  header h1 svg { flex: none; }
+  .search {
+    flex: 1;
+    display: flex; align-items: center; gap: 8px;
+    background: var(--surface); border-radius: 999px;
+    padding: 9px 14px; box-shadow: var(--shadow);
+  }
+  .search input { border: none; outline: none; background: transparent; width: 100%; font-size: .95rem; color: var(--text); }
+  .icon-btn {
+    flex: none;
+    border: none; background: transparent; color: var(--text-2);
+    width: 40px; height: 40px; border-radius: 50%;
+    display: inline-flex; align-items: center; justify-content: center;
+    cursor: pointer; transition: background .15s, color .15s;
+  }
+  .icon-btn:active, .icon-btn:hover { background: var(--hover); }
+  .icon-btn svg { pointer-events: none; }
+
+  main { max-width: 720px; margin: 0 auto; padding: 0 12px 24px; }
+
+  .creator {
+    background: var(--surface); border-radius: var(--radius);
+    box-shadow: var(--shadow); margin-bottom: 16px; overflow: hidden;
+    transition: box-shadow .2s;
+  }
+  .creator.focused { box-shadow: 0 2px 10px rgba(0,0,0,.18); }
+  .creator textarea, .editor textarea {
+    width: 100%; border: none; outline: none; resize: none;
+    background: transparent; color: var(--text);
+    font: inherit; font-size: 1rem; line-height: 1.45;
+    padding: 14px 16px 4px; min-height: 46px;
+  }
+  .creator .creator-bar {
+    display: flex; align-items: center; gap: 4px;
+    padding: 4px 8px 6px; min-height: 44px;
+  }
+  .creator .creator-bar.hidden { display: none; }
+  .spacer { flex: 1; }
+  .btn-text {
+    border: none; background: transparent; color: var(--text-2);
+    font: inherit; font-weight: 600; font-size: .9rem;
+    padding: 8px 16px; border-radius: 8px; cursor: pointer;
+    margin-right: 4px;
+  }
+  .btn-text:hover { background: var(--hover); }
+
+  .palette { display: flex; gap: 8px; padding: 0 14px 10px; }
+  .palette.hidden { display: none; }
+  .swatch {
+    width: 26px; height: 26px; border-radius: 50%;
+    border: 1px solid rgba(0,0,0,.15); cursor: pointer;
+    display: inline-flex; align-items: center; justify-content: center;
+    padding: 0; background: var(--c);
+  }
+  .swatch[data-on="1"] { outline: 2px solid var(--text-2); outline-offset: 2px; }
+  .swatch svg { opacity: .7; }
+
+  .grid { columns: 1; column-gap: 12px; }
+  @media (min-width: 560px) { .grid { columns: 2; } }
+
+  .note {
+    break-inside: avoid;
+    background: var(--surface); border-radius: var(--radius);
+    box-shadow: var(--shadow); padding: 12px 12px 6px;
+    margin-bottom: 12px; cursor: pointer;
+    border: 1px solid transparent;
+    position: relative;
+    overflow-wrap: break-word;
+  }
+  .note:hover { border-color: var(--border); }
+  .note .note-text { white-space: pre-wrap; font-size: .95rem; line-height: 1.45; }
+  .note .note-date { font-size: .72rem; color: var(--text-2); margin-top: 8px; }
+  .note .note-bar {
+    display: flex; justify-content: flex-end; gap: 2px;
+    opacity: 0; transition: opacity .15s;
+  }
+  .note:hover .note-bar, .note:active .note-bar { opacity: 1; }
+  @media (hover: none) { .note .note-bar { opacity: 1; } }
+  .note .pin-badge {
+    position: absolute; top: 8px; right: 8px; color: var(--text-2);
+  }
+
+  .c-default { background: #ffffff; }
+  .c-jaune  { background: #fff475; }
+  .c-orange { background: #ffcc80; }
+  .c-rose   { background: #f8bbd0; }
+  .c-vert   { background: #a7ffeb; }
+  .c-bleu   { background: #d0e4fc; }
+  .c-violet { background: #d7aefb; }
+  .c-gris   { background: #e8eaed; }
+  @media (prefers-color-scheme: dark) {
+    .c-default { background: #242526; }
+    .c-jaune  { background: #655c1c; }
+    .c-orange { background: #7a5232; }
+    .c-rose   { background: #6e4257; }
+    .c-vert   { background: #1e5c50; }
+    .c-bleu   { background: #28405f; }
+    .c-violet { background: #4f3a68; }
+    .c-gris   { background: #333537; }
+  }
+
+  .empty { text-align: center; color: var(--text-2); padding: 60px 20px; font-size: .95rem; }
+  .empty svg { display: block; margin: 0 auto 14px; opacity: .6; }
+
+  .toast {
+    position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%) translateY(20px);
+    background: #323232; color: #fff; font-size: .88rem;
+    padding: 10px 18px; border-radius: 8px; box-shadow: 0 3px 10px rgba(0,0,0,.3);
+    opacity: 0; pointer-events: none; transition: all .25s; z-index: 100;
+    max-width: 90vw; text-align: center;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  .toast button {
+    border: none; background: transparent; color: #8ab4f8; font: inherit;
+    font-weight: 600; margin-left: 12px; cursor: pointer; text-transform: uppercase;
+  }
+
+  .overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,.45);
+    display: none; align-items: center; justify-content: center; z-index: 50;
+    padding: 16px;
+  }
+  .overlay.show { display: flex; }
+  .editor {
+    background: var(--surface); border-radius: var(--radius);
+    width: 100%; max-width: 560px; box-shadow: 0 10px 40px rgba(0,0,0,.35);
+    max-height: 85vh; display: flex; flex-direction: column;
+  }
+  .editor .editor-foot {
+    display: flex; align-items: center; gap: 2px;
+    padding: 4px 8px 8px; border-top: 1px solid var(--border);
+  }
+  .editor .btn-done { color: #8ab4f8; }
+
+  .menu {
+    position: fixed; top: 60px; right: 12px; z-index: 60;
+    background: var(--surface); border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,.25);
+    padding: 8px 0; min-width: 200px; display: none;
+  }
+  .menu.show { display: block; }
+  .menu button {
+    display: flex; align-items: center; gap: 14px; width: 100%;
+    border: none; background: transparent; color: var(--text);
+    font: inherit; font-size: .92rem; padding: 12px 20px; cursor: pointer;
+    text-align: left;
+  }
+  .menu button:hover { background: var(--hover); }
+  .menu button.danger { color: var(--danger); }
+
+  .save-ind {
+    position: fixed; top: 10px; left: 50%; transform: translateX(-50%);
+    font-size: .75rem; color: var(--text-2); background: var(--surface);
+    padding: 4px 12px; border-radius: 999px; box-shadow: var(--shadow);
+    opacity: 0; transition: opacity .25s; pointer-events: none; z-index: 90;
+  }
+  .save-ind.show { opacity: 1; }
+
+  @media print { header, .creator, .note-bar { display: none !important; } .note { break-inside: avoid; } }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+      <path d="M4 4h16v12l-4 4H4V4z" fill="#fbbc04"/>
+      <path d="M20 16h-4v4l4-4z" fill="#c0a012"/>
+      <path d="M4 4h16v12l-4 4H4V4z" stroke="#9c7c10" stroke-width="1" fill="none"/>
+      <path d="M8 8.5h8M8 12h5" stroke="#5f4a00" stroke-width="1.6" stroke-linecap="round"/>
+    </svg>
+    <span>Bloc-notes</span>
+  </h1>
+  <div class="search">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+    <input id="search" type="search" placeholder="Rechercher dans les notes…" autocomplete="off" />
+  </div>
+  <button class="icon-btn" id="menuBtn" title="Menu" aria-label="Menu">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="5" r="1.6" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.6" fill="currentColor" stroke="none"/><circle cx="12" cy="19" r="1.6" fill="currentColor" stroke="none"/></svg>
+  </button>
+</header>
+
+<main>
+  <div class="creator" id="creator">
+    <textarea id="creatorText" rows="1" placeholder="Prendre une note…"></textarea>
+    <div class="palette hidden" id="creatorPalette"></div>
+    <div class="creator-bar hidden" id="creatorBar">
+      <button class="icon-btn" data-role="color" title="Couleur de fond">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3a9 9 0 100 18c1.4 0 2-.9 2-1.8 0-.9-.6-1.7-.6-2.5 0-1 .8-1.7 1.8-1.7H17a4 4 0 004-4c0-4-4-8-9-8z"/><circle cx="7.5" cy="11" r="1.2" fill="currentColor" stroke="none"/><circle cx="10.5" cy="7.5" r="1.2" fill="currentColor" stroke="none"/><circle cx="15" cy="7.5" r="1.2" fill="currentColor" stroke="none"/></svg>
+      </button>
+      <span class="spacer"></span>
+      <button class="btn-text" id="creatorClose">Fermer</button>
+    </div>
+  </div>
+
+  <div class="grid" id="grid"></div>
+  <div class="empty" id="empty" style="display:none">
+    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5" stroke-linecap="round"/></svg>
+    Aucune note pour l'instant.<br>Écrivez votre première note ci-dessus ✏️
+  </div>
+</main>
+
+<div class="save-ind" id="saveInd">✓ Sauvegardé</div>
+<div class="toast" id="toast"></div>
+<input type="file" id="fileInput" accept=".json,application/json" style="display:none" />
+
+<div class="menu" id="menu">
+  <button id="mExport">
+    <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3M7 8l5-5 5 5"/><path d="M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2"/></svg>
+    Exporter (JSON)
+  </button>
+  <button id="mImport">
+    <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 10l5 5 5-5"/><path d="M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2"/></svg>
+    Importer (JSON)
+  </button>
+  <button id="mPrint">
+    <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M6 9V3h12v6M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="7"/></svg>
+    Imprimer / PDF
+  </button>
+  <button id="mClear" class="danger">
+    <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 7h16M9 7V5a1 1 0 011-1h4a1 1 0 011 1v2M6 7l1 13a1 1 0 001 1h8a1 1 0 001-1l1-13M10 11v6M14 11v6"/></svg>
+    Tout supprimer
+  </button>
+</div>
+
+<div class="overlay" id="editOverlay">
+  <div class="editor" id="editorCard">
+    <textarea id="editorText" rows="6" placeholder="Modifier la note…"></textarea>
+    <div class="palette" id="editorPalette"></div>
+    <div class="editor-foot">
+      <button class="icon-btn" id="editorDelete" title="Supprimer">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 7h16M9 7V5a1 1 0 011-1h4a1 1 0 011 1v2M6 7l1 13a1 1 0 001 1h8a1 1 0 001-1l1-13"/></svg>
+      </button>
+      <button class="icon-btn" id="editorPin" title="Épingler"></button>
+      <span class="spacer"></span>
+      <button class="btn-text btn-done" id="editorDone">Terminé</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  "use strict";
+  var KEY = "bloc-notes:v1";
+  var COLORS = ["default", "jaune", "orange", "rose", "vert", "bleu", "violet", "gris"];
+  var COLOR_HEX = { default: "#ffffff", jaune: "#fff475", orange: "#ffcc80", rose: "#f8bbd0", vert: "#a7ffeb", bleu: "#d0e4fc", violet: "#d7aefb", gris: "#e8eaed" };
+  var DARK_HEX = { default: "#242526", jaune: "#655c1c", orange: "#7a5232", rose: "#6e4257", vert: "#1e5c50", bleu: "#28405f", violet: "#4f3a68", gris: "#333537" };
+  var ICONS = {
+    pin: '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M14.5 2.5l7 7-2.2.6a4 4 0 00-2 1.2l-3.2 3.4-3.5 3.5c-.6.6-1.5.6-2.1 0l-.7-.7-4.2 4.2-1-1 4.2-4.2-.7-.7c-.6-.6-.6-1.5 0-2.1l3.5-3.5 3.4-3.2a4 4 0 001.2-2l.6-2.2h.7z"/></svg>',
+    pinOff: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M14.5 2.5l7 7-2.2.6a4 4 0 00-2 1.2l-3.2 3.4-3.5 3.5c-.6.6-1.5.6-2.1 0l-.7-.7-4.2 4.2"/><path d="M8.3 15.2L2.6 9.5l1-1a4 4 0 012-.6l4.4.4"/></svg>',
+    trash: '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M4 7h16M9 7V5a1 1 0 011-1h4a1 1 0 011 1v2M6 7l1 13a1 1 0 001 1h8a1 1 0 001-1l1-13"/></svg>',
+    palette: '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 3a9 9 0 100 18c1.4 0 2-.9 2-1.8 0-.9-.6-1.7-.6-2.5 0-1 .8-1.7 1.8-1.7H17a4 4 0 004-4c0-4-4-8-9-8z"/><circle cx="7.5" cy="11" r="1.1" fill="currentColor" stroke="none"/><circle cx="10.5" cy="7.5" r="1.1" fill="currentColor" stroke="none"/><circle cx="15" cy="7.5" r="1.1" fill="currentColor" stroke="none"/></svg>'
+  };
+
+  var $ = function (id) { return document.getElementById(id); };
+  var grid = $("grid"), creatorText = $("creatorText"), creatorBar = $("creatorBar");
+  var searchInput = $("search"), emptyEl = $("empty"), toastEl = $("toast"), saveInd = $("saveInd");
+
+  var notes = load();
+  var query = "";
+  var editingId = null;
+  var creatorColor = "default";
+  var undoData = null;
+  var undoTimer = null;
+  var saveTimer = null;
+
+  function load() {
+    try {
+      var raw = JSON.parse(localStorage.getItem(KEY) || "[]");
+      return Array.isArray(raw) ? raw.filter(function (n) { return n && typeof n.text === "string"; }) : [];
+    } catch (e) { return []; }
+  }
+  function persist(showInd) {
+    try { localStorage.setItem(KEY, JSON.stringify(notes)); } catch (e) { toast("⚠️ Sauvegarde impossible"); return; }
+    if (showInd !== false) {
+      saveInd.classList.add("show");
+      clearTimeout(saveTimer);
+      saveTimer = setTimeout(function () { saveInd.classList.remove("show"); }, 1200);
+    }
+  }
+  function esc(s) {
+    return s.replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  }
+  function fmtDate(ts) {
+    var d = new Date(ts), now = new Date();
+    var diff = (now - d) / 1000;
+    if (diff < 60) return "à l'instant";
+    if (diff < 3600) return "il y a " + Math.floor(diff / 60) + " min";
+    if (diff < 86400 && d.getDate() === now.getDate()) return "il y a " + Math.floor(diff / 3600) + " h";
+    var opts = { day: "numeric", month: "short" };
+    if (d.getFullYear() !== now.getFullYear()) opts.year = "numeric";
+    return d.toLocaleDateString("fr-FR", opts) + " " + d.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" });
+  }
+  function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 8); }
+
+  function toast(msg, actionLabel, action) {
+    toastEl.innerHTML = esc(msg) + (actionLabel ? "<button id='toastAct'>" + esc(actionLabel) + "</button>" : "");
+    toastEl.classList.add("show");
+    clearTimeout(toast._t);
+    toast._t = setTimeout(function () { toastEl.classList.remove("show"); }, 4000);
+    if (actionLabel) $("toastAct").onclick = function () { action(); toastEl.classList.remove("show"); };
+  }
+
+  /* ---------- Rendu ---------- */
+  function visibleNotes() {
+    var q = query.trim().toLowerCase();
+    var list = notes.filter(function (n) { return !q || n.text.toLowerCase().indexOf(q) !== -1; });
+    list.sort(function (a, b) { return (b.pinned - a.pinned) || (b.updatedAt - a.updatedAt); });
+    return list;
+  }
+  function render() {
+    var list = visibleNotes();
+    emptyEl.style.display = "none";
+    if (list.length === 0) {
+      emptyEl.style.display = "";
+      emptyEl.innerHTML = query
+        ? "Aucun résultat pour « " + esc(query) + " »"
+        : 'Aucune note pour l\'instant.<br>Écrivez votre première note ci-dessus ✏️';
+    }
+    var html = "";
+    for (var i = 0; i < list.length; i++) {
+      var n = list[i];
+      html += '<section class="note c-' + esc(n.color || "default") + '" data-id="' + n.id + '">' +
+        (n.pinned ? '<span class="pin-badge">' + ICONS.pin + "</span>" : "") +
+        '<div class="note-text">' + esc(n.text) + "</div>" +
+        '<div class="note-date">' + fmtDate(n.updatedAt) + "</div>" +
+        '<div class="note-bar">' +
+          '<button class="icon-btn" data-act="pin" title="Épingler">' + (n.pinned ? ICONS.pin : ICONS.pinOff) + "</button>" +
+          '<button class="icon-btn" data-act="color" title="Couleur">' + ICONS.palette + "</button>" +
+          '<button class="icon-btn" data-act="delete" title="Supprimer">' + ICONS.trash + "</button>" +
+        "</div></section>";
+    }
+    grid.innerHTML = html;
+  }
+
+  /* ---------- Palette (composant partagé) ---------- */
+  function buildPalette(container, current, onPick) {
+    container.innerHTML = "";
+    COLORS.forEach(function (c) {
+      var b = document.createElement("button");
+      b.className = "swatch";
+      var dark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+      b.style.setProperty("--c", dark ? DARK_HEX[c] : COLOR_HEX[c]);
+      b.dataset.on = c === current ? "1" : "0";
+      b.title = c;
+      b.onclick = function (e) {
+        e.stopPropagation();
+        Array.prototype.forEach.call(container.children, function (s) { s.dataset.on = "0"; });
+        b.dataset.on = "1";
+        onPick(c);
+      };
+      container.appendChild(b);
+    });
+  }
+
+  /* ---------- Créateur ---------- */
+  function autoResize(ta) {
+    ta.style.height = "auto";
+    ta.style.height = Math.min(ta.scrollHeight, 300) + "px";
+  }
+  creatorText.addEventListener("focus", function () {
+    $("creator").classList.add("focused");
+    creatorBar.classList.remove("hidden");
+    $("creatorPalette").classList.remove("hidden");
+    buildPalette($("creatorPalette"), creatorColor, function (c) {
+      creatorColor = c;
+      $("creator").className = "creator focused c-" + c;
+    });
+  });
+  creatorText.addEventListener("input", function () { autoResize(creatorText); });
+  creatorText.addEventListener("blur", function () {
+    setTimeout(function () {
+      if (document.activeElement && document.activeElement.closest && document.activeElement.closest("#creator")) return;
+      if (!creatorText.value.trim()) resetCreator();
+    }, 150);
+  });
+  function resetCreator() {
+    creatorText.value = "";
+    autoResize(creatorText);
+    creatorColor = "default";
+    $("creator").className = "creator";
+    creatorBar.classList.add("hidden");
+    $("creatorPalette").classList.add("hidden");
+  }
+  creatorText.addEventListener("keydown", function (e) {
+    if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) { e.preventDefault(); creatorClose(); }
+  });
+  function creatorClose() {
+    var text = creatorText.value.trim();
+    if (text) {
+      notes.unshift({ id: uid(), text: text, color: creatorColor, pinned: false, updatedAt: Date.now() });
+      persist();
+      render();
+    }
+    resetCreator();
+  }
+  $("creatorClose").addEventListener("click", creatorClose);
+  $("creatorBar").querySelector("[data-role=color]").addEventListener("click", function () {
+    $("creatorPalette").classList.toggle("hidden");
+  });
+
+  /* ---------- Notes (grille) ---------- */
+  grid.addEventListener("click", function (e) {
+    var btn = e.target.closest("[data-act]");
+    var card = e.target.closest(".note");
+    if (!card) return;
+    var id = card.dataset.id;
+    if (btn) {
+      e.stopPropagation();
+      var act = btn.dataset.act;
+      var note = findNote(id);
+      if (!note) return;
+      if (act === "pin") { note.pinned = !note.pinned; persist(); render(); }
+      if (act === "delete") { deleteNote(id); }
+      if (act === "color") { openColorPopover(btn, note); }
+      return;
+    }
+    openEditor(id);
+  });
+  function findNote(id) {
+    for (var i = 0; i < notes.length; i++) if (notes[i].id === id) return notes[i];
+    return null;
+  }
+  function deleteNote(id) {
+    var idx = -1;
+    for (var i = 0; i < notes.length; i++) if (notes[i].id === id) idx = i;
+    if (idx === -1) return;
+    var removed = notes.splice(idx, 1)[0];
+    persist(); render();
+    clearTimeout(undoTimer);
+    undoData = { note: removed, idx: idx };
+    toast("Note supprimée", "Annuler", function () {
+      if (!undoData) return;
+      notes.splice(Math.min(undoData.idx, notes.length), 0, undoData.note);
+      undoData = null;
+      persist(); render();
+    });
+    undoTimer = setTimeout(function () { undoData = null; }, 4000);
+  }
+  function openColorPopover(anchor, note) {
+    closeColorPopover();
+    var pop = document.createElement("div");
+    pop.id = "colorPop";
+    pop.style.cssText = "position:absolute;background:var(--surface);border-radius:10px;box-shadow:0 4px 18px rgba(0,0,0,.3);padding:8px 10px;display:flex;gap:8px;z-index:40;";
+    var rect = anchor.getBoundingClientRect();
+    pop.style.left = Math.min(rect.left, window.innerWidth - 240) + "px";
+    pop.style.top = (rect.bottom + 6) + "px";
+    buildPalette(pop, note.color || "default", function (c) {
+      note.color = c; persist(); render(); closeColorPopover();
+    });
+    document.body.appendChild(pop);
+    setTimeout(function () {
+      document.addEventListener("click", colorPopOutside);
+    }, 0);
+  }
+  function colorPopOutside(e) {
+    if (!e.target.closest("#colorPop")) closeColorPopover();
+  }
+  function closeColorPopover() {
+    var p = document.getElementById("colorPop");
+    if (p) p.remove();
+    document.removeEventListener("click", colorPopOutside);
+  }
+
+  /* ---------- Éditeur ---------- */
+  function openEditor(id) {
+    var note = findNote(id);
+    if (!note) return;
+    editingId = id;
+    var ta = $("editorText");
+    ta.value = note.text;
+    autoResize(ta);
+    $("editorCard").className = "editor c-" + (note.color || "default");
+    buildPalette($("editorPalette"), note.color || "default", function (c) {
+      note.color = c;
+      $("editorCard").className = "editor c-" + c;
+      persist();
+    });
+    $("editorPalette").classList.remove("hidden");
+    updatePinBtn(note.pinned);
+    $("editOverlay").classList.add("show");
+    setTimeout(function () { ta.focus(); }, 50);
+  }
+  function updatePinBtn(pinned) {
+    $("editorPin").innerHTML = pinned ? ICONS.pin : ICONS.pinOff;
+    $("editorPin").style.color = pinned ? "var(--accent)" : "";
+  }
+  $("editorText").addEventListener("input", function () { autoResize($("editorText")); });
+  $("editorPin").addEventListener("click", function () {
+    var n = findNote(editingId); if (!n) return;
+    n.pinned = !n.pinned; updatePinBtn(n.pinned); persist(); render();
+  });
+  $("editorDelete").addEventListener("click", function () {
+    var id = editingId; closeEditor(); deleteNote(id);
+  });
+  function closeEditor() {
+    var n = findNote(editingId);
+    if (n) {
+      var t = $("editorText").value.trim();
+      if (t) { n.text = t; n.updatedAt = Date.now(); }
+      else { closeEditorRaw(); deleteNote(editingId); return; }
+    }
+    closeEditorRaw();
+    persist(); render();
+  }
+  function closeEditorRaw() {
+    $("editOverlay").classList.remove("show");
+    editingId = null;
+  }
+  $("editorDone").addEventListener("click", closeEditor);
+  $("editOverlay").addEventListener("click", function (e) { if (e.target === this) closeEditor(); });
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape" && $("editOverlay").classList.contains("show")) closeEditor();
+  });
+  $("editorText").addEventListener("keydown", function (e) {
+    if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) { e.preventDefault(); closeEditor(); }
+  });
+
+  /* ---------- Recherche ---------- */
+  var searchTimer = null;
+  searchInput.addEventListener("input", function () {
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(function () { query = searchInput.value; render(); }, 120);
+  });
+
+  /* ---------- Menu ---------- */
+  var menuEl = $("menu");
+  function toggleMenu(force) {
+    menuEl.classList.toggle("show", force);
+  }
+  $("menuBtn").addEventListener("click", function (e) { e.stopPropagation(); toggleMenu(); });
+  document.addEventListener("click", function (e) { if (!e.target.closest("#menu") && !e.target.closest("#menuBtn")) toggleMenu(false); });
+
+  /* ---------- Export ---------- */
+  $("mExport").addEventListener("click", function () {
+    toggleMenu(false);
+    if (notes.length === 0) { toast("Aucune note à exporter"); return; }
+    var payload = { app: "bloc-notes", version: 1, exportedAt: new Date().toISOString(), notes: notes };
+    var blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement("a");
+    var d = new Date();
+    var pad = function (x) { return String(x).padStart(2, "0"); };
+    a.href = url;
+    a.download = "notes-" + d.getFullYear() + pad(d.getMonth() + 1) + pad(d.getDate()) + ".json";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(function () { URL.revokeObjectURL(url); }, 3000);
+    toast(notes.length + " note" + (notes.length > 1 ? "s" : "") + " exportée" + (notes.length > 1 ? "s" : ""));
+  });
+
+  /* ---------- Import ---------- */
+  $("mImport").addEventListener("click", function () {
+    toggleMenu(false);
+    $("fileInput").click();
+  });
+  $("fileInput").addEventListener("change", function () {
+    var file = this.files[0];
+    this.value = "";
+    if (!file) return;
+    var reader = new FileReader();
+    reader.onload = function () {
+      var data;
+      try { data = JSON.parse(reader.result); } catch (e) { toast("⚠️ Fichier JSON invalide"); return; }
+      var imported = Array.isArray(data) ? data : (data && Array.isArray(data.notes) ? data.notes : null);
+      if (!imported) { toast("⚠️ Format non reconnu"); return; }
+      imported = imported.filter(function (n) { return n && typeof n.text === "string" && n.text.trim(); })
+        .map(function (n) {
+          return {
+            id: (typeof n.id === "string" && n.id) || uid(),
+            text: String(n.text).slice(0, 100000),
+            color: COLORS.indexOf(n.color) !== -1 ? n.color : "default",
+            pinned: !!n.pinned,
+            updatedAt: typeof n.updatedAt === "number" ? n.updatedAt : Date.now()
+          };
+        });
+      if (imported.length === 0) { toast("Aucune note valide dans ce fichier"); return; }
+      askImportMode(imported);
+    };
+    reader.readAsText(file);
+  });
+  function askImportMode(imported) {
+    if (!confirm(imported.length + " note(s) trouvée(s).\n\nOK = Fusionner (ajouter aux notes actuelles)\nAnnuler = Remplacer toutes les notes")) {
+      notes = imported;
+      persist(); render();
+      toast(imported.length + " note(s) importée(s) — notes remplacées");
+      return;
+    }
+    var existingIds = {};
+    notes.forEach(function (n) { existingIds[n.id] = 1; });
+    var added = 0;
+    imported.forEach(function (n) {
+      if (existingIds[n.id]) { n.id = uid(); } // évite les doublons d'id
+      notes.unshift(n); added++;
+    });
+    persist(); render();
+    toast(added + " note(s) ajoutée(s)");
+  }
+
+  /* ---------- Imprimer / Nettoyer ---------- */
+  $("mPrint").addEventListener("click", function () { toggleMenu(false); window.print(); });
+  $("mClear").addEventListener("click", function () {
+    toggleMenu(false);
+    if (notes.length === 0) { toast("Aucune note à supprimer"); return; }
+    if (!confirm("Supprimer TOUTES les notes ? Cette action est irréversible.")) return;
+    notes = [];
+    persist(); render();
+    toast("Toutes les notes ont été supprimées");
+  });
+
+  /* ---------- Init ---------- */
+  render();
+  if (window.matchMedia) {
+    var mq = window.matchMedia("(prefers-color-scheme: dark)");
+    var onScheme = function () { /* re-render des palettes si ouvertes */ };
+    if (mq.addEventListener) mq.addEventListener("change", onScheme);
+  }
+})();
+</script>
+</body>
+</html>

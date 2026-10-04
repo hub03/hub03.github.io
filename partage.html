@@ -5,33 +5,120 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Ma note</title>
     <style>
-      input {
+      /* Les inputs côte à côte, avec retour à la ligne si besoin */
+      #champs {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        align-items: center;
+      }
+      input[type="text"] {
         font-size: 18px;
         padding: 10px;
-        width: 100%;
         box-sizing: border-box;
-        margin-bottom: 10px;
+        flex: 1 1 45%; /* 2 par ligne environ */
+      }
+      input[type="checkbox"] {
+        width: 22px;
+        height: 22px;
+      }
+      button {
+        font-size: 16px;
+        padding: 10px;
+        margin-top: 15px;
+      }
+      #importer {
+        font-size: 13px;
+        padding: 6px 8px;
+      }
+      #fichier {
+        display: none;
       }
     </style>
   </head>
   <body>
-    <input id="principal" placeholder="Compte principal" />
-    <input id="attached" placeholder="Compte rataché" />
-    <input id="services" placeholder="Services" />
-    <input type=checkbox id="used" placeholder="Utilisé ?" />
+    <div id="champs">
+      <input type="text" id="principal" placeholder="Compte principal" />
+      <input type="text" id="attached" placeholder="Compte rattaché" />
+      <input type="text" id="services" placeholder="Services" />
+      <label><input type="checkbox" id="used" /> Utilisé ?</label>
+    </div>
+
+    <button onclick="exporter()">💾 Sauvegarder</button>
+    <button id="importer" onclick="document.getElementById('fichier').click()">⬆️ Importer</button>
+    <input type="file" id="fichier" onchange="importerFichier(event)" />
 
     <script>
-      const inputs = document.querySelectorAll("input");
+      // Seulement les inputs du formulaire (pas celui qui sert à importer)
+      const inputs = document.querySelectorAll("#champs input");
 
-      inputs.forEach(function (input) {
-        // 1. Au chargement : afficher ce qui est sauvegardé
-        input.value = localStorage.getItem(input.id) || "";
-
-        // 2. À chaque frappe : sauvegarder automatiquement
-        input.addEventListener("input", function () {
+      // --- Sauvegarder et restaurer un seul input ---
+      function save(input) {
+        if (input.type === "checkbox") {
+          localStorage.setItem(input.id, input.checked);
+        } else {
           localStorage.setItem(input.id, input.value);
-        });
+        }
+      }
+
+      function load(input) {
+        if (input.type === "checkbox") {
+          input.checked = localStorage.getItem(input.id) === "true";
+        } else {
+          input.value = localStorage.getItem(input.id) || "";
+        }
+      }
+
+      // 1. Au chargement : restaurer, puis sauvegarder à chaque changement
+      inputs.forEach(function (input) {
+        load(input);
+        if (input.type === "checkbox") {
+          input.addEventListener("change", function () {
+            save(input);
+          });
+        } else {
+          input.addEventListener("input", function () {
+            save(input);
+          });
+        }
       });
+
+      // 2. Bouton Sauvegarder : télécharger un fichier avec toutes les données
+      function exporter() {
+        const donnees = {};
+        inputs.forEach(function (input) {
+          if (input.type === "checkbox") {
+            donnees[input.id] = input.checked;
+          } else {
+            donnees[input.id] = input.value;
+          }
+        });
+        const blob = new Blob([JSON.stringify(donnees, null, 2)], {
+          type: "application/json",
+        });
+        const lien = document.createElement("a");
+        lien.href = URL.createObjectURL(blob);
+        lien.download = "mes-donnees.json";
+        lien.click();
+      }
+
+      // 3. Bouton Importer : lire le fichier et remettre les données
+      function importerFichier(event) {
+        const fichier = event.target.files[0];
+        const lecteur = new FileReader();
+        lecteur.onload = function () {
+          const donnees = JSON.parse(lecteur.result);
+          inputs.forEach(function (input) {
+            if (input.type === "checkbox") {
+              input.checked = donnees[input.id];
+            } else {
+              input.value = donnees[input.id] || "";
+            }
+            save(input); // on remet aussi dans le localStorage
+          });
+        };
+        lecteur.readAsText(fichier);
+      }
     </script>
   </body>
 </html>

@@ -3,17 +3,17 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <meta name="theme-color" content="#0b1020" />
+    <meta name="theme-color" content="#f6f8fc" />
     <title>Accueil</title>
     <style>
       :root {
-        --bg: #eeeeee;
-        --bg-soft: #121a33;
-        --card: rgba(255, 255, 255, 0.06);
-        --card-border: rgba(255, 255, 255, 0.10);
-        --text: #eef1f8;
-        --text-dim: #9aa4bf;
-        --accent: #6c8cff;
+        --bg: #f6f8fc;
+        --bg-soft: #eef2f9;
+        --card: #ffffff;
+        --card-border: rgba(15, 23, 42, 0.08);
+        --text: #17203a;
+        --text-dim: #5b6577;
+        --accent: #4f6ef7;
         --radius: 20px;
       }
 
@@ -24,8 +24,8 @@
       body {
         font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
         background:
-          radial-gradient(1000px 500px at 80% -10%, rgba(108, 140, 255, 0.18), transparent 60%),
-          radial-gradient(700px 400px at -10% 110%, rgba(160, 108, 255, 0.14), transparent 60%),
+          radial-gradient(1000px 500px at 80% -10%, rgba(79, 110, 247, 0.10), transparent 60%),
+          radial-gradient(700px 400px at -10% 110%, rgba(147, 112, 255, 0.08), transparent 60%),
           var(--bg);
         color: var(--text);
         min-height: 100dvh;
@@ -65,8 +65,8 @@
         width: 7px;
         height: 7px;
         border-radius: 50%;
-        background: #4ade80;
-        box-shadow: 0 0 8px #4ade80;
+        background: #22c55e;
+        box-shadow: 0 0 8px rgba(34, 197, 94, 0.6);
       }
 
       h1 {
@@ -77,7 +77,7 @@
       }
 
       h1 span {
-        background: linear-gradient(90deg, #6c8cff, #b48cff);
+        background: linear-gradient(90deg, #4f6ef7, #9333ea);
         -webkit-background-clip: text;
         background-clip: text;
         -webkit-text-fill-color: transparent;
@@ -121,8 +121,9 @@
       @media (hover: hover) {
         nav a.tile:hover {
           transform: translateY(-3px);
-          border-color: rgba(108, 140, 255, 0.45);
-          background: rgba(255, 255, 255, 0.09);
+          border-color: rgba(79, 110, 247, 0.40);
+          background: #ffffff;
+          box-shadow: 0 10px 24px rgba(23, 32, 58, 0.08);
         }
       }
 
@@ -138,11 +139,11 @@
 
       .tile:first-child .icon { width: 54px; height: 54px; font-size: 1.6rem; }
 
-      .t-discover  { background: rgba(108, 140, 255, 0.16); color: #8fa6ff; }
-      .t-note      { background: rgba(255, 193, 84, 0.14); color: #ffc554; }
-      .t-partage   { background: rgba(94, 219, 158, 0.14); color: #5edb9e; }
-      .t-prios     { background: rgba(255, 116, 137, 0.14); color: #ff7485; }
-      .t-red       { background: rgba(180, 140, 255, 0.14); color: #b48cff; }
+      .t-discover  { background: rgba(79, 110, 247, 0.12); color: #4f6ef7; }
+      .t-note      { background: rgba(217, 119, 6, 0.12); color: #d97706; }
+      .t-partage   { background: rgba(13, 148, 136, 0.12); color: #0d9488; }
+      .t-prios     { background: rgba(225, 29, 72, 0.10); color: #e11d48; }
+      .t-red       { background: rgba(124, 58, 237, 0.10); color: #7c3aed; }
 
       .tile-body { display: flex; flex-direction: column; gap: 4px; }
 
@@ -183,8 +184,8 @@
         <a class="tile" href="discover.html">
           <span class="icon t-discover">🧭</span>
           <span class="tile-body">
-            <h2>Discover</h2>
-            <p>Accès à l'app Discover</p>
+            <h2>Découvrir</h2>
+            <p>Explorez de nouveaux contenus et inspirations.</p>
           </span>
           <span class="arrow">→</span>
         </a>
@@ -202,7 +203,7 @@
           <span class="icon t-partage">📤</span>
           <span class="tile-body">
             <h2>Partage</h2>
-            <p>Gérez le partage d'abonnements</p>
+            <p>Partagez du contenu avec vos proches.</p>
           </span>
           <span class="arrow">→</span>
         </a>
@@ -211,16 +212,16 @@
           <span class="icon t-prios">⭐</span>
           <span class="tile-body">
             <h2>Priorités</h2>
-            <p>Ouvrir l'outil de création du tableau de prios</p>
+            <p>Gérez vos tâches et priorités.</p>
           </span>
           <span class="arrow">→</span>
         </a>
 
-        <a class="tile" href="redv2.html">
+        <a class="tile" href="red.html">
           <span class="icon t-red">✍️</span>
           <span class="tile-body">
-            <h2>Parrainages RED</h2>
-            <p>Activer les avantages RED</p>
+            <h2>Rédaction</h2>
+            <p>Rédigez et publiez vos textes.</p>
           </span>
           <span class="arrow">→</span>
         </a>

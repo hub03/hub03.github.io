@@ -1,827 +1,232 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="fr">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>📅</title>
-  <style>
-:root {
-  --bg: #fefeee;          /* Fond crème (stone-50) */
-  --card-bg: #fdfcf8;     /* Cartes blanc cassé */
-  --accent: #10b981;      /* Vert émeraude (emerald-500) */
-  --accent-glow: rgba(16, 185, 129, 0.2);
-  --text: #1f2937;        /* Texte gris foncé (gray-800) */
-  --text-muted: #6b7280;   /* Texte gris (gray-500) */
-  --today-bg: #059669;    /* Vert plus foncé pour le jour actuel (emerald-600) */
-  --border: #d1d5db;      /* Bordures grises (gray-300) */
-}
-    
-.hero-card, .modal-card, .season-row {
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.1);
-}
-
-canvas {
-  filter: drop-shadow(0 0 10px rgba(14, 165, 233, 0.3));
-}
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: system-ui, -apple-system, sans-serif;
-    }
-
-    body {
-      background-color: var(--bg);
-      color: var(--text);
-      min-height: 100vh;
-      padding: 2rem 1rem;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      position: relative;
-    }
-
-    .help-btn, .timezone-btn {
-      position: fixed;
-      top: 1.5rem;
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      background: var(--card-bg);
-      border: 1px solid var(--border);
-      color: var(--text-muted);
-      font-size: 1rem;
-      font-weight: bold;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.2s;
-      z-index: 100;
-    }
-
-    .help-btn {
-      right: 1.5rem;
-    }
-
-    .timezone-btn {
-      right: 60px;
-    }
-
-    .help-btn:hover, .timezone-btn:hover {
-      color: var(--accent);
-      border-color: var(--accent);
-      box-shadow: 0 0 10px var(--accent-glow);
-    }
-
-    .modal-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      background: rgba(15, 23, 42, 0.8);
-      backdrop-filter: blur(4px);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      z-index: 1000;
-      padding: 1rem;
-    }
-
-    .modal-overlay.visible {
-      display: flex;
-    }
-
-    .modal-card {
-      background: var(--card-bg);
-      border: 1px solid var(--border);
-      border-radius: 1.5rem;
-      max-width: 650px;
-      width: 100%;
-      max-height: 85vh;
-      display: flex;
-      flex-direction: column;
-      box-shadow: 0 20px 40px rgba(0,0,0,0.5);
-      overflow: hidden;
-    }
-
-    .modal-header {
-      padding: 1.2rem 1.5rem;
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 1rem;
-    }
-
-    .lang-select {
-      background: var(--bg);
-      color: var(--accent);
-      border: 1px solid var(--border);
-      padding: 0.4rem 0.8rem;
-      border-radius: 0.5rem;
-      font-size: 0.9rem;
-      font-weight: 600;
-      outline: none;
-      cursor: pointer;
-    }
-
-    .close-btn {
-      background: none;
-      border: none;
-      color: var(--text-muted);
-      font-size: 1.5rem;
-      cursor: pointer;
-      line-height: 1;
-    }
-
-    .close-btn:hover {
-      color: var(--text);
-    }
-
-    .modal-body {
-      padding: 1.5rem;
-      overflow-y: auto;
-      font-size: 0.95rem;
-      line-height: 1.6;
-      color: var(--text-muted);
-    }
-
-    .modal-body h2 {
-      color: var(--accent);
-      font-size: 1.4rem;
-      margin-bottom: 0.8rem;
-    }
-
-    .modal-body h3 {
-      color: var(--text);
-      font-size: 1.1rem;
-      margin: 1.2rem 0 0.4rem 0;
-    }
-
-    .modal-body p {
-      margin-bottom: 0.8rem;
-    }
-
-    .modal-body ul {
-      margin-left: 1.2rem;
-      margin-bottom: 0.8rem;
-    }
-
-    .hero-card {
-      background: var(--card-bg);
-      border: 1px solid var(--border);
-      border-radius: 1.5rem;
-      padding: 2rem 3rem;
-      text-align: center;
-      box-shadow: 0 10px 30px var(--accent-glow);
-      cursor: pointer;
-      user-select: none;
-      transition: transform 0.2s, border-color 0.2s;
-      max-width: 600px;
-      width: 100%;
-      margin-top: 1rem;
-    }
-
-    .hero-card:hover {
-      transform: translateY(-2px);
-      border-color: var(--accent);
-    }
-
-    .clock {
-      font-size: 3rem;
-      font-weight: 800;
-      font-family: monospace;
-      color: var(--accent);
-      margin-bottom: 0.8rem;
-    }
-
-    .current-date {
-      font-size: 1.5rem;
-      font-weight: 700;
-      color: var(--text);
-    }
-
-    /* Style du conteneur du globe */
-    .globe-wrapper {
-      margin-top: 3rem;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      transition: opacity 0.3s ease;
-    }
-
-    .globe-wrapper.hidden {
-      display: none;
-    }
-
-    canvas {
-      filter: drop-shadow(0 0 15px var(--accent-glow));
-    }
-
-    .year-nav {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 1.5rem;
-      margin: 2rem 0 1.5rem 0;
-      width: 100%;
-      max-width: 1000px;
-    }
-
-    .nav-btn {
-      background: var(--card-bg);
-      border: 1px solid var(--border);
-      color: var(--accent);
-      font-size: 1.2rem;
-      font-weight: bold;
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: background 0.2s, border-color 0.2s;
-    }
-
-    .nav-btn:hover {
-      border-color: var(--accent);
-      background: rgba(56, 189, 248, 0.1);
-    }
-
-    .year-display {
-      font-size: 1.5rem;
-      font-weight: 800;
-      color: var(--text);
-    }
-
-    .calendar-container {
-      width: 100%;
-      max-width: 1000px;
-      display: none;
-      flex-direction: column;
-      align-items: center;
-    }
-
-    .calendar-container.visible {
-      display: flex;
-    }
-
-    .calendar-rows {
-      display: flex;
-      flex-direction: column;
-      gap: 1.5rem;
-      width: 100%;
-    }
-
-    .season-row {
-      background: var(--card-bg);
-      border: 1px solid var(--border);
-      border-radius: 1rem;
-      padding: 1.2rem;
-      display: flex;
-      flex-direction: column;
-      gap: 0.8rem;
-      transition: border-color 0.2s;
-    }
-
-    .season-row:hover {
-      border-color: var(--accent);
-    }
-
-    .season-title {
-      font-size: 1.2rem;
-      font-weight: 800;
-      color: var(--accent);
-    }
-
-    .months-container {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 1.2rem;
-    }
-
-    @media (max-width: 768px) {
-      .months-container {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    .month-card {
-      background: rgba(15, 23, 42, 0.4);
-      border: 1px solid var(--border);
-      border-radius: 0.8rem;
-      padding: 0.8rem;
-      display: flex;
-      flex-direction: column;
-    }
-
-    .month-label {
-      font-size: 0.85rem;
-      font-weight: 800;
-      color: var(--accent);
-      margin-bottom: 0.6rem;
-      text-align: center;
-      border-bottom: 1px dashed var(--border);
-      padding-bottom: 0.4rem;
-    }
-
-    .days-grid {
-      display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      gap: 0.3rem;
-      text-align: center;
-    }
-
-    .day-cell {
-      aspect-ratio: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.8rem;
-      border-radius: 0.4rem;
-      background: rgba(255, 255, 255, 0.03);
-      color: var(--text);
-    }
-
-    .day-cell.today {
-      background: var(--today-bg);
-      color: #fff;
-      font-weight: 800;
-      box-shadow: 0 0 12px var(--accent);
-    }
-  </style>
-</head>
-<body>
-
-  <button class="timezone-btn" id="toggle-timezone" title="Basculer entre UTC et heure locale">UTC</button>
-  <button class="help-btn" id="open-help" title="Explications">?</button>
-
-  <div class="modal-overlay" id="modal-overlay">
-    <div class="modal-card">
-      <div class="modal-header">
-        <select class="lang-select" id="lang-select">
-          <option value="fr">Français</option>
-          <option value="en">English</option>
-          <option value="es">Español</option>
-          <option value="de">Deutsch</option>
-          <option value="zh">中文</option>
-          <option value="ja">日本語</option>
-          <option value="ar">العربية</option>
-          <option value="ru">Русский</option>
-        </select>
-        <button class="close-btn" id="close-help">&times;</button>
-      </div>
-      <div class="modal-body" id="modal-content"></div>
-    </div>
-  </div>
-
-  <div class="hero-card" id="hero-card">
-    <div class="clock" id="clock">00:00:00 UTC</div>
-    <div class="current-date" id="current-fixed-date">---</div>
-  </div>
-
-  <!-- Globe terrestre -->
-  <div class="globe-wrapper" id="globe-wrapper">
-    <canvas id="globeCanvas" width="280" height="280"></canvas>
-  </div>
-
-  <div class="calendar-container" id="calendar-container">
-    <div class="year-nav">
-      <button class="nav-btn" id="prev-year">&lt;</button>
-      <div class="year-display" id="displayed-year">---</div>
-      <button class="nav-btn" id="next-year">&gt;</button>
-    </div>
-
-    <div class="calendar-rows" id="calendar-rows"></div>
-  </div>
-
-  <script>
-    const I18N = {
-      fr: {
-        title: "Le Calendrier Cosmologique Universel",
-        intro: "Ce calendrier s'affranchit de toute tradition religieuse, politique ou nationale. Il repose uniquement sur la géométrie orbitale terrestre et une logique mathématique pure.",
-        hYear: "Origine de l'Année 1 (Ère Cénozoïque)",
-        pYear: "Le point zéro est fixé à l'impact de la météorite de Chicxulub (~66 038 000 ans BP), événement planétaire absolu ayant terminé l'ère des dinosaures et ouvert le règne des mammifères.",
-        hDay: "Origine du Jour 1 (Le Périhélie)",
-        pDay: "Le 1er jour de l'année est le Périhélie terrestre (~4 janvier) : le moment orbital exact où la Terre est au plus près du Soleil.",
-        hGrid: "Structure : 5 Saisons (S1-S5) × 3 Mois (M1-M3)",
-        pGrid: "L'année compte 5 saisons de 73 jours. Les jours de la semaine ne portent pas de nom : leur numéro indique directement leur position dans le cycle de 5 jours.",
-        li1: "Saisons : 5 lignes principales numérotées de S1 à S5.",
-        li2: "Mois : M1 et M2 comptent 25 jours (D1 à D25). M3 en compte 23 (D1 à D23) afin de respecter le rythme économique (loyers, abonnements).",
-        li3: "Jour bissextile : tous les 4 ans, le 366e jour est directement intégré à la fin de l'année en tant que 24e jour du mois S5 M3 (D24)."
-      },
-      en: {
-        title: "The Universal Cosmological Calendar",
-        intro: "This calendar is free from religious, political, or national traditions. It relies solely on Earth's orbital geometry and pure mathematical logic.",
-        hYear: "Origin of Year 1 (Cenozoic Era)",
-        pYear: "Year Zero is set at the Chicxulub asteroid impact (~66,038,000 BP), the planetary event ending the dinosaur era.",
-        hDay: "Origin of Day 1 (Perihelion)",
-        pDay: "Day 1 of the year is Earth's Perihelion (~Jan 4th), when Earth is closest to the Sun.",
-        hGrid: "Structure: 5 Seasons (S1-S5) × 3 Months (M1-M3)",
-        pGrid: "The year consists of 5 seasons of 73 days. Days carry no names; their position indicates their place in the 5-day cycle.",
-        li1: "Seasons: 5 main rows numbered S1 to S5.",
-        li2: "Months: M1 & M2 have 25 days (D1-D25). M3 has 23 days (D1-D23) to align with standard billing cycles.",
-        li3: "Leap year: Every 4 years, the 366th day is added directly to the end of the year as the 24th day of S5 M3 (D24)."
-      },
-      es: {
-        title: "El Calendario Cosmológico Universal",
-        intro: "Este calendario está libre de tradiciones religiosas o políticas. Se basa únicamente en la geometría orbital terrestre.",
-        hYear: "Origen del Año 1 (Era Cenozoica)",
-        pYear: "El año cero se establece en el impacto del asteroide Chicxulub (~66 038 000 AP).",
-        hDay: "Origen del Día 1 (Perihelio)",
-        pDay: "El día 1 del año es el Perihelio terrestre (~4 de enero).",
-        hGrid: "Estructura: 5 Estaciones (S1-S5) × 3 Meses (M1-M3)",
-        pGrid: "El año cuenta con 5 estaciones de 73 días. No hay nombres para los días: su número muestra su posición en el ciclo de 5 días.",
-        li1: "Estaciones: 5 filas principales de S1 a S5.",
-        li2: "Meses: M1 y M2 tienen 25 días (D1-D25). M3 tiene 23 días (D1-D23).",
-        li3: "Año bisiesto: Cada 4 años, el día 366 se añade al final del año como el 24.º día de S5 M3 (D24)."
-      },
-      de: {
-        title: "Der Universelle Kosmologische Kalender",
-        intro: "Dieser Kalender ist frei von religiösen oder politischen Traditionen. Er basiert auf orbitaler Geometrie und reiner Logik.",
-        hYear: "Ursprung von Jahr 1 (Känozoikum)",
-        pYear: "Jahr Null ist der Einschlag des Chicxulub-Asteroiden (~66.038.000 BP).",
-        hDay: "Ursprung von Tag 1 (Perihel)",
-        pDay: "Tag 1 des Jahres ist das Erdperihel (~4. Januar).",
-        hGrid: "Struktur: 5 Jahreszeiten (S1-S5) × 3 Monate (M1-M3)",
-        pGrid: "Das Jahr hat 5 Jahreszeiten zu 73 Tagen. Keine Wochentagsnamen: Die Zahl zeigt die Position im 5-Tage-Zyklus an.",
-        li1: "Saisons: 5 Hauptzeilen von S1 bis S5.",
-        li2: "Monate: M1 & M2 haben 25 Tage (D1-D25). M3 hat 23 Tage (D1-D23).",
-        li3: "Schaltjahr: Alle 4 Jahre wird der 366. Tag am Ende des Jahres als 24. Tag von S5 M3 (D24) angehängt."
-      },
-      zh: {
-        title: "宇宙通用历法",
-        intro: "本历法无宗教或政治背景，完全基于地球轨道几何学与数学逻辑。",
-        hYear: "第 1 年的由来（新生代）",
-        pYear: "元年定为希克苏鲁伯陨石撞击事件（约 66,038,000 年前）。",
-        hDay: "第 1 天的由来（近日点）",
-        pDay: "每年第 1 天为地球近日点（约 1 月 4 日）。",
-        hGrid: "结构：5 个季节 (S1-S5) × 3 个月份 (M1-M3)",
-        pGrid: "每年 5 个 73 天的季节。无星期名称，数字直接指示 5 天周期中的位置。",
-        li1: "季节：5 个主要行，编号 S1 至 S5。",
-        li2: "月份：M1 和 M2 为 25 天（D1-D25），M3 为 23 天（D1-D23）。",
-        li3: "闰年：每 4 年将第 366 天直接作为 S5 M3 的第 24 天（D24）附加于年末。"
-      },
-      ja: {
-        title: "宇宙汎用暦",
-        intro: "この暦は宗教や政治的伝統から完全に独立し、軌道幾何学に基づいています。",
-        hYear: "1年の起源（新生代）",
-        pYear: "紀元0年はチクシュルーブ隕石衝突（約66,038,000年前）です。",
-        hDay: "1日の起源（近日点）",
-        pDay: "一の第1日は地球の近日点（約1月4日）です。",
-        hGrid: "構造：5つの季節 (S1-S5) × 3つの月 (M1-M3)",
-        pGrid: "一年は73日間の5つの季節で構成されます。曜日の名前はなく、数字が5日周期内の位置を示します。",
-        li1: "季節：S1からS5までの5つの行。",
-        li2: "月：M1とM2は25日間（D1-D25）、M3は23日間（D1-D23）。",
-        li3: "うるう年：4年ごとに366日目がS5 M3の24日目（D24）として年末に追加されます。"
-      },
-      ar: {
-        title: "التقويم الكوني العالمي",
-        intro: "هذا التقويم خالي من أي تقاليد دينية أو سياسية، ويعتمد على الهندسة المدارية والمنطق الرياضي.",
-        hYear: "أصل السنة 1 (العصر الحديث)",
-        pYear: "سنة الصفر هي اصطدام كويكب تشيكشولوب (حوالي 66,038,000 سنة).",
-        hDay: "أصل اليوم 1 (الحضيض الشمسي)",
-        pDay: "اليوم الأول هو الحضيض الشمسي للأرض (حوالي 4 يناير).",
-        hGrid: "الهيكل: 5 فصول (S1-S5) × 3 أشهر (M1-M3)",
-        pGrid: "السنة 5 فصول من 73 يوماً. لا توجد أسماء للأيام، حيث يشير الرقم مباشرة إلى موقعه في الدورة.",
-        li1: "الفصول: 5 أسطر رئيسية مرقمة من S1 إلى S5.",
-        li2: "الأشهر: M1 و M2 يتكونان من 25 يوماً، و M3 من 23 يوماً.",
-        li3: "السنة الكبيسة: كل 4 سنوات، يضاف اليوم 366 مباشرة كـ اليوم 24 من S5 M3 (D24)."
-      },
-      ru: {
-        title: "Вселенский Космологический Календарь",
-        intro: "Этот календарь свободен от религиозных и политических традиций. Он основан на орбитальной геометрии.",
-        hYear: "Происхождение 1-го года (Кайнозой)",
-        pYear: "Нулевой год — падение Чикшулубского метеорита (~66 038 000 лет назад).",
-        hDay: "Происхождение 1-го дня (Перигелий)",
-        pDay: "1-й день года — перигелий Земли (~4 января).",
-        hGrid: "Структура: 5 Сезонов (S1-S5) × 3 Месяца (M1-M3)",
-        pGrid: "Год состоит из 5 сезонов по 73 дня. Названия дней упразднены.",
-        li1: "Сезоны: 5 основных строк с S1 по S5.",
-        li2: "Месяцы: M1 и M2 содержат по 25 дней (D1-D25), M3 — 23 дня (D1-D23).",
-        li3: "Високосный год: каждые 4 года 366-й день добавляется в конец года как 24-й день S5 M3 (D24)."
-      }
-    };
-
-    const CENOZOIC_BASE = 66038000;
-    let currentGregorianYear = new Date().getUTCFullYear();
-    let selectedGregorianYear = currentGregorianYear;
-    let isGlobeActive = true;
-    let animFrameId = null;
-    let useUTC = true; // Basculer entre UTC et heure locale
-
-    function getCenozoicYear(gregorianYear) {
-      return CENOZOIC_BASE + (gregorianYear - 1950);
-    }
-
-    function formatYear(year) {
-      return year.toLocaleString('fr-FR');
-    }
-
-    function isLeapYear(year) {
-      return (year % 4 === 0 && year % 100 !== 0) || (year % 400 === 0);
-    }
-
-    function getOrbitalDay(date) {
-      const year = date.getUTCFullYear();
-      // Crée le périhélie en UTC (4 janvier à 00:00:00 UTC)
-      let perihelion = new Date(Date.UTC(year, 0, 4, 0, 0, 0, 0));
-
-      let start = perihelion;
-      // Compare les timestamps UTC
-      if (date.getTime() < perihelion.getTime()) {
-        start = new Date(Date.UTC(year - 1, 0, 4, 0, 0, 0, 0));
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#0b1020" />
+    <title>Accueil</title>
+    <style>
+      :root {
+        --bg: #0b1020;
+        --bg-soft: #121a33;
+        --card: rgba(255, 255, 255, 0.06);
+        --card-border: rgba(255, 255, 255, 0.10);
+        --text: #eef1f8;
+        --text-dim: #9aa4bf;
+        --accent: #6c8cff;
+        --radius: 20px;
       }
 
-      const diff = date.getTime() - start.getTime();
-      const oneDay = 1000 * 60 * 60 * 24;
-      return Math.floor(diff / oneDay) + 1;
-    }
+      * { margin: 0; padding: 0; box-sizing: border-box; }
 
-    function convertToFixedDate(date) {
-      const dayOfYear = getOrbitalDay(date);
-      const cenozoicYear = getCenozoicYear(date.getUTCFullYear());
+      html, body { height: 100%; }
 
-      if (dayOfYear <= 365) {
-        const seasonIndex = Math.floor((dayOfYear - 1) / 73) + 1;
-        const dayOfSeason = ((dayOfYear - 1) % 73) + 1;
-
-        let monthInSeason = 1;
-        let dayInMonth = dayOfSeason;
-
-        if (dayOfSeason > 50) {
-          monthInSeason = 3;
-          dayInMonth = dayOfSeason - 50;
-        } else if (dayOfSeason > 25) {
-          monthInSeason = 2;
-          dayInMonth = dayOfSeason - 25;
-        }
-
-        return {
-          season: seasonIndex,
-          month: monthInSeason,
-          day: dayInMonth,
-          year: cenozoicYear
-        };
-      } else {
-        return {
-          season: 5,
-          month: 3,
-          day: 24,
-          year: cenozoicYear
-        };
-      }
-    }
-
-    function updateClockAndHeader() {
-      const now = new Date();
-      let hrs, mins, secs, timezoneLabel;
-
-      if (useUTC) {
-        hrs = String(now.getUTCHours()).padStart(2, '0');
-        mins = String(now.getUTCMinutes()).padStart(2, '0');
-        secs = String(now.getUTCSeconds()).padStart(2, '0');
-        timezoneLabel = 'UTC';
-      } else {
-        hrs = String(now.getHours()).padStart(2, '0');
-        mins = String(now.getMinutes()).padStart(2, '0');
-        secs = String(now.getSeconds()).padStart(2, '0');
-        timezoneLabel = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      body {
+        font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+        background:
+          radial-gradient(1000px 500px at 80% -10%, rgba(108, 140, 255, 0.18), transparent 60%),
+          radial-gradient(700px 400px at -10% 110%, rgba(160, 108, 255, 0.14), transparent 60%),
+          var(--bg);
+        color: var(--text);
+        min-height: 100dvh;
+        display: flex;
+        flex-direction: column;
+        -webkit-font-smoothing: antialiased;
       }
 
-      document.getElementById('clock').textContent = `${hrs}:${mins}:${secs} ${timezoneLabel}`;
-
-      const fixed = convertToFixedDate(now);
-      const dateString = `${formatYear(fixed.year)} / S${fixed.season} / M${fixed.month} / D${fixed.day}`;
-      document.getElementById('current-fixed-date').textContent = dateString;
-    }
-
-    function renderCalendar() {
-      const container = document.getElementById('calendar-rows');
-      container.innerHTML = '';
-
-      const displayedCenozoicYear = getCenozoicYear(selectedGregorianYear);
-      document.getElementById('displayed-year').textContent = formatYear(displayedCenozoicYear);
-
-      const now = new Date();
-      const fixedToday = convertToFixedDate(now);
-      const leap = isLeapYear(selectedGregorianYear);
-
-      for (let s = 1; s <= 5; s++) {
-        const seasonRow = document.createElement('div');
-        seasonRow.className = 'season-row';
-
-        const title = document.createElement('div');
-        title.className = 'season-title';
-        title.textContent = `S${s}`;
-        seasonRow.appendChild(title);
-
-        const monthsContainer = document.createElement('div');
-        monthsContainer.className = 'months-container';
-
-        const m3Days = (s === 5 && leap) ? 24 : 23;
-
-        const monthsConfig = [
-          { m: 1, totalDays: 25 },
-          { m: 2, totalDays: 25 },
-          { m: 3, totalDays: m3Days }
-        ];
-
-        monthsConfig.forEach(cfg => {
-          const monthCard = document.createElement('div');
-          monthCard.className = 'month-card';
-
-          const monthLabel = document.createElement('div');
-          monthLabel.className = 'month-label';
-          monthLabel.textContent = `M${cfg.m}`;
-          monthCard.appendChild(monthLabel);
-
-          const daysGrid = document.createElement('div');
-          daysGrid.className = 'days-grid';
-
-          for (let d = 1; d <= cfg.totalDays; d++) {
-            const cell = document.createElement('div');
-            cell.className = 'day-cell';
-            cell.textContent = d;
-
-            if (selectedGregorianYear === now.getUTCFullYear() && fixedToday.season === s && fixedToday.month === cfg.m && fixedToday.day === d) {
-              cell.classList.add('today');
-            }
-            daysGrid.appendChild(cell);
-          }
-
-          monthCard.appendChild(daysGrid);
-          monthsContainer.appendChild(monthCard);
-        });
-
-        seasonRow.appendChild(monthsContainer);
-        container.appendChild(seasonRow);
+      main {
+        width: 100%;
+        max-width: 480px;
+        margin: 0 auto;
+        padding: 28px 20px 40px;
+        flex: 1;
       }
-    }
 
-    /* Logic du Globe Wireframe */
-    const canvas = document.getElementById('globeCanvas');
-    const ctx = canvas.getContext('2d');
-    const width = canvas.width;
-    const height = canvas.height;
-    const cx = width / 2;
-    const cy = height / 2;
-    const radius = 100;
-    const tilt = 23.44 * (Math.PI / 180);
+      /* ----- En-tête ----- */
+      header { margin-bottom: 28px; }
 
-    function drawGlobe() {
-      if (!isGlobeActive) return;
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.72rem;
+        font-weight: 600;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--text-dim);
+        background: var(--card);
+        border: 1px solid var(--card-border);
+        border-radius: 999px;
+        padding: 6px 12px;
+        margin-bottom: 16px;
+      }
 
-      ctx.clearRect(0, 0, width, height);
+      .badge .dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: #4ade80;
+        box-shadow: 0 0 8px #4ade80;
+      }
 
-      const now = new Date();
-      const secondsInDay = (now.getUTCHours() * 3600) +
-                           (now.getUTCMinutes() * 60) +
-                           now.getUTCSeconds() +
-                           (now.getUTCMilliseconds() / 1000);
+      h1 {
+        font-size: clamp(1.7rem, 6vw, 2.1rem);
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        line-height: 1.15;
+      }
 
-      // Vitesse ralentie de moitié : 2880 (1 tour complet en ~30s)
-      const SPEED_FACTOR = 2880;
-      const rotationAngle = ((secondsInDay * SPEED_FACTOR) / 86400) * (2 * Math.PI);
+      h1 span {
+        background: linear-gradient(90deg, #6c8cff, #b48cff);
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
 
-      ctx.save();
-      ctx.translate(cx, cy);
-      ctx.rotate(tilt);
+      header p {
+        margin-top: 8px;
+        color: var(--text-dim);
+        font-size: 0.95rem;
+        line-height: 1.5;
+      }
 
-      // Silhouette du globe
-      ctx.beginPath();
-      ctx.arc(0, 0, radius, 0, Math.PI * 2);
-      ctx.strokeStyle = '#38bdf8';
-      ctx.lineWidth = 1.5;
-      ctx.stroke();
+      /* ----- Grille de navigation ----- */
+      nav {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 14px;
+      }
 
-      // Axe de rotation (pointillé)
-      ctx.beginPath();
-      ctx.moveTo(0, -radius - 12);
-      ctx.lineTo(0, radius + 12);
-      ctx.strokeStyle = '#334155';
-      ctx.lineWidth = 1;
-      ctx.setLineDash([4, 4]);
-      ctx.stroke();
-      ctx.setLineDash([]);
+      nav a.tile {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        text-decoration: none;
+        color: var(--text);
+        background: var(--card);
+        border: 1px solid var(--card-border);
+        border-radius: var(--radius);
+        padding: 18px 16px;
+        min-height: 148px;
+        position: relative;
+        overflow: hidden;
+        transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease;
+        -webkit-tap-highlight-color: transparent;
+      }
 
-      // Parallèles (Latitudes)
-      const parallels = [-60, -30, 0, 30, 60];
-      parallels.forEach(lat => {
-        const radLat = lat * (Math.PI / 180);
-        const y = -radius * Math.sin(radLat);
-        const rLat = radius * Math.cos(radLat);
+      nav a.tile:first-child { grid-column: 1 / -1; flex-direction: row; align-items: center; min-height: 128px; }
 
-        ctx.beginPath();
-        ctx.ellipse(0, y, rLat, rLat * 0.3, 0, 0, Math.PI * 2);
-        ctx.strokeStyle = lat === 0 ? 'rgba(56, 189, 248, 0.6)' : 'rgba(148, 163, 184, 0.2)';
-        ctx.lineWidth = lat === 0 ? 1.2 : 0.8;
-        ctx.stroke();
-      });
+      nav a.tile:active { transform: scale(0.97); }
 
-      // Méridiens (Longitudes)
-      const meridianCount = 12;
-      for (let i = 0; i < meridianCount; i++) {
-        const angle = rotationAngle + (i * (Math.PI * 2 / meridianCount));
-        const xOffset = Math.sin(angle) * radius;
-
-        if (Math.cos(angle) > 0) {
-          ctx.beginPath();
-          ctx.ellipse(0, 0, Math.abs(xOffset), radius, 0, 0, Math.PI * 2);
-          ctx.strokeStyle = 'rgba(56, 189, 248, 0.35)';
-          ctx.lineWidth = 0.8;
-          ctx.stroke();
+      @media (hover: hover) {
+        nav a.tile:hover {
+          transform: translateY(-3px);
+          border-color: rgba(108, 140, 255, 0.45);
+          background: rgba(255, 255, 255, 0.09);
         }
       }
 
-      ctx.restore();
-
-      animFrameId = requestAnimationFrame(drawGlobe);
-    }
-
-    function updateModalLanguage(lang) {
-      const data = I18N[lang] || I18N.fr;
-      const content = document.getElementById('modal-content');
-      content.innerHTML = `
-        <h2>${data.title}</h2>
-        <p>${data.intro}</p>
-        <h3>${data.hYear}</h3>
-        <p>${data.pYear}</p>
-        <h3>${data.hDay}</h3>
-        <p>${data.pDay}</p>
-        <h3>${data.hGrid}</h3>
-        <p>${data.pGrid}</p>
-        <ul>
-          <li>${data.li1}</li>
-          <li>${data.li2}</li>
-          <li>${data.li3}</li>
-        </ul>
-      `;
-    }
-
-    document.getElementById('open-help').addEventListener('click', () => {
-      document.getElementById('modal-overlay').classList.add('visible');
-    });
-
-    document.getElementById('close-help').addEventListener('click', () => {
-      document.getElementById('modal-overlay').classList.remove('visible');
-    });
-
-    document.getElementById('modal-overlay').addEventListener('click', (e) => {
-      if (e.target.id === 'modal-overlay') {
-        document.getElementById('modal-overlay').classList.remove('visible');
+      .icon {
+        width: 46px;
+        height: 46px;
+        flex-shrink: 0;
+        border-radius: 14px;
+        display: grid;
+        place-items: center;
+        font-size: 1.35rem;
       }
-    });
 
-    document.getElementById('lang-select').addEventListener('change', (e) => {
-      updateModalLanguage(e.target.value);
-    });
+      .tile:first-child .icon { width: 54px; height: 54px; font-size: 1.6rem; }
 
-    // Basculer entre UTC et heure locale
-    document.getElementById('toggle-timezone').addEventListener('click', () => {
-      useUTC = !useUTC;
-      document.getElementById('toggle-timezone').textContent = useUTC ? 'UTC' : 'Local';
-      updateClockAndHeader();
-    });
+      .t-discover  { background: rgba(108, 140, 255, 0.16); color: #8fa6ff; }
+      .t-note      { background: rgba(255, 193, 84, 0.14); color: #ffc554; }
+      .t-partage   { background: rgba(94, 219, 158, 0.14); color: #5edb9e; }
+      .t-prios     { background: rgba(255, 116, 137, 0.14); color: #ff7485; }
+      .t-red       { background: rgba(180, 140, 255, 0.14); color: #b48cff; }
 
-    // Basculement Calendrier <-> Globe
-    document.getElementById('hero-card').addEventListener('click', () => {
-      const calendarContainer = document.getElementById('calendar-container');
-      const globeWrapper = document.getElementById('globe-wrapper');
+      .tile-body { display: flex; flex-direction: column; gap: 4px; }
 
-      const isCalendarVisible = calendarContainer.classList.toggle('visible');
+      .tile h2 { font-size: 1.02rem; font-weight: 650; letter-spacing: -0.01em; }
+      .tile p  { font-size: 0.82rem; color: var(--text-dim); line-height: 1.45; }
 
-      if (isCalendarVisible) {
-        // Masquer le globe
-        globeWrapper.classList.add('hidden');
-        isGlobeActive = false;
-        if (animFrameId) cancelAnimationFrame(animFrameId);
-      } else {
-        // Réafficher le globe
-        globeWrapper.classList.remove('hidden');
-        isGlobeActive = true;
-        drawGlobe();
+      .arrow {
+        position: absolute;
+        top: 16px;
+        right: 16px;
+        color: var(--text-dim);
+        font-size: 0.95rem;
+        opacity: 0.7;
+        transition: transform 0.18s ease, opacity 0.18s ease;
       }
-    });
 
-    document.getElementById('prev-year').addEventListener('click', () => {
-      selectedGregorianYear--;
-      renderCalendar();
-    });
+      nav a.tile:active .arrow { transform: translateX(3px); opacity: 1; }
 
-    document.getElementById('next-year').addEventListener('click', () => {
-      selectedGregorianYear++;
-      renderCalendar();
-    });
+      /* ----- Pied de page ----- */
+      footer {
+        margin-top: 32px;
+        text-align: center;
+        font-size: 0.75rem;
+        color: var(--text-dim);
+        opacity: 0.8;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header>
+        <div class="badge"><span class="dot"></span> Accueil</div>
+        <h1>Bienvenue <span>👋</span><br />Que voulez-vous faire&nbsp;?</h1>
+        <p>Choisissez une section pour continuer.</p>
+      </header>
 
-    updateModalLanguage('fr');
-    renderCalendar();
-    updateClockAndHeader();
-    setInterval(updateClockAndHeader, 1000);
-    drawGlobe();
-  </script>
-</body>
+      <nav>
+        <a class="tile" href="discover.html">
+          <span class="icon t-discover">🧭</span>
+          <span class="tile-body">
+            <h2>Découvrir</h2>
+            <p>Explorez de nouveaux contenus et inspirations.</p>
+          </span>
+          <span class="arrow">→</span>
+        </a>
+
+        <a class="tile" href="note.html">
+          <span class="icon t-note">📝</span>
+          <span class="tile-body">
+            <h2>Notes</h2>
+            <p>Prenez et relisez vos notes.</p>
+          </span>
+          <span class="arrow">→</span>
+        </a>
+
+        <a class="tile" href="partage.html">
+          <span class="icon t-partage">📤</span>
+          <span class="tile-body">
+            <h2>Partage</h2>
+            <p>Partagez du contenu avec vos proches.</p>
+          </span>
+          <span class="arrow">→</span>
+        </a>
+
+        <a class="tile" href="prios.html">
+          <span class="icon t-prios">⭐</span>
+          <span class="tile-body">
+            <h2>Priorités</h2>
+            <p>Gérez vos tâches et priorités.</p>
+          </span>
+          <span class="arrow">→</span>
+        </a>
+
+        <a class="tile" href="red.html">
+          <span class="icon t-red">✍️</span>
+          <span class="tile-body">
+            <h2>Rédaction</h2>
+            <p>Rédigez et publiez vos textes.</p>
+          </span>
+          <span class="arrow">→</span>
+        </a>
+      </nav>
+
+      <footer>© 2026 — Tous droits réservés</footer>
+    </main>
+  </body>
 </html>

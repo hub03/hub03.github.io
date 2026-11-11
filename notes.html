@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#202124" media="(prefers-color-scheme: dark)">
+<title>Notes</title>
+<style>
+  /* ===== Couleurs (clair / sombre automatique) ===== */
+  :root{--bg:#fff;--fg:#202124;--muted:#5f6368;--border:#e0e0e0;--bar:#f1f3f4;--shadow:rgba(0,0,0,.25)}
+  @media (prefers-color-scheme: dark){
+    :root{--bg:#202124;--fg:#e8eaed;--muted:#9aa0a6;--border:#5f6368;--bar:#303134;--shadow:rgba(0,0,0,.6)}
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--bg);color:var(--fg);
+    font-family:system-ui,-apple-system,Roboto,"Segoe UI",sans-serif;-webkit-tap-highlight-color:transparent}
+  button{font-family:inherit}
+
+  /* ===== Barre de recherche ===== */
+  header{position:sticky;top:0;z-index:5;background:var(--bg);
+    padding:10px 12px;padding-top:max(10px,env(safe-area-inset-top))}
+  .search{display:flex;align-items:center;gap:2px;background:var(--bar);border-radius:24px;height:48px;padding:0 4px 0 16px}
+  .search input{flex:1;min-width:0;border:0;background:transparent;color:var(--fg);font-size:16px;outline:none}
+  .iconbtn{flex:none;border:0;background:transparent;color:var(--muted);width:44px;height:44px;border-radius:50%;
+    display:grid;place-items:center;cursor:pointer}
+  .iconbtn:active{background:var(--border)}
+  .iconbtn svg{width:24px;height:24px;fill:currentColor}
+
+  /* ===== Grille des notes ===== */
+  #grid{columns:2;column-gap:10px;padding:4px 12px 110px}
+  @media (min-width:700px){#grid{columns:3}}
+  @media (min-width:1000px){#grid{columns:4;max-width:1100px;margin:0 auto}}
+  .card{break-inside:avoid;border:1px solid var(--border);border-radius:8px;padding:12px 14px;margin-bottom:10px;cursor:pointer}
+  .card:active{box-shadow:0 1px 4px var(--shadow)}
+  .card h3{margin:0 0 6px;font-size:16px;font-weight:600;overflow-wrap:anywhere}
+  .card p{margin:0;font-size:14px;line-height:1.4;white-space:pre-wrap;overflow-wrap:anywhere;
+    display:-webkit-box;-webkit-line-clamp:10;-webkit-box-orient:vertical;overflow:hidden}
+  #status{text-align:center;color:var(--muted);padding:30px 20px;font-size:14px}
+
+  /* ===== Bouton + ===== */
+  .fab{position:fixed;right:16px;bottom:max(20px,env(safe-area-inset-bottom));width:58px;height:58px;border-radius:16px;
+    border:0;background:var(--bar);color:var(--fg);box-shadow:0 2px 8px var(--shadow);display:grid;place-items:center;cursor:pointer}
+  .fab svg{width:32px;height:32px;fill:currentColor}
+
+  /* ===== Éditeur plein écran ===== */
+  #editor{position:fixed;inset:0;z-index:10;background:var(--bg);display:none;flex-direction:column}
+  #editor.open{display:flex}
+  .ebar{display:flex;justify-content:space-between;align-items:center;padding:6px;padding-top:max(6px,env(safe-area-inset-top))}
+  #etitle{border:0;background:transparent;color:var(--fg);font-size:22px;font-family:inherit;padding:8px 16px;outline:none}
+  #etext{flex:1;border:0;background:transparent;color:var(--fg);font-size:17px;line-height:1.5;font-family:inherit;
+    padding:8px 16px;padding-bottom:max(16px,env(safe-area-inset-bottom));resize:none;outline:none}
+  #editor.busy{opacity:.6;pointer-events:none}
+
+  /* ===== Petit message en bas ===== */
+  #toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:#323232;color:#fff;padding:12px 18px;
+    border-radius:6px;font-size:14px;z-index:20;opacity:0;transition:opacity .2s;pointer-events:none;max-width:90vw;text-align:center}
+  #toast.show{opacity:1}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="search">
+    <input id="q" type="search" placeholder="Rechercher dans les notes" autocomplete="off">
+    <button class="iconbtn" id="btnReload" title="Recharger">
+      <svg viewBox="0 0 24 24"><path d="M17.65 6.35A7.96 7.96 0 0 0 12 4a8 8 0 1 0 7.73 10h-2.08A6 6 0 1 1 12 6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
+    </button>
+    <button class="iconbtn" id="btnToken" title="Changer de token">
+      <svg viewBox="0 0 24 24"><path d="M12.65 10A6 6 0 1 0 12.65 14H17v4h4v-4h2v-4H12.65zM7 14a2 2 0 1 1 0-4 2 2 0 0 1 0 4z"/></svg>
+    </button>
+  </div>
+</header>
+
+<main>
+  <div id="status">Chargement…</div>
+  <div id="grid"></div>
+</main>
+
+<button class="fab" id="btnNew" title="Nouvelle note">
+  <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+</button>
+
+<div id="editor">
+  <div class="ebar">
+    <button class="iconbtn" id="btnBack" title="Retour (enregistre)">
+      <svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+    </button>
+    <button class="iconbtn" id="btnDelete" title="Supprimer">
+      <svg viewBox="0 0 24 24"><path d="M6 19a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+    </button>
+  </div>
+  <input id="etitle" placeholder="Titre" autocomplete="off">
+  <textarea id="etext" placeholder="Note"></textarea>
+</div>
+
+<div id="toast"></div>
+
+<script>
+// ============================================================
+//  RÉGLAGES — à adapter si besoin
+// ============================================================
+const OWNER  = "hub03";    // ton nom d'utilisateur GitHub
+const REPO   = "private";  // nom du repo PRIVÉ qui contient les .txt
+const FOLDER = "";         // dossier des notes dans ce repo ("" = racine, ex : "notes")
+// ============================================================
+
+const API = `https://api.github.com/repos/${OWNER}/${REPO}/contents`;
+const $ = id => document.getElementById(id);
+let notes = [];        // { name, path, sha, title, text }
+let current = null;    // note ouverte (null = nouvelle note)
+let skipSave = false;
+
+// ---------- Petits outils ----------
+function toast(msg, ms = 2500){
+  const t = $("toast"); t.textContent = msg; t.classList.add("show");
+  clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove("show"), ms);
+}
+function store(key, val){ try{ val === undefined ? localStorage.removeItem(key) : localStorage.setItem(key, val); }catch(e){} }
+function read(key){ try{ return localStorage.getItem(key); }catch(e){ return null; } }
+
+function getToken(force){
+  let t = read("gh_token");
+  if (!t || force){
+    t = prompt("Colle ton token GitHub (accès au repo privé) :");
+    if (!t) return null;
+    t = t.trim(); store("gh_token", t);
+  }
+  return t;
+}
+
+// Texte -> base64 en gardant les accents (UTF-8)
+function toBase64(str){
+  const bytes = new TextEncoder().encode(str);
+  let bin = ""; for (const b of bytes) bin += String.fromCharCode(b);
+  return btoa(bin);
+}
+
+// Appel à l'API GitHub
+async function gh(path, { method = "GET", body = null, raw = false } = {}){
+  const token = getToken();
+  if (!token) throw new Error("Aucun token");
+  const url = API + (path ? "/" + path.split("/").map(encodeURIComponent).join("/") : "");
+  const headers = {
+    "Authorization": "Bearer " + token,
+    "Accept": raw ? "application/vnd.github.raw+json" : "application/vnd.github+json"
+  };
+  if (body) headers["Content-Type"] = "application/json";
+  const r = await fetch(url, { method, headers, cache: "no-store", body: body ? JSON.stringify(body) : null });
+  if (r.status === 401){ store("gh_token"); throw new Error("Token refusé : recharge et colles-en un nouveau"); }
+  if (r.status === 404) throw new Error("Introuvable : vérifie le nom du repo et les droits du token");
+  if (r.status === 409) throw new Error("Conflit : la note a changé ailleurs, recharge la page");
+  if (!r.ok) throw new Error("Erreur GitHub " + r.status);
+  return raw ? r.text() : r.json();
+}
+
+// ---------- Chargement ----------
+async function load(){
+  $("status").style.display = "block";
+  $("status").textContent = "Chargement…";
+  $("grid").innerHTML = "";
+  try{
+    const list = await gh(FOLDER);
+    const files = list.filter(f => f.type === "file" && /\.txt$/i.test(f.name));
+    const result = new Array(files.length);
+    let i = 0;
+    // 6 téléchargements en parallèle maximum
+    async function worker(){
+      while (i < files.length){
+        const k = i++, f = files[k];
+        result[k] = { name: f.name, path: f.path, sha: f.sha,
+                      title: f.name.replace(/\.txt$/i, ""), text: await gh(f.path, { raw: true }) };
+        $("status").textContent = `Chargement… ${result.filter(Boolean).length}/${files.length}`;
+      }
+    }
+    await Promise.all(Array.from({ length: 6 }, worker));
+    notes = result;
+    render();
+  }catch(e){
+    $("status").textContent = e.message;
+  }
+}
+
+// ---------- Affichage ----------
+function render(){
+  const q = $("q").value.trim().toLowerCase();
+  const grid = $("grid");
+  grid.innerHTML = "";
+  const shown = notes
+    .filter(n => !q || n.title.toLowerCase().includes(q) || n.text.toLowerCase().includes(q))
+    .sort((a, b) => a.title.localeCompare(b.title, "fr", { numeric: true, sensitivity: "base" }));
+  for (const n of shown){
+    const card = document.createElement("div");
+    card.className = "card";
+    const h = document.createElement("h3"); h.textContent = n.title;
+    const p = document.createElement("p");  p.textContent = n.text;
+    card.append(h, p);
+    card.onclick = () => openEditor(n);
+    grid.append(card);
+  }
+  $("status").style.display = shown.length ? "none" : "block";
+  $("status").textContent = q ? "Aucune note trouvée" : "Aucune note pour l'instant";
+}
+
+// ---------- Éditeur ----------
+function openEditor(note){
+  current = note;
+  $("etitle").value = note ? note.title : "";
+  $("etext").value  = note ? note.text  : "";
+  $("editor").classList.add("open");
+  history.pushState({ editor: true }, "");
+  if (!note) $("etext").focus();
+}
+function hideEditor(){
+  $("editor").classList.remove("open");
+  store("draft");
+  current = null;
+  render();
+}
+
+// Nom de fichier propre à partir du titre (ou du début du texte)
+function makeFileName(title, text){
+  const clean = s => s.replace(/[\/\\:*?"<>|\r\n\t]+/g, " ").replace(/\s+/g, " ").trim().slice(0, 60).trim();
+  let base = clean(title) || clean(text.split("\n").find(l => l.trim()) || "");
+  if (!base) base = "Note " + new Date().toLocaleString("fr-FR").replace(/[\/:]/g, "-");
+  let name = base + ".txt", k = 2;
+  while (notes.some(n => n !== current && n.name.toLowerCase() === name.toLowerCase())){
+    name = `${base} (${k++}).txt`;
+  }
+  return name;
+}
+
+async function save(){
+  const title = $("etitle").value.trim();
+  const text  = $("etext").value;
+  if (!current && !title && !text.trim()) return;                        // note vide : rien à faire
+  if (current && title === current.title && text === current.text) return; // rien n'a changé
+
+  const name = (current && title === current.title) ? current.name : makeFileName(title, text);
+
+  if (current && name === current.name){
+    // Modification du contenu
+    const res = await gh(current.path, { method: "PUT",
+      body: { message: "Modifie " + name, content: toBase64(text), sha: current.sha } });
+    current.sha = res.content.sha;
+    current.text = text;
+  } else {
+    // Nouvelle note, ou titre changé (= nouveau fichier puis suppression de l'ancien)
+    const path = (FOLDER ? FOLDER + "/" : "") + name;
+    const res = await gh(path, { method: "PUT",
+      body: { message: (current ? "Renomme " : "Ajoute ") + name, content: toBase64(text) } });
+    if (current){
+      await gh(current.path, { method: "DELETE", body: { message: "Renomme " + current.name, sha: current.sha } });
+      notes = notes.filter(n => n !== current);
+    }
+    notes.push({ name, path: res.content.path, sha: res.content.sha, title: name.replace(/\.txt$/i, ""), text });
+  }
+  toast("Enregistré");
+}
+
+async function deleteNote(){
+  if (!current){ skipSave = true; history.back(); return; }   // nouvelle note : on abandonne
+  if (!confirm("Supprimer cette note ?")) return;
+  $("editor").classList.add("busy");
+  try{
+    await gh(current.path, { method: "DELETE", body: { message: "Supprime " + current.name, sha: current.sha } });
+    notes = notes.filter(n => n !== current);
+    toast("Note supprimée");
+    skipSave = true; history.back();
+  }catch(e){ toast(e.message, 4000); }
+  $("editor").classList.remove("busy");
+}
+
+// Bouton retour (flèche ou bouton retour d'Android) : enregistre puis ferme
+window.addEventListener("popstate", async () => {
+  if (!$("editor").classList.contains("open")) return;
+  if (skipSave){ skipSave = false; hideEditor(); return; }
+  $("editor").classList.add("busy");
+  try{
+    await save();
+    hideEditor();
+  }catch(e){
+    toast(e.message, 4000);
+    history.pushState({ editor: true }, "");   // on reste dans l'éditeur, rien n'est perdu
+  }
+  $("editor").classList.remove("busy");
+});
+
+// Brouillon de secours si le navigateur se ferme pendant l'écriture
+function saveDraft(){
+  store("draft", JSON.stringify({ path: current ? current.path : null, title: $("etitle").value, text: $("etext").value }));
+}
+function checkDraft(){
+  const raw = read("draft"); if (!raw) return;
+  let d; try{ d = JSON.parse(raw); }catch(e){ store("draft"); return; }
+  if (!confirm("Une note non enregistrée a été retrouvée. La rouvrir ?")){ store("draft"); return; }
+  openEditor(notes.find(n => n.path === d.path) || null);
+  $("etitle").value = d.title; $("etext").value = d.text;
+}
+
+// ---------- Boutons ----------
+$("btnNew").onclick    = () => openEditor(null);
+$("btnBack").onclick   = () => history.back();
+$("btnDelete").onclick = deleteNote;
+$("btnReload").onclick = load;
+$("btnToken").onclick  = () => { if (getToken(true)) load(); };
+$("q").oninput         = render;
+$("etitle").oninput    = saveDraft;
+$("etext").oninput     = saveDraft;
+
+load().then(checkDraft);
+</script>
+</body>
+</html>
